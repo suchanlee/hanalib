@@ -1,12 +1,17 @@
 'use client';
 
 import { BookHeart, Globe2, LockKeyhole, UsersRound } from 'lucide-react';
-import { useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
 import { oauthStartUrl } from './provider-config';
 
 const subscribeToEnvironment = () => () => undefined;
+
+interface AuthProviders {
+  google: boolean;
+  apple: boolean;
+}
 
 export function AuthView() {
   const { state, actions } = useHanaApp();
@@ -16,6 +21,27 @@ export function AuthView() {
     () => process.env.NEXT_PUBLIC_AUTH_DEMO_MODE === 'true',
     () => false,
   );
+  const [providers, setProviders] = useState<AuthProviders>();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch('/api/auth/providers', {
+      credentials: 'same-origin',
+      headers: { accept: 'application/json' },
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('provider-status-unavailable');
+        return response.json() as Promise<AuthProviders>;
+      })
+      .then(setProviders)
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === 'AbortError')) {
+          setProviders({ google: false, apple: false });
+        }
+      });
+    return () => controller.abort();
+  }, []);
 
   function beginSignIn(provider: 'google' | 'apple') {
     window.location.assign(oauthStartUrl(provider));
@@ -101,6 +127,7 @@ export function AuthView() {
           <Button
             className="h-12 w-full rounded-xl bg-foreground text-base text-background hover:bg-foreground/85"
             data-testid="auth-google"
+            disabled={providers?.google !== true}
             onClick={() => beginSignIn('google')}
           >
             <span aria-hidden="true" className="text-base font-bold">G</span>
@@ -109,12 +136,20 @@ export function AuthView() {
           <Button
             className="h-12 w-full rounded-xl text-base"
             data-testid="auth-apple"
+            disabled={providers?.apple !== true}
             onClick={() => beginSignIn('apple')}
             variant="outline"
           >
             <span aria-hidden="true" className="text-lg leading-none">●</span>
             {ko ? 'Apple로 계속' : 'Continue with Apple'}
           </Button>
+          {providers && (!providers.google || !providers.apple) && (
+            <output className="block px-2 text-center text-xs leading-5 text-muted-foreground" data-testid="auth-provider-status">
+              {ko
+                ? '로그인 연결을 준비 중이에요. 운영자가 제공자 설정을 완료한 뒤 이용할 수 있어요.'
+                : 'Sign-in setup is still in progress. Access will open after the provider configuration is complete.'}
+            </output>
+          )}
           {demoEnabled && (
             <div className="rounded-xl border border-dashed p-3 text-center" data-testid="auth-demo-note">
               <p className="text-xs leading-5 text-muted-foreground">
