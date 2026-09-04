@@ -25,3 +25,10 @@ void test('normalizes the NLK ISBN bibliographic response', () => {
   assert.equal(result?.pageCount, 263);
   assert.equal(result?.coverUrl, 'https://example.test/almond.jpg');
 });
+
+void test('does not accept a mismatched NLK record for the requested ISBN', () => {
+  const result = normalizeNlkResponse('9788936434267', {
+    docs: [{ TITLE: 'Wrong book', EA_ISBN: '9780593321201' }],
+  });
+  assert.equal(result, null);
+});

@@ -1,6 +1,7 @@
 # Local/production integration contract. Never commit real values.
 DEPLOYMENT_REGION=us-west
 PUBLIC_APP_URL=http://localhost:3000
+APP_RUNTIME_MODE=development
 
 # External OAuth. Configure callback URLs in Google Cloud and Apple Developer.
 GOOGLE_CLIENT_ID=
@@ -13,6 +14,13 @@ APPLE_PRIVATE_KEY=
 # ISBN metadata stitching.
 NLK_API_KEY=
 GOOGLE_BOOKS_API_KEY=
+# Local/test only. Production always rejects fixture fallback even if set.
+ISBN_FIXTURES_ENABLED=true
+
+# Signed member sessions. Use at least 32 random characters in production.
+SESSION_SIGNING_SECRET=
+# Local browser demo only. Never enable in production.
+ALLOW_DEMO_AUTH=true
 
 # US SMS and transactional email.
 TWILIO_ACCOUNT_SID=
