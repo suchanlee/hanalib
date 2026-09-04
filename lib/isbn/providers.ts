@@ -1,6 +1,6 @@
 import type { AddBookInput, AppLocale } from '@/lib/domain/types';
 
-export type MetadataSource = 'nlk' | 'google-books' | 'member' | 'fixture';
+export type MetadataSource = 'nlk' | 'naver' | 'google-books' | 'open-library' | 'member' | 'fixture';
 
 export interface MetadataCandidate {
   source: MetadataSource;
@@ -109,17 +109,19 @@ function firstValue<T>(candidates: MetadataCandidate[], sourceOrder: MetadataSou
 
 export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: MetadataCandidate[]): StitchedBookMetadata {
   const bibliographicOrder: MetadataSource[] = locale === 'ko'
-    ? ['nlk', 'google-books', 'fixture', 'member']
-    : ['google-books', 'nlk', 'fixture', 'member'];
-  const coverOrder: MetadataSource[] = ['google-books', 'nlk', 'fixture', 'member'];
+    ? ['nlk', 'naver', 'google-books', 'open-library', 'fixture', 'member']
+    : ['google-books', 'open-library', 'naver', 'nlk', 'fixture', 'member'];
+  const coverOrder: MetadataSource[] = ['naver', 'google-books', 'nlk', 'open-library', 'fixture', 'member'];
   const title = firstValue(candidates, bibliographicOrder, (candidate) => candidate.title);
-  const titleEn = firstValue(candidates, ['google-books', 'nlk', 'fixture'], (candidate) => candidate.titleEn);
+  const titleEn = firstValue(candidates, ['google-books', 'open-library', 'naver', 'nlk', 'fixture'], (candidate) => candidate.titleEn);
   const authors = firstValue(candidates, bibliographicOrder, (candidate) => candidate.authors);
   const publisher = firstValue(candidates, bibliographicOrder, (candidate) => candidate.publisher);
   const publishedYear = firstValue(candidates, bibliographicOrder, (candidate) => candidate.publishedYear);
   const language = firstValue(candidates, bibliographicOrder, (candidate) => candidate.language);
-  const pageCount = firstValue(candidates, ['google-books', 'nlk', 'fixture'], (candidate) => candidate.pageCount);
-  const description = firstValue(candidates, ['google-books', 'nlk', 'fixture'], (candidate) => candidate.description);
+  const pageCount = firstValue(candidates, ['google-books', 'open-library', 'nlk', 'naver', 'fixture'], (candidate) => candidate.pageCount);
+  const description = firstValue(candidates, locale === 'ko'
+    ? ['naver', 'google-books', 'nlk', 'open-library', 'fixture']
+    : ['google-books', 'open-library', 'naver', 'nlk', 'fixture'], (candidate) => candidate.description);
   const coverUrl = firstValue(candidates, coverOrder, (candidate) => candidate.coverUrl);
 
   const selections = { title, titleEn, authors, publisher, publishedYear, language, pageCount, description, coverUrl };

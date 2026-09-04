@@ -1,4 +1,5 @@
 import type { MetadataCandidate } from './providers';
+import { isbn10To13, normalizeIsbn } from './isbn.ts';
 
 interface GoogleVolumeInfo {
   title?: string;
@@ -8,7 +9,14 @@ interface GoogleVolumeInfo {
   description?: string;
   pageCount?: number;
   language?: string;
-  imageLinks?: { thumbnail?: string; smallThumbnail?: string };
+  imageLinks?: {
+    extraLarge?: string;
+    large?: string;
+    medium?: string;
+    small?: string;
+    thumbnail?: string;
+    smallThumbnail?: string;
+  };
   industryIdentifiers?: Array<{ type?: string; identifier?: string }>;
 }
 
@@ -16,22 +24,78 @@ export interface GoogleVolumesResponse {
   items?: Array<{ volumeInfo?: GoogleVolumeInfo }>;
 }
 
+export interface NaverBooksResponse {
+  items?: Array<{
+    title?: string;
+    image?: string;
+    author?: string;
+    publisher?: string;
+    pubdate?: string;
+    isbn?: string;
+    description?: string;
+  }>;
+}
+
+export interface OpenLibraryEditionResponse {
+  title?: string;
+  subtitle?: string;
+  authors?: Array<{ key?: string }>;
+  by_statement?: string;
+  publishers?: string[];
+  publish_date?: string;
+  number_of_pages?: number;
+  languages?: Array<{ key?: string }>;
+  covers?: number[];
+  isbn_10?: string[];
+  isbn_13?: string[];
+  description?: string | { value?: string };
+}
+
 function language(value?: string): MetadataCandidate['language'] {
   if (value === 'ko') return 'ko';
   if (value === 'en') return 'en';
-  return 'other';
+  return value ? 'other' : undefined;
 }
 
 function year(value?: string) {
-  const match = value?.match(/^\d{4}/);
+  const match = value?.match(/\d{4}/);
   return match ? Number(match[0]) : undefined;
 }
 
+function cleanMarkup(value?: string) {
+  if (!value) return undefined;
+  const cleaned = value
+    .replace(/<[^>]*>/g, '')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#(?:39|x27);/gi, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned || undefined;
+}
+
+function includesIsbn13(values: string[], isbn13: string) {
+  return values.some((value) => {
+    const normalized = normalizeIsbn(value);
+    return normalized === isbn13 || (normalized.length === 10 && isbn10To13(normalized) === isbn13);
+  });
+}
+
 export function normalizeGoogleBooksResponse(isbn13: string, response: GoogleVolumesResponse): Omit<MetadataCandidate, 'source'> | null {
-  const exact = response.items?.find(({ volumeInfo }) => volumeInfo?.industryIdentifiers?.some(({ identifier }) => identifier?.replace(/\D/g, '') === isbn13));
+  const exact = response.items?.find(({ volumeInfo }) => includesIsbn13(
+    volumeInfo?.industryIdentifiers?.flatMap(({ identifier }) => identifier ? [identifier] : []) ?? [],
+    isbn13,
+  ));
   const info = exact?.volumeInfo;
-  if (!info?.title || !info.authors?.length) return null;
-  const rawCover = info.imageLinks?.thumbnail ?? info.imageLinks?.smallThumbnail;
+  if (!info?.title) return null;
+  const rawCover = info.imageLinks?.extraLarge
+    ?? info.imageLinks?.large
+    ?? info.imageLinks?.medium
+    ?? info.imageLinks?.small
+    ?? info.imageLinks?.thumbnail
+    ?? info.imageLinks?.smallThumbnail;
 
   return {
     isbn13,
@@ -65,10 +129,7 @@ export function normalizeNlkResponse(isbn13: string, response: UnknownRecord): O
     ...records(response.RESULT),
     ...records(response.result),
   ];
-  const candidatesWithIsbn = candidates.filter((item) => text(item, 'EA_ISBN'));
-  const exact = candidates.find((item) => text(item, 'EA_ISBN')?.replace(/\D/g, '') === isbn13);
-  if (candidatesWithIsbn.length > 0 && !exact) return null;
-  const selected = exact ?? candidates[0];
+  const selected = candidates.find((item) => includesIsbn13(text(item, 'EA_ISBN')?.split(/\s+/) ?? [], isbn13));
   if (!selected) return null;
   const title = text(selected, 'TITLE');
   if (!title) return null;
@@ -85,5 +146,54 @@ export function normalizeNlkResponse(isbn13: string, response: UnknownRecord): O
     language: 'ko',
     pageCount: parsedPages && Number.isFinite(parsedPages) ? parsedPages : undefined,
     coverUrl: text(selected, 'TITLE_URL')?.replace(/^http:/, 'https:'),
+  };
+}
+
+export function normalizeNaverBooksResponse(isbn13: string, response: NaverBooksResponse): Omit<MetadataCandidate, 'source'> | null {
+  const exact = response.items?.find((item) => includesIsbn13(item.isbn?.split(/\s+/) ?? [], isbn13));
+  const title = cleanMarkup(exact?.title);
+  if (!exact || !title) return null;
+  const authors = cleanMarkup(exact.author)?.split(/[|^;,]/).map((value) => value.trim()).filter(Boolean);
+
+  return {
+    isbn13,
+    title,
+    authors,
+    publisher: cleanMarkup(exact.publisher),
+    publishedYear: year(exact.pubdate),
+    language: /[\uac00-\ud7a3]/.test(`${title} ${authors?.join(' ') ?? ''}`) ? 'ko' : undefined,
+    description: cleanMarkup(exact.description),
+    coverUrl: exact.image?.replace(/^http:/, 'https:'),
+  };
+}
+
+export function normalizeOpenLibraryEditionResponse(
+  isbn13: string,
+  response: OpenLibraryEditionResponse,
+  authorNames: string[] = [],
+): Omit<MetadataCandidate, 'source'> | null {
+  const identifiers = [...(response.isbn_13 ?? []), ...(response.isbn_10 ?? [])];
+  if (!includesIsbn13(identifiers, isbn13)) return null;
+  const baseTitle = cleanMarkup(response.title);
+  if (!baseTitle) return null;
+  const subtitle = cleanMarkup(response.subtitle);
+  const title = subtitle && !baseTitle.includes(subtitle) ? `${baseTitle}: ${subtitle}` : baseTitle;
+  const statementAuthor = cleanMarkup(response.by_statement)?.replace(/^by\s+/i, '');
+  const authors = authorNames.map((value) => value.trim()).filter(Boolean);
+  if (authors.length === 0 && statementAuthor) authors.push(statementAuthor);
+  const coverId = response.covers?.find((value) => Number.isInteger(value) && value > 0);
+  const rawDescription = typeof response.description === 'string' ? response.description : response.description?.value;
+  const languageKey = response.languages?.[0]?.key?.split('/').pop();
+
+  return {
+    isbn13,
+    title,
+    authors,
+    publisher: response.publishers?.find((value) => value.trim())?.trim(),
+    publishedYear: year(response.publish_date),
+    language: languageKey === 'kor' ? 'ko' : languageKey === 'eng' ? 'en' : languageKey ? 'other' : undefined,
+    pageCount: Number.isInteger(response.number_of_pages) && (response.number_of_pages ?? 0) > 0 ? response.number_of_pages : undefined,
+    description: cleanMarkup(rawDescription),
+    coverUrl: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false` : undefined,
   };
 }

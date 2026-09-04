@@ -6,6 +6,7 @@ void test('normalizes and validates Korean and English ISBN-13 fixtures', () => 
   assert.equal(normalizeIsbn('978-89-3643-426-7'), '9788936434267');
   assert.equal(isValidIsbn13('9788936434267'), true);
   assert.equal(isValidIsbn13('9780593321201'), true);
+  assert.equal(isValidIsbn13('9791186701140'), true);
   assert.equal(isValidIsbn13('9780593321200'), false);
 });
 
@@ -17,6 +18,8 @@ void test('validates ISBN-10 and converts it to ISBN-13', () => {
     isbn10: '0306406152',
     isbn13: '9780306406157',
   });
+  assert.equal(isValidIsbn10('0-8044-2957-X'), true);
+  assert.equal(isbn10To13('0-8044-2957-X'), '9780804429573');
 });
 
 void test('rejects malformed barcode input', () => {

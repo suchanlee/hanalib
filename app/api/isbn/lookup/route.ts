@@ -15,6 +15,8 @@ export async function GET(request: Request) {
     locale,
     {
       nlkApiKey: process.env.NLK_API_KEY,
+      naverClientId: process.env.NAVER_CLIENT_ID,
+      naverClientSecret: process.env.NAVER_CLIENT_SECRET,
       googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY,
       timeoutMs: 5_000,
     },

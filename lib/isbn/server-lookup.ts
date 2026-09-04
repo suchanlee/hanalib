@@ -1,12 +1,22 @@
 import type { AppLocale } from '../domain/types.ts';
 import { lookupFixtureMetadata, stitchMetadata, type MetadataCandidate, type StitchedBookMetadata } from './providers.ts';
-import { normalizeGoogleBooksResponse, normalizeNlkResponse, type GoogleVolumesResponse } from './server-normalizers.ts';
+import {
+  normalizeGoogleBooksResponse,
+  normalizeNaverBooksResponse,
+  normalizeNlkResponse,
+  normalizeOpenLibraryEditionResponse,
+  type GoogleVolumesResponse,
+  type NaverBooksResponse,
+  type OpenLibraryEditionResponse,
+} from './server-normalizers.ts';
 
 export type ProviderStatus = 'ok' | 'not-found' | 'failed' | 'not-configured';
-export type ProviderId = 'nlk' | 'google-books';
+export type ProviderId = 'nlk' | 'naver' | 'google-books' | 'open-library';
 
 export interface LookupProviderConfig {
   nlkApiKey?: string;
+  naverClientId?: string;
+  naverClientSecret?: string;
   googleBooksApiKey?: string;
   timeoutMs?: number;
 }
@@ -66,6 +76,55 @@ export async function fetchGoogleBooksMetadata(
   return normalized ? { ...normalized, source: 'google-books' as const } : null;
 }
 
+export async function fetchNaverBooksMetadata(
+  isbn13: string,
+  clientId: string,
+  clientSecret: string,
+  options: { fetchImpl?: FetchLike; timeoutMs?: number } = {},
+) {
+  const url = new URL('https://openapi.naver.com/v1/search/book.json');
+  url.searchParams.set('query', isbn13);
+  url.searchParams.set('display', '10');
+  const response = await (options.fetchImpl ?? fetch)(url, {
+    headers: {
+      accept: 'application/json',
+      'x-naver-client-id': clientId,
+      'x-naver-client-secret': clientSecret,
+    },
+    signal: providerSignal(options.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+  });
+  if (!response.ok) throw new Error(`Naver Books responded with ${response.status}.`);
+  const normalized = normalizeNaverBooksResponse(isbn13, await response.json() as NaverBooksResponse);
+  return normalized ? { ...normalized, source: 'naver' as const } : null;
+}
+
+export async function fetchOpenLibraryMetadata(
+  isbn13: string,
+  options: { fetchImpl?: FetchLike; timeoutMs?: number } = {},
+) {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const signal = providerSignal(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const headers = {
+    accept: 'application/json',
+    'user-agent': 'Hana Community Library/1.0 (https://hana-community-library.lee-suchan.chatgpt.site/)',
+  };
+  const response = await fetchImpl(`https://openlibrary.org/isbn/${isbn13}.json`, { headers, signal });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`Open Library responded with ${response.status}.`);
+  const edition = await response.json() as OpenLibraryEditionResponse;
+  const authorKeys = [...new Set((edition.authors ?? []).flatMap(({ key }) => key ? [key] : []))].slice(0, 12);
+  const authorResponses = await Promise.allSettled(authorKeys.map(async (key) => {
+    if (!/^\/authors\/OL\d+A$/.test(key)) return undefined;
+    const authorResponse = await fetchImpl(`https://openlibrary.org${key}.json`, { headers, signal });
+    if (!authorResponse.ok) return undefined;
+    const payload = await authorResponse.json() as { name?: string };
+    return payload.name?.trim() || undefined;
+  }));
+  const authorNames = authorResponses.flatMap((result) => result.status === 'fulfilled' && result.value ? [result.value] : []);
+  const normalized = normalizeOpenLibraryEditionResponse(isbn13, edition, authorNames);
+  return normalized ? { ...normalized, source: 'open-library' as const } : null;
+}
+
 export async function resolveBookMetadata(
   isbn13: string,
   locale: AppLocale,
@@ -74,12 +133,16 @@ export async function resolveBookMetadata(
 ): Promise<ServerLookupResult> {
   const providerStatus: Record<ProviderId, ProviderStatus> = {
     nlk: config.nlkApiKey ? 'failed' : 'not-configured',
+    naver: config.naverClientId && config.naverClientSecret ? 'failed' : 'not-configured',
     'google-books': config.googleBooksApiKey ? 'failed' : 'not-configured',
+    'open-library': 'failed',
   };
   const tasks: Array<{ id: ProviderId; promise: Promise<MetadataCandidate | null> }> = [];
   const providerOptions = { fetchImpl: options.fetchImpl, timeoutMs: config.timeoutMs };
   if (config.nlkApiKey) tasks.push({ id: 'nlk', promise: fetchNlkMetadata(isbn13, config.nlkApiKey, providerOptions) });
+  if (config.naverClientId && config.naverClientSecret) tasks.push({ id: 'naver', promise: fetchNaverBooksMetadata(isbn13, config.naverClientId, config.naverClientSecret, providerOptions) });
   if (config.googleBooksApiKey) tasks.push({ id: 'google-books', promise: fetchGoogleBooksMetadata(isbn13, config.googleBooksApiKey, providerOptions) });
+  tasks.push({ id: 'open-library', promise: fetchOpenLibraryMetadata(isbn13, providerOptions) });
 
   const settled = await Promise.allSettled(tasks.map(({ promise }) => promise));
   const candidates: MetadataCandidate[] = [];

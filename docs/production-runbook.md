@@ -20,7 +20,7 @@ Sites applies the immutable `drizzle/*.sql` migrations to D1 and binds R2 as `FI
 
 ## 3. ISBN resolver
 
-Set `NLK_API_KEY` and `GOOGLE_BOOKS_API_KEY`. The resolver queries both providers in parallel, accepts partial provider failure, normalizes exact ISBN matches, and stitches fields with per-field provenance. Production fixtures are disabled. Review each provider’s current attribution, caching, and cover-image terms before public launch; retain a provider URL only when permitted and use member-uploaded R2 covers otherwise.
+Open Library is the credential-free baseline. Set `NLK_API_KEY` and `GOOGLE_BOOKS_API_KEY` for Korean and English enrichment; optionally set both `NAVER_CLIENT_ID` and `NAVER_CLIENT_SECRET` for Naver Books enrichment. The resolver queries configured providers plus Open Library in parallel, accepts partial provider failure, rejects non-exact ISBN editions, and stitches fields with per-field provenance. Production fixtures are disabled. Review each provider’s current attribution, caching, and cover-image terms before public launch; retain a provider URL only when permitted and use member-uploaded R2 covers otherwise.
 
 ## 4. Notifications and inbound SMS
 

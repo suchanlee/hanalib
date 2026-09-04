@@ -21,6 +21,8 @@ APPLE_PRIVATE_KEY=
 
 # ISBN metadata stitching.
 NLK_API_KEY=
+NAVER_CLIENT_ID=
+NAVER_CLIENT_SECRET=
 GOOGLE_BOOKS_API_KEY=
 # Local/test only. Production always rejects fixture fallback even if set.
 ISBN_FIXTURES_ENABLED=true

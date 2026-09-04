@@ -77,7 +77,7 @@ const intakeCopy = {
     isbnPlaceholder: '예: 9788936434267',
     find: '도서 찾기',
     looking: '가장 좋은 도서 정보를 찾는 중…',
-    lookingHelp: '국립중앙도서관과 Google Books 결과를 비교해요.',
+    lookingHelp: '여러 도서 제공처에서 ISBN이 정확히 일치하는 판본을 비교해요.',
     invalidTitle: 'ISBN을 확인해 주세요',
     invalidBody: '10자리 또는 13자리 ISBN을 정확히 입력해 주세요. 하이픈은 있어도 괜찮아요.',
     notFoundTitle: '일치하는 도서를 찾지 못했어요',
@@ -142,7 +142,7 @@ const intakeCopy = {
     isbnPlaceholder: 'e.g. 9788936434267',
     find: 'Find book',
     looking: 'Finding the best book information…',
-    lookingHelp: 'Comparing results from NLK and Google Books.',
+    lookingHelp: 'Comparing exact-edition ISBN matches across book providers.',
     invalidTitle: 'Check the ISBN',
     invalidBody: 'Enter a valid 10- or 13-digit ISBN. Hyphens are okay.',
     notFoundTitle: 'We couldn’t find a matching book',
@@ -369,6 +369,7 @@ export function IntakeView() {
     } catch (error) {
       if (controller.signal.aborted || sequence !== lookupSequenceRef.current) return;
       console.error('book-metadata-lookup-failed', error);
+      setDraft(blankDraft(parsed.isbn13, locale));
       setErrorKind('lookup');
       setStage('error');
       return;
@@ -631,10 +632,12 @@ export function IntakeView() {
           </Card>
 
           <ManualIsbnForm disabled={false} locale={locale} onChange={setManualIsbn} onSubmit={() => void performLookup(manualIsbn)} value={manualIsbn} />
-          <Button className="h-10 w-full text-muted-foreground" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)} variant="ghost">
-            <Sparkles aria-hidden="true" />
-            {c.simulate}
-          </Button>
+          {process.env.NODE_ENV !== 'production' && (
+            <Button className="h-10 w-full text-muted-foreground" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)} variant="ghost">
+              <Sparkles aria-hidden="true" />
+              {c.simulate}
+            </Button>
+          )}
         </div>
       )}
 
@@ -669,11 +672,13 @@ export function IntakeView() {
               <AlertDescription>{c.detectorUnavailable}</AlertDescription>
             </Alert>
           )}
-          <div className="grid grid-cols-2 gap-2">
-            <Button className="h-11" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)}>
-              <Sparkles aria-hidden="true" />
-              {c.simulate}
-            </Button>
+          <div className={process.env.NODE_ENV !== 'production' ? 'grid grid-cols-2 gap-2' : 'grid gap-2'}>
+            {process.env.NODE_ENV !== 'production' && (
+              <Button className="h-11" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)}>
+                <Sparkles aria-hidden="true" />
+                {c.simulate}
+              </Button>
+            )}
             <Button className="h-11" onClick={reset} variant="outline">
               {c.stop}
             </Button>
@@ -707,7 +712,7 @@ export function IntakeView() {
             <h1 className="mt-5 text-2xl font-semibold">{errorTitle}</h1>
             <p className="mx-auto mt-2 max-w-md text-pretty leading-6 text-muted-foreground">{errorBody}</p>
           </section>
-          {errorKind === 'not-found' && (
+          {(errorKind === 'not-found' || errorKind === 'lookup') && (
             <Button className="h-12 w-full" data-testid="enter-details-manually" onClick={useManualDetails}>
               <Keyboard aria-hidden="true" />
               {c.enterManually}

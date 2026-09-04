@@ -9,6 +9,8 @@ export interface ServerConfig {
   publicAppUrl?: string;
   metadata: {
     nlkApiKey?: string;
+    naverClientId?: string;
+    naverClientSecret?: string;
     googleBooksApiKey?: string;
   };
   messaging: {
@@ -37,6 +39,8 @@ export function readServerConfig(source: EnvSource = process.env): ServerConfig 
     publicAppUrl: source.PUBLIC_APP_URL,
     metadata: {
       nlkApiKey: source.NLK_API_KEY,
+      naverClientId: source.NAVER_CLIENT_ID,
+      naverClientSecret: source.NAVER_CLIENT_SECRET,
       googleBooksApiKey: source.GOOGLE_BOOKS_API_KEY,
     },
     messaging: {
