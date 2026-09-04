@@ -1,6 +1,7 @@
 'use client';
 
 import { BookHeart, Globe2, LockKeyhole, UsersRound } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
@@ -162,6 +163,17 @@ export function AuthView() {
               </Button>
             </div>
           )}
+          <p className="px-2 text-center text-xs leading-5 text-muted-foreground">
+            {ko ? '계속하면 ' : 'By continuing, you agree to the '}
+            <Link className="underline underline-offset-4 hover:text-foreground" href="/terms">
+              {ko ? '이용약관' : 'Terms'}
+            </Link>
+            {ko ? '과 ' : ' and acknowledge the '}
+            <Link className="underline underline-offset-4 hover:text-foreground" href="/privacy">
+              {ko ? '개인정보 처리방침' : 'Privacy Policy'}
+            </Link>
+            {ko ? '에 동의합니다.' : '.'}
+          </p>
         </section>
       </div>
     </main>
