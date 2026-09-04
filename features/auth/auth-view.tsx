@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { BookHeart, Globe2, LockKeyhole, UsersRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
@@ -10,21 +9,6 @@ export function AuthView() {
   const { state, actions } = useHanaApp();
   const ko = state.locale === 'ko';
   const demoEnabled = process.env.NEXT_PUBLIC_AUTH_DEMO_MODE === 'true';
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetch('/api/auth/session', {
-      credentials: 'same-origin',
-      headers: { accept: 'application/json' },
-      signal: controller.signal,
-    }).then(async (response) => {
-      if (!response.ok) return;
-      const payload = await response.json() as { member?: { provider?: string } };
-      if (payload.member?.provider === 'apple') actions.signIn('apple');
-      else if (payload.member) actions.signIn('google');
-    }).catch(() => undefined);
-    return () => controller.abort();
-  }, [actions]);
 
   function beginSignIn(provider: 'google' | 'apple') {
     window.location.assign(oauthStartUrl(provider));
@@ -36,7 +20,7 @@ export function AuthView() {
       credentials: 'same-origin',
       headers: { accept: 'application/json' },
     });
-    if (response.ok) actions.signIn('google');
+    if (response.ok) await actions.refresh();
   }
 
   return (

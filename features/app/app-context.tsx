@@ -1,34 +1,147 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { initialAppState } from '@/lib/domain/seed';
-import type { AddBookInput, HanaAppActions, HanaAppState } from '@/lib/domain/types';
+import type {
+  AddBookInput,
+  BorrowRequest,
+  CatalogItem,
+  HanaAppActions,
+  HanaAppState,
+  Loan,
+  Member,
+} from '@/lib/domain/types';
+import type { LibraryBootstrap } from '@/lib/persistence/contracts';
 
 interface HanaContextValue {
   state: HanaAppState;
   actions: HanaAppActions;
 }
 
+interface ApiEnvelope<Value> {
+  data?: Value;
+  error?: { code?: string; message?: string };
+}
+
 const HanaContext = createContext<HanaContextValue | null>(null);
 
-function newId(prefix: string) {
-  return `${prefix}-${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
+const emptyState: HanaAppState = {
+  ...initialAppState,
+  currentUserId: '',
+  members: [],
+  items: [],
+  requests: [],
+  loans: [],
+};
+
+class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: string,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+async function apiData<Value>(path: string, init?: RequestInit) {
+  const headers = new Headers(init?.headers);
+  headers.set('accept', 'application/json');
+  if (init?.body) headers.set('content-type', 'application/json');
+  const response = await fetch(path, {
+    ...init,
+    credentials: 'same-origin',
+    headers,
+  });
+  const envelope = await response.json().catch(() => ({})) as ApiEnvelope<Value>;
+  if (!response.ok || envelope.data === undefined) {
+    throw new ApiError(
+      response.status,
+      envelope.error?.code ?? 'request-failed',
+      envelope.error?.message ?? 'The library service is temporarily unavailable.',
+    );
+  }
+  return envelope.data;
+}
+
+function mutationInit(method: 'POST' | 'PATCH' | 'DELETE', body?: object): RequestInit {
+  return {
+    method,
+    headers: { 'idempotency-key': crypto.randomUUID() },
+    body: body ? JSON.stringify(body) : undefined,
+  };
+}
+
+function withBootstrap(current: HanaAppState, bootstrap: LibraryBootstrap): HanaAppState {
+  return {
+    ...current,
+    isAuthenticated: true,
+    currentUserId: bootstrap.profile.id,
+    locale: bootstrap.profile.locale,
+    members: bootstrap.members,
+    items: bootstrap.items,
+    requests: bootstrap.requests,
+    loans: bootstrap.loans,
+  };
+}
+
+function failureAnnouncement(locale: HanaAppState['locale']) {
+  return locale === 'ko'
+    ? '저장하지 못했어요. 연결을 확인하고 다시 시도해 주세요.'
+    : 'We couldn’t save that. Check your connection and try again.';
 }
 
 export function HanaAppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<HanaAppState>(initialAppState);
+  const [state, setState] = useState<HanaAppState>(emptyState);
+
+  const refresh = useCallback(async () => {
+    try {
+      const bootstrap = await apiData<LibraryBootstrap>('/api/app');
+      setState((current) => withBootstrap(current, bootstrap));
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        setState((current) => ({
+          ...current,
+          isAuthenticated: false,
+          currentUserId: '',
+          members: [],
+          items: [],
+          requests: [],
+          loans: [],
+        }));
+      } else {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(refresh);
+  }, [refresh]);
 
   const actions = useMemo<HanaAppActions>(() => ({
-    signIn(provider) {
-      setState((current) => ({ ...current, isAuthenticated: true, authProvider: provider, screen: 'catalog', announcement: current.locale === 'ko' ? '로그인했어요.' : 'Signed in.' }));
-    },
+    refresh,
     signOut() {
-      setState((current) => ({ ...current, isAuthenticated: false, authProvider: undefined, screen: 'catalog', selectedItemId: undefined }));
-    },
-    switchDemoUser(userId) {
-      setState((current) => current.members.some((member) => member.id === userId)
-        ? { ...current, currentUserId: userId, screen: 'catalog', selectedItemId: undefined, announcement: current.locale === 'ko' ? '테스트 사용자를 변경했어요.' : 'Demo user changed.' }
-        : current);
+      setState((current) => ({
+        ...current,
+        isAuthenticated: false,
+        authProvider: undefined,
+        currentUserId: '',
+        members: [],
+        items: [],
+        requests: [],
+        loans: [],
+        screen: 'catalog',
+        selectedItemId: undefined,
+      }));
     },
     setLocale(locale) {
       setState((current) => ({
@@ -36,6 +149,9 @@ export function HanaAppProvider({ children }: { children: ReactNode }) {
         locale,
         members: current.members.map((member) => member.id === current.currentUserId ? { ...member, locale } : member),
       }));
+      void apiData<Member>('/api/profile', mutationInit('PATCH', { locale })).catch(() => {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+      });
     },
     setScreen(screen) {
       setState((current) => ({ ...current, screen }));
@@ -51,139 +167,104 @@ export function HanaAppProvider({ children }: { children: ReactNode }) {
     setFilters(filters) {
       setState((current) => ({ ...current, filters: { ...current.filters, ...filters } }));
     },
-    addBook(input: AddBookInput) {
-      const itemId = newId('item');
-      setState((current) => ({
-        ...current,
-        items: [{
-          id: itemId,
-          ownerId: current.currentUserId,
-          status: 'available',
-          condition: input.condition,
-          ownerNotes: input.ownerNotes,
-          createdAt: new Date().toISOString(),
-          edition: {
-            id: newId('edition'),
-            isbn13: input.isbn13,
-            title: input.title,
-            titleEn: input.titleEn,
-            authors: input.authors,
-            publisher: input.publisher,
-            publishedYear: input.publishedYear,
-            language: input.language,
-            pageCount: input.pageCount,
-            coverUrl: input.coverUrl,
-            coverTone: 'blue',
-            provenance: input.provenance,
-          },
-        }, ...current.items],
-        selectedItemId: itemId,
-        screen: 'detail',
-        announcement: current.locale === 'ko' ? '도서를 추가했어요.' : 'Book added.',
-      }));
-      return itemId;
+    async addBook(input: AddBookInput) {
+      try {
+        const item = await apiData<CatalogItem>('/api/catalog', mutationInit('POST', input));
+        setState((current) => ({
+          ...current,
+          items: [item, ...current.items.filter((candidate) => candidate.id !== item.id)],
+          selectedItemId: item.id,
+          announcement: current.locale === 'ko' ? '도서를 추가했어요.' : 'Book added.',
+        }));
+        return item.id;
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
     },
     updateItem(itemId, changes) {
-      setState((current) => ({
-        ...current,
-        items: current.items.map((item) => item.id === itemId && item.ownerId === current.currentUserId ? { ...item, ...changes } : item),
-        announcement: current.locale === 'ko' ? '도서 정보를 저장했어요.' : 'Book details saved.',
-      }));
+      void apiData<CatalogItem>(`/api/catalog/${encodeURIComponent(itemId)}`, mutationInit('PATCH', changes))
+        .then((item) => {
+          setState((current) => ({
+            ...current,
+            items: current.items.map((candidate) => candidate.id === item.id ? item : candidate),
+            announcement: current.locale === 'ko' ? '도서 정보를 저장했어요.' : 'Book details saved.',
+          }));
+        })
+        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
     archiveItem(itemId) {
-      setState((current) => {
-        const item = current.items.find((candidate) => candidate.id === itemId);
-        if (!item || item.ownerId !== current.currentUserId || item.status === 'borrowed') return current;
-        return {
-          ...current,
-          items: current.items.map((candidate) => candidate.id === itemId ? { ...candidate, status: 'archived' } : candidate),
-          screen: 'catalog',
-          selectedItemId: undefined,
-          announcement: current.locale === 'ko' ? '도서를 목록에서 삭제했어요.' : 'Book removed from the catalog.',
-        };
-      });
+      void apiData<{ id: string; archived: boolean }>(`/api/catalog/${encodeURIComponent(itemId)}`, mutationInit('DELETE'))
+        .then(() => {
+          setState((current) => ({
+            ...current,
+            items: current.items.filter((candidate) => candidate.id !== itemId),
+            screen: 'catalog',
+            selectedItemId: undefined,
+            announcement: current.locale === 'ko' ? '도서를 목록에서 삭제했어요.' : 'Book removed from the catalog.',
+          }));
+        })
+        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
     requestBorrow(itemId) {
-      setState((current) => {
-        const item = current.items.find((candidate) => candidate.id === itemId);
-        const alreadyPending = current.requests.some((request) => request.catalogItemId === itemId && request.requesterId === current.currentUserId && request.status === 'pending');
-        if (!item || item.status !== 'available' || item.ownerId === current.currentUserId || alreadyPending) return current;
-        const requestedAt = new Date();
-        return {
-          ...current,
-          requests: [...current.requests, {
-            id: newId('request'),
-            catalogItemId: itemId,
-            requesterId: current.currentUserId,
-            status: 'pending',
-            requestedAt: requestedAt.toISOString(),
-            expiresAt: new Date(requestedAt.getTime() + 48 * 3_600_000).toISOString(),
-          }],
-          announcement: current.locale === 'ko' ? '소유자에게 대여 요청을 보냈어요.' : 'Borrow request sent to the owner.',
-        };
-      });
+      void apiData<BorrowRequest>('/api/borrow-requests', mutationInit('POST', { itemId }))
+        .then((request) => {
+          setState((current) => ({
+            ...current,
+            requests: [request, ...current.requests.filter((candidate) => candidate.id !== request.id)],
+            announcement: current.locale === 'ko' ? '소유자에게 대여 요청을 보냈어요.' : 'Borrow request sent to the owner.',
+          }));
+        })
+        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
     cancelRequest(requestId) {
-      setState((current) => ({
-        ...current,
-        requests: current.requests.map((request) => request.id === requestId && request.requesterId === current.currentUserId && request.status === 'pending' ? { ...request, status: 'canceled' } : request),
-        announcement: current.locale === 'ko' ? '요청을 취소했어요.' : 'Request canceled.',
-      }));
+      void apiData<BorrowRequest>(`/api/borrow-requests/${encodeURIComponent(requestId)}`, mutationInit('DELETE'))
+        .then((request) => {
+          setState((current) => ({
+            ...current,
+            requests: current.requests.map((candidate) => candidate.id === request.id ? request : candidate),
+            announcement: current.locale === 'ko' ? '요청을 취소했어요.' : 'Request canceled.',
+          }));
+        })
+        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
     respondToRequest(requestId, decision) {
-      setState((current) => {
-        const request = current.requests.find((candidate) => candidate.id === requestId);
-        const item = request ? current.items.find((candidate) => candidate.id === request.catalogItemId) : undefined;
-        if (!request || !item || request.status !== 'pending' || item.ownerId !== current.currentUserId) return current;
-        const respondedRequests = current.requests.map((candidate) => candidate.id === requestId
-          ? { ...candidate, status: decision }
-          : decision === 'accepted' && candidate.catalogItemId === item.id && candidate.status === 'pending'
-            ? { ...candidate, status: 'superseded' as const }
-            : candidate);
-        if (decision === 'declined') {
-          return { ...current, requests: respondedRequests, announcement: current.locale === 'ko' ? '요청을 거절했어요.' : 'Request declined.' };
-        }
-        const startedAt = new Date();
-        return {
-          ...current,
-          requests: respondedRequests,
-          items: current.items.map((candidate) => candidate.id === item.id ? { ...candidate, status: 'borrowed' } : candidate),
-          loans: [...current.loans, {
-            id: newId('loan'),
-            catalogItemId: item.id,
-            requestId: request.id,
-            ownerId: item.ownerId,
-            borrowerId: request.requesterId,
-            status: 'active',
-            startedAt: startedAt.toISOString(),
-            nextCheckAt: new Date(startedAt.getTime() + 7 * 86_400_000).toISOString(),
-          }],
-          announcement: current.locale === 'ko' ? '요청을 수락하고 대여를 시작했어요.' : 'Request accepted and loan started.',
-        };
-      });
+      void apiData<{ request: BorrowRequest; loan?: Loan }>(
+        `/api/borrow-requests/${encodeURIComponent(requestId)}`,
+        mutationInit('PATCH', { decision }),
+      ).then(refresh)
+        .then(() => {
+          setState((current) => ({
+            ...current,
+            announcement: decision === 'accepted'
+              ? current.locale === 'ko' ? '요청을 수락하고 대여를 시작했어요.' : 'Request accepted and loan started.'
+              : current.locale === 'ko' ? '요청을 거절했어요.' : 'Request declined.',
+          }));
+        })
+        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
     markReturned(loanId) {
-      setState((current) => {
-        const loan = current.loans.find((candidate) => candidate.id === loanId);
-        if (!loan || loan.status !== 'active' || (loan.ownerId !== current.currentUserId && loan.borrowerId !== current.currentUserId)) return current;
-        const returnedAt = new Date().toISOString();
-        return {
+      void apiData<Loan>(`/api/loans/${encodeURIComponent(loanId)}/return`, mutationInit('POST'))
+        .then(refresh)
+        .then(() => setState((current) => ({
           ...current,
-          loans: current.loans.map((candidate) => candidate.id === loanId ? { ...candidate, status: 'returned', returnedAt, returnedBy: current.currentUserId } : candidate),
-          items: current.items.map((item) => item.id === loan.catalogItemId ? { ...item, status: 'available' } : item),
           announcement: current.locale === 'ko' ? '반납을 기록했어요.' : 'Return recorded.',
-        };
-      });
+        })))
+        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
     updateProfile(changes) {
-      setState((current) => ({
-        ...current,
-        locale: changes.locale ?? current.locale,
-        members: current.members.map((member) => member.id === current.currentUserId ? { ...member, ...changes } : member),
-        announcement: current.locale === 'ko' ? '설정을 저장했어요.' : 'Settings saved.',
-      }));
+      void apiData<Member>('/api/profile', mutationInit('PATCH', changes))
+        .then((member) => {
+          setState((current) => ({
+            ...current,
+            locale: member.locale,
+            members: current.members.map((candidate) => candidate.id === member.id ? member : candidate),
+            announcement: current.locale === 'ko' ? '설정을 저장했어요.' : 'Settings saved.',
+          }));
+        })
+        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
-  }), []);
+  }), [refresh]);
 
   const value = useMemo(() => ({ state, actions }), [state, actions]);
   return <HanaContext.Provider value={value}>{children}</HanaContext.Provider>;

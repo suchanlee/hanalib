@@ -10,7 +10,6 @@ import {
   MessageSquare,
   ShieldCheck,
   UserRoundCog,
-  UsersRound,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -239,34 +238,6 @@ export function SettingsView() {
             {saved ? t(locale, '저장했어요', 'Saved') : t(locale, '설정 저장', 'Save settings')}
           </Button>
         </form>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UsersRound aria-hidden="true" />
-              {t(locale, '로컬 데모 사용자', 'Local demo identity')}
-            </CardTitle>
-            <CardDescription>
-              {t(locale, '대여 흐름을 시험하기 위한 미리보기 전용 도구예요. 실제 서비스에는 표시되지 않아요.', 'Preview-only tool for testing both sides of a loan. It is hidden in production.')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Label className="sr-only" htmlFor="demo-user">{t(locale, '데모 사용자', 'Demo user')}</Label>
-            <NativeSelect
-              className="w-full"
-              data-testid="settings-demo-user"
-              id="demo-user"
-              onChange={(event) => actions.switchDemoUser(event.target.value)}
-              value={state.currentUserId}
-            >
-              {state.members.map((candidate) => (
-                <NativeSelectOption key={candidate.id} value={candidate.id}>
-                  {candidate.displayNameKo} · {candidate.displayName}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </CardContent>
-        </Card>
 
         <Separator />
         <Button

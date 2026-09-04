@@ -107,6 +107,7 @@ const intakeCopy = {
     coverHelp: '제공처 표지가 없거나 정확하지 않다면 휴대폰 사진으로 바꿀 수 있어요. 최대 8MB.',
     coverError: '8MB 이하의 이미지 파일을 선택해 주세요.',
     uploadFailed: '표지 사진을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
+    saveFailed: '도서를 추가하지 못했어요. 잠시 후 다시 시도해 주세요.',
     requiredError: '제목, 저자, 출판사, 출판 연도를 확인해 주세요.',
     back: 'ISBN으로 돌아가기',
     create: '내 도서로 추가',
@@ -171,6 +172,7 @@ const intakeCopy = {
     coverHelp: 'If the provider cover is missing or wrong, use a phone photo up to 8MB.',
     coverError: 'Choose an image file no larger than 8MB.',
     uploadFailed: 'We couldn’t save the cover photo. Please try again.',
+    saveFailed: 'We couldn’t add the book. Please try again.',
     requiredError: 'Check the title, author, publisher, and published year.',
     back: 'Back to ISBN',
     create: 'Add to my library',
@@ -539,20 +541,27 @@ export function IntakeView() {
       }
     }
 
-    const itemId = actions.addBook({
-      isbn13: draft.isbn13,
-      title: draft.title.trim(),
-      titleEn: draft.titleEn.trim() || undefined,
-      authors,
-      publisher: draft.publisher.trim(),
-      publishedYear,
-      language: draft.language,
-      pageCount: pageCount && pageCount > 0 ? pageCount : undefined,
-      coverUrl: persistedCoverUrl,
-      condition: draft.condition,
-      ownerNotes: draft.ownerNotes.trim() || undefined,
-      provenance: draft.provenance,
-    });
+    let itemId: string;
+    try {
+      itemId = await actions.addBook({
+        isbn13: draft.isbn13,
+        title: draft.title.trim(),
+        titleEn: draft.titleEn.trim() || undefined,
+        authors,
+        publisher: draft.publisher.trim(),
+        publishedYear,
+        language: draft.language,
+        pageCount: pageCount && pageCount > 0 ? pageCount : undefined,
+        coverUrl: persistedCoverUrl,
+        condition: draft.condition,
+        ownerNotes: draft.ownerNotes.trim() || undefined,
+        provenance: draft.provenance,
+      });
+    } catch {
+      setFormError(c.saveFailed);
+      setIsSaving(false);
+      return;
+    }
     setCreatedItemId(itemId);
     setCoverFile(undefined);
     if (uploadUrlRef.current) URL.revokeObjectURL(uploadUrlRef.current);

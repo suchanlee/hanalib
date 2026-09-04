@@ -89,15 +89,14 @@ export interface AddBookInput {
 }
 
 export interface HanaAppActions {
-  signIn(provider: AuthProvider): void;
+  refresh(): Promise<void>;
   signOut(): void;
-  switchDemoUser(userId: string): void;
   setLocale(locale: AppLocale): void;
   setScreen(screen: AppScreen): void;
   selectItem(itemId: string): void;
   setSearchQuery(query: string): void;
   setFilters(filters: Partial<CatalogFilters>): void;
-  addBook(input: AddBookInput): string;
+  addBook(input: AddBookInput): Promise<string>;
   updateItem(itemId: string, changes: Pick<CatalogItem, 'condition' | 'ownerNotes'>): void;
   archiveItem(itemId: string): void;
   requestBorrow(itemId: string): void;
