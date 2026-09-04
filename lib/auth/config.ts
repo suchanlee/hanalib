@@ -38,7 +38,11 @@ function signingSecret(source: AuthEnvSource, key: string) {
 function appUrl(source: AuthEnvSource) {
   const value = required(source, 'PUBLIC_APP_URL');
   const parsed = new URL(value);
-  if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== '/') {
+  if (
+    !['http:', 'https:'].includes(parsed.protocol) ||
+    parsed.username || parsed.password ||
+    parsed.pathname !== '/' || parsed.search || parsed.hash
+  ) {
     throw new Error('PUBLIC_APP_URL must be an http(s) origin with no path, credentials, query, or fragment');
   }
   return parsed.origin;
@@ -113,5 +117,14 @@ export function callbackUrl(config: Pick<AuthBaseConfig, 'publicAppUrl'>, provid
 }
 
 export function safeReturnTo(value: string | null | undefined) {
-  return value?.startsWith('/') && !value.startsWith('//') ? value : '/';
+  if (!value?.startsWith('/') || value.startsWith('//') || value.includes('\\')) return '/';
+  try {
+    const base = new URL('https://return.hana.invalid');
+    const parsed = new URL(value, base);
+    return parsed.origin === base.origin
+      ? `${parsed.pathname}${parsed.search}${parsed.hash}`
+      : '/';
+  } catch {
+    return '/';
+  }
 }

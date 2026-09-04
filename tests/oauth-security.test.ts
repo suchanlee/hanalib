@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { base64UrlEncode, jsonBase64Url, parseJsonBase64Url, utf8 } from '../lib/auth/encoding.ts';
-import { readProviderAuthConfig } from '../lib/auth/config.ts';
+import { readProviderAuthConfig, safeReturnTo } from '../lib/auth/config.ts';
 import {
   authorizationUrl,
   createAppleClientSecret,
@@ -35,6 +35,13 @@ const baseEnv = {
 void test('uses the standard S256 PKCE transformation', async () => {
   const verifier = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
   assert.equal(await pkceChallenge(verifier), 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM');
+});
+
+void test('canonicalizes return paths and rejects network-path variants', () => {
+  assert.equal(safeReturnTo('/catalog?owner=me#top'), '/catalog?owner=me#top');
+  assert.equal(safeReturnTo('//attacker.example'), '/');
+  assert.equal(safeReturnTo('/\\attacker.example'), '/');
+  assert.equal(safeReturnTo('https://attacker.example'), '/');
 });
 
 void test('binds OAuth state, nonce, verifier, and return path in a signed short-lived cookie', async () => {
