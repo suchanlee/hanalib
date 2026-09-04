@@ -77,6 +77,7 @@ interface MemberRow {
   notificationChannel: string;
   phone: string;
   email: string;
+  phoneEncrypted?: string | null;
 }
 
 interface ContactRow {
@@ -438,6 +439,25 @@ export class D1LibraryRepository implements LibraryRepository {
       if (item) return mapCatalogItem(item);
     }
 
+    if (
+      !input ||
+      typeof input.isbn13 !== 'string' ||
+      typeof input.title !== 'string' ||
+      !Array.isArray(input.authors) ||
+      !input.authors.every((author) => typeof author === 'string') ||
+      !input.authors.some((author) => author.trim()) ||
+      typeof input.publisher !== 'string' ||
+      (input.titleEn !== undefined && typeof input.titleEn !== 'string') ||
+      (input.ownerNotes !== undefined && typeof input.ownerNotes !== 'string') ||
+      (input.coverUrl !== undefined && typeof input.coverUrl !== 'string') ||
+      (input.pageCount !== undefined && (!Number.isInteger(input.pageCount) || input.pageCount <= 0)) ||
+      !['ko', 'en', 'other'].includes(input.language) ||
+      !input.provenance ||
+      typeof input.provenance !== 'object' ||
+      Array.isArray(input.provenance)
+    ) {
+      throw libraryError('invalid-input', 'ISBN, title, author, publisher, language, and provenance are required.');
+    }
     const parsedIsbn = parseIsbn(input.isbn13);
     if (!parsedIsbn || !input.title.trim() || !input.authors.length || !validCondition(input.condition)) {
       throw libraryError('invalid-input', 'ISBN, title, author, and condition are required.');
@@ -903,19 +923,26 @@ export class D1LibraryRepository implements LibraryRepository {
         COALESCE((
           SELECT ai.email FROM auth_identities ai
           WHERE ai.profile_id = p.id ORDER BY ai.last_signed_in_at DESC LIMIT 1
-        ), '') AS email
+        ), '') AS email,
+        (
+          SELECT ne.address_encrypted FROM notification_endpoints ne
+          WHERE ne.user_id = p.id AND ne.kind = 'sms' AND ne.enabled = 1 LIMIT 1
+        ) AS phoneEncrypted
       FROM profiles p
       WHERE p.id = ?
       LIMIT 1
     `).bind(context.actorId).first<MemberRow>();
     if (!existing) throw libraryError('not-found', 'Profile not found.');
 
+    const currentPhone = existing.phoneEncrypted && this.contactEncryptionKey
+      ? await decryptContact(existing.phoneEncrypted, this.contactEncryptionKey)
+      : '';
     const next = {
       displayName: changes.displayName?.trim() ?? existing.displayName,
       displayNameKo: changes.displayNameKo?.trim() ?? existing.displayNameKo,
       locale: changes.locale ?? locale(existing.locale),
       notificationChannel: changes.notificationChannel ?? notificationChannel(existing.notificationChannel),
-      phone: changes.phone?.replace(/[\s().-]/g, '') ?? existing.phone,
+      phone: changes.phone?.replace(/[\s().-]/g, '') ?? currentPhone,
     };
     if (!next.displayName || !next.displayNameKo) throw libraryError('invalid-input', 'Both display names are required.');
     if (next.locale !== 'ko' && next.locale !== 'en') throw libraryError('invalid-input', 'Invalid locale.');
@@ -938,22 +965,28 @@ export class D1LibraryRepository implements LibraryRepository {
       if (!this.contactEncryptionKey || !this.contactHashKey) {
         throw libraryError('server-misconfigured', 'Contact encryption is not configured.');
       }
-      const encrypted = await encryptContact(next.phone, this.contactEncryptionKey);
-      const hashed = await hashContact(next.phone, this.contactHashKey);
+      const encrypted = next.phone ? await encryptContact(next.phone, this.contactEncryptionKey) : '';
+      const hashed = next.phone ? await hashContact(next.phone, this.contactHashKey) : '';
       const results = await this.db.batch([
         profileStatement,
-        this.db.prepare(`
-          INSERT INTO notification_endpoints (
-            id, user_id, kind, address_encrypted, address_hash, verified_at, enabled
-          ) VALUES (?, ?, 'sms', ?, ?, NULL, 1)
-          ON CONFLICT(user_id, kind) DO UPDATE SET
-            address_encrypted = excluded.address_encrypted,
-            address_hash = excluded.address_hash,
-            verified_at = NULL,
-            enabled = 1
-        `).bind(id('endpoint'), context.actorId, encrypted, hashed),
+        next.phone
+          ? this.db.prepare(`
+              INSERT INTO notification_endpoints (
+                id, user_id, kind, address_encrypted, address_hash, verified_at, enabled
+              ) VALUES (?, ?, 'sms', ?, ?, NULL, 1)
+              ON CONFLICT(user_id, kind) DO UPDATE SET
+                address_encrypted = excluded.address_encrypted,
+                address_hash = excluded.address_hash,
+                verified_at = NULL,
+                enabled = 1
+            `).bind(id('endpoint'), context.actorId, encrypted, hashed)
+          : this.db.prepare(`
+              UPDATE notification_endpoints
+              SET enabled = 0, verified_at = NULL
+              WHERE user_id = ? AND kind = 'sms'
+            `).bind(context.actorId),
       ]);
-      if (affected(results[0]) !== 1 || affected(results[1]) !== 1) throw libraryError('not-found', 'Profile not found.');
+      if (affected(results[0]) !== 1 || (next.phone && affected(results[1]) !== 1)) throw libraryError('not-found', 'Profile not found.');
     } else {
       const result = await profileStatement.run();
       if (affected(result) !== 1) throw libraryError('not-found', 'Profile not found.');
