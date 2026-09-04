@@ -18,8 +18,6 @@ export const profiles = sqliteTable('profiles', {
   avatarUrl: text('avatar_url'),
   locale: text('locale').notNull().default('ko'),
   notificationChannel: text('notification_channel').notNull().default('email'),
-  phone: text('phone').notNull().default(''),
-  email: text('email').notNull().default(''),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 });
