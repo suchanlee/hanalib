@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { ResolvedBookProvider } from '../lib/isbn/providers.ts';
 import {
   normalizeGoogleBooksResponse,
   normalizeNaverBooksResponse,
@@ -137,4 +138,23 @@ void test('rejects mismatched search results and ambiguous aggregate publishers'
     docs: [{ title: 'Fantastic Mr. Fox', isbn: ['9780140328721'], publisher: ['Puffin', 'Knopf'] }],
   });
   assert.equal(aggregate?.publisher, undefined);
+});
+
+void test('does not reuse cached lookup failures when a member retries', async () => {
+  const originalFetch = globalThis.fetch;
+  let cacheMode: RequestCache | undefined;
+  globalThis.fetch = async (_input, init) => {
+    cacheMode = init?.cache;
+    return Response.json({
+      isbn13: '9780140328721', title: 'Fantastic Mr. Fox', authors: ['Roald Dahl'],
+      publisher: 'Puffin', publishedYear: 1988, language: 'en', provenance: { title: 'open-library' },
+    });
+  };
+  try {
+    const result = await new ResolvedBookProvider().lookup('9780140328721', 'en');
+    assert.equal(result?.title, 'Fantastic Mr. Fox');
+    assert.equal(cacheMode, 'no-store');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

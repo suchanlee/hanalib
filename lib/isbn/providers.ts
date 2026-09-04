@@ -35,6 +35,7 @@ abstract class ServerProxyProvider implements BookMetadataProvider {
 
   async lookup(isbn13: string, locale: AppLocale, signal?: AbortSignal) {
     const response = await fetch(`${this.endpoint}?isbn=${encodeURIComponent(isbn13)}&locale=${locale}`, {
+      cache: 'no-store',
       headers: { accept: 'application/json' },
       signal,
     });
@@ -85,7 +86,12 @@ export class ResolvedBookProvider {
     if (process.env.NODE_ENV !== 'production' && this.developmentMemberId) {
       headers.set('x-hana-demo-member-id', this.developmentMemberId);
     }
-    const response = await fetch(`${this.endpoint}?${search}`, { credentials: 'same-origin', headers, signal });
+    const response = await fetch(`${this.endpoint}?${search}`, {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers,
+      signal,
+    });
     if (response.status === 404) return null;
     if (!response.ok) throw new Error(`Book metadata lookup failed (${response.status})`);
     return await response.json() as StitchedBookMetadata;

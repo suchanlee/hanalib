@@ -31,12 +31,13 @@ export async function GET(request: Request) {
   if (result.metadata) return Response.json(result.metadata, { headers });
 
   const statuses = Object.values(result.providerStatus);
+  const errorHeaders = { ...headers, 'cache-control': 'no-store' };
   if (statuses.every((status) => status === 'not-configured')) {
-    return Response.json({ error: 'provider-not-configured', providerStatus: result.providerStatus }, { status: 503, headers });
+    return Response.json({ error: 'provider-not-configured', providerStatus: result.providerStatus }, { status: 503, headers: errorHeaders });
   }
   if (statuses.some((status) => status === 'failed')) {
     console.warn('book-metadata-lookup-miss', { providerStatus: result.providerStatus });
-    return Response.json({ error: 'providers-unavailable', providerStatus: result.providerStatus }, { status: 502, headers });
+    return Response.json({ error: 'providers-unavailable', providerStatus: result.providerStatus }, { status: 502, headers: errorHeaders });
   }
-  return Response.json({ error: 'not-found', providerStatus: result.providerStatus }, { status: 404, headers });
+  return Response.json({ error: 'not-found', providerStatus: result.providerStatus }, { status: 404, headers: errorHeaders });
 }
