@@ -5,10 +5,10 @@ const daysAgo = (days: number) => new Date(now.getTime() - days * 86_400_000).to
 const daysFromNow = (days: number) => new Date(now.getTime() + days * 86_400_000).toISOString();
 
 export const seedMembers: Member[] = [
-  { id: 'jiwoo', displayName: 'Jiwoo', displayNameKo: '지우', initials: 'JW', locale: 'ko', notificationChannel: 'both', phone: '+14155552481', email: 'jiwoo@example.com' },
-  { id: 'seoyeon', displayName: 'Seoyeon', displayNameKo: '서연', initials: 'SY', locale: 'ko', notificationChannel: 'sms', phone: '+14155550177', email: 'seoyeon@example.com' },
-  { id: 'minji', displayName: 'Minji', displayNameKo: '민지', initials: 'MJ', locale: 'ko', notificationChannel: 'email', phone: '+14155550862', email: 'minji@example.com' },
-  { id: 'alex', displayName: 'Alex', displayNameKo: '알렉스', initials: 'AK', locale: 'en', notificationChannel: 'email', phone: '+14155551354', email: 'alex@example.com' },
+  { id: 'jiwoo', displayName: 'Jiwoo', displayNameKo: '지우', initials: 'JW', locale: 'ko', notificationChannel: 'both', phone: '+14155552481', phoneVerified: true, email: 'jiwoo@example.com' },
+  { id: 'seoyeon', displayName: 'Seoyeon', displayNameKo: '서연', initials: 'SY', locale: 'ko', notificationChannel: 'sms', phone: '+14155550177', phoneVerified: true, email: 'seoyeon@example.com' },
+  { id: 'minji', displayName: 'Minji', displayNameKo: '민지', initials: 'MJ', locale: 'ko', notificationChannel: 'email', phone: '+14155550862', phoneVerified: true, email: 'minji@example.com' },
+  { id: 'alex', displayName: 'Alex', displayNameKo: '알렉스', initials: 'AK', locale: 'en', notificationChannel: 'email', phone: '+14155551354', phoneVerified: true, email: 'alex@example.com' },
 ];
 
 const editions: BookEdition[] = [

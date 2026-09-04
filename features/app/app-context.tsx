@@ -252,17 +252,20 @@ export function HanaAppProvider({ children }: { children: ReactNode }) {
         })))
         .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
-    updateProfile(changes) {
-      void apiData<Member>('/api/profile', mutationInit('PATCH', changes))
-        .then((member) => {
-          setState((current) => ({
-            ...current,
-            locale: member.locale,
-            members: current.members.map((candidate) => candidate.id === member.id ? member : candidate),
-            announcement: current.locale === 'ko' ? '설정을 저장했어요.' : 'Settings saved.',
-          }));
-        })
-        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
+    async updateProfile(changes) {
+      try {
+        const member = await apiData<Member>('/api/profile', mutationInit('PATCH', changes));
+        setState((current) => ({
+          ...current,
+          locale: member.locale,
+          members: current.members.map((candidate) => candidate.id === member.id ? member : candidate),
+          announcement: current.locale === 'ko' ? '설정을 저장했어요.' : 'Settings saved.',
+        }));
+        return member;
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
     },
   }), [refresh]);
 

@@ -76,6 +76,7 @@ interface MemberRow {
   locale: string;
   notificationChannel: string;
   phone: string;
+  phoneVerified: number | boolean;
   email: string;
   phoneEncrypted?: string | null;
 }
@@ -83,6 +84,7 @@ interface MemberRow {
 interface ContactRow {
   kind: string;
   addressEncrypted: string;
+  verifiedAt: number | null;
 }
 
 interface RequestRow {
@@ -179,6 +181,7 @@ function mapMember(row: MemberRow): Member {
     locale: locale(row.locale),
     notificationChannel: notificationChannel(row.notificationChannel),
     phone: row.phone,
+    phoneVerified: Boolean(row.phoneVerified),
     email: row.email,
   };
 }
@@ -352,6 +355,7 @@ export class D1LibraryRepository implements LibraryRepository {
           p.locale,
           p.notification_channel AS notificationChannel,
           '' AS phone,
+          0 AS phoneVerified,
           '' AS email
         FROM community_members cm
         INNER JOIN profiles p ON p.id = cm.user_id
@@ -389,7 +393,7 @@ export class D1LibraryRepository implements LibraryRepository {
         ORDER BY started_at DESC
       `).bind(context.communityId),
       this.db.prepare(`
-        SELECT kind, address_encrypted AS addressEncrypted
+        SELECT kind, address_encrypted AS addressEncrypted, verified_at AS verifiedAt
         FROM notification_endpoints
         WHERE user_id = ? AND enabled = 1
       `).bind(context.actorId),
@@ -405,12 +409,13 @@ export class D1LibraryRepository implements LibraryRepository {
     const profile = members.find((member) => member.id === context.actorId);
     if (!profile) throw libraryError('forbidden', 'The signed-in profile is not active in this community.');
     const contacts = results[4].results as unknown as ContactRow[];
-    const encryptedPhone = contacts.find((contact) => contact.kind === 'sms')?.addressEncrypted;
+    const phoneContact = contacts.find((contact) => contact.kind === 'sms');
+    const encryptedPhone = phoneContact?.addressEncrypted;
     const phone = encryptedPhone && this.contactEncryptionKey
       ? await decryptContact(encryptedPhone, this.contactEncryptionKey)
       : '';
     const email = (results[5].results[0] as { email?: string } | undefined)?.email ?? '';
-    const hydratedProfile = { ...profile, phone, email };
+    const hydratedProfile = { ...profile, phone, phoneVerified: Boolean(phoneContact?.verifiedAt), email };
     return {
       profile: hydratedProfile,
       members: members.map((member) => member.id === hydratedProfile.id ? hydratedProfile : member),
@@ -920,6 +925,7 @@ export class D1LibraryRepository implements LibraryRepository {
         p.locale,
         p.notification_channel AS notificationChannel,
         '' AS phone,
+        0 AS phoneVerified,
         COALESCE((
           SELECT ai.email FROM auth_identities ai
           WHERE ai.profile_id = p.id ORDER BY ai.last_signed_in_at DESC LIMIT 1
@@ -927,7 +933,12 @@ export class D1LibraryRepository implements LibraryRepository {
         (
           SELECT ne.address_encrypted FROM notification_endpoints ne
           WHERE ne.user_id = p.id AND ne.kind = 'sms' AND ne.enabled = 1 LIMIT 1
-        ) AS phoneEncrypted
+        ) AS phoneEncrypted,
+        COALESCE((
+          SELECT CASE WHEN ne.verified_at IS NULL THEN 0 ELSE 1 END
+          FROM notification_endpoints ne
+          WHERE ne.user_id = p.id AND ne.kind = 'sms' AND ne.enabled = 1 LIMIT 1
+        ), 0) AS phoneVerified
       FROM profiles p
       WHERE p.id = ?
       LIMIT 1
@@ -943,7 +954,10 @@ export class D1LibraryRepository implements LibraryRepository {
       locale: changes.locale ?? locale(existing.locale),
       notificationChannel: changes.notificationChannel ?? notificationChannel(existing.notificationChannel),
       phone: changes.phone?.replace(/[\s().-]/g, '') ?? currentPhone,
+      phoneVerified: changes.phone === undefined ? Boolean(existing.phoneVerified) : false,
     };
+    const phoneChanged = changes.phone !== undefined && next.phone !== currentPhone;
+    if (!phoneChanged) next.phoneVerified = Boolean(existing.phoneVerified);
     if (!next.displayName || !next.displayNameKo) throw libraryError('invalid-input', 'Both display names are required.');
     if (next.locale !== 'ko' && next.locale !== 'en') throw libraryError('invalid-input', 'Invalid locale.');
     if (!['email', 'sms', 'both'].includes(next.notificationChannel)) throw libraryError('invalid-input', 'Invalid notification channel.');
@@ -961,7 +975,7 @@ export class D1LibraryRepository implements LibraryRepository {
       this.now().getTime(),
       context.actorId,
     );
-    if (changes.phone !== undefined) {
+    if (phoneChanged) {
       if (!this.contactEncryptionKey || !this.contactHashKey) {
         throw libraryError('server-misconfigured', 'Contact encryption is not configured.');
       }

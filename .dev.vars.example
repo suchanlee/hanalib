@@ -25,9 +25,6 @@ GOOGLE_BOOKS_API_KEY=
 # Local/test only. Production always rejects fixture fallback even if set.
 ISBN_FIXTURES_ENABLED=true
 
-# Local browser demo only. Never enable in production.
-ALLOW_DEMO_AUTH=true
-
 # US SMS and transactional email.
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=

@@ -178,6 +178,14 @@ export const notificationEndpoints = sqliteTable(
   (table) => [uniqueIndex('notification_endpoints_user_kind_unique').on(table.userId, table.kind)],
 );
 
+export const phoneVerifications = sqliteTable('phone_verifications', {
+  userId: text('user_id').primaryKey().references(() => profiles.id),
+  codeHash: text('code_hash').notNull(),
+  expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+  attemptCount: integer('attempt_count').notNull().default(0),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
 export const notificationDeliveries = sqliteTable(
   'notification_deliveries',
   {

@@ -14,6 +14,7 @@ export interface Member {
   locale: AppLocale;
   notificationChannel: NotificationChannel;
   phone: string;
+  phoneVerified: boolean;
   email: string;
 }
 
@@ -103,7 +104,7 @@ export interface HanaAppActions {
   cancelRequest(requestId: string): void;
   respondToRequest(requestId: string, decision: 'accepted' | 'declined'): void;
   markReturned(loanId: string): void;
-  updateProfile(changes: Partial<Pick<Member, 'displayName' | 'displayNameKo' | 'locale' | 'notificationChannel' | 'phone'>>): void;
+  updateProfile(changes: Partial<Pick<Member, 'displayName' | 'displayNameKo' | 'locale' | 'notificationChannel' | 'phone'>>): Promise<Member>;
 }
 
 export interface HanaAppState {

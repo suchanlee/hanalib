@@ -43,6 +43,10 @@ export function SettingsView() {
   const [phone, setPhone] = useState(member.phone);
   const [channel, setChannel] = useState<NotificationChannel>(member.notificationChannel);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [verificationPending, setVerificationPending] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationError, setVerificationError] = useState('');
 
   const needsPhone = channel === 'sms' || channel === 'both';
   const phoneValid = !needsPhone || isValidUsPhone(phone);
@@ -51,13 +55,52 @@ export function SettingsView() {
   function save(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!phoneValid || !namesValid) return;
-    actions.updateProfile({
+    setSaving(true);
+    setVerificationError('');
+    void actions.updateProfile({
       displayName: displayName.trim(),
       displayNameKo: displayNameKo.trim(),
       phone: normalizeUsPhone(phone),
       notificationChannel: channel,
+    }).then(async (updated) => {
+      setSaved(true);
+      if (needsPhone && !updated.phoneVerified) {
+        const response = await fetch('/api/profile/phone-verification', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { accept: 'application/json', 'idempotency-key': crypto.randomUUID() },
+        });
+        if (!response.ok) throw new Error('verification-send-failed');
+        setVerificationPending(true);
+      } else {
+        setVerificationPending(false);
+      }
+    }).catch(() => {
+      setSaved(false);
+      setVerificationError(t(locale, '저장하거나 인증 문자를 보내지 못했어요.', 'We couldn’t save or send the verification text.'));
+    }).finally(() => setSaving(false));
+  }
+
+  function verifyPhone() {
+    if (!/^\d{6}$/.test(verificationCode)) return;
+    setVerificationError('');
+    void fetch('/api/profile/phone-verification', {
+      method: 'PATCH',
+      credentials: 'same-origin',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'idempotency-key': crypto.randomUUID(),
+      },
+      body: JSON.stringify({ code: verificationCode }),
+    }).then(async (response) => {
+      if (!response.ok) throw new Error('verification-failed');
+      setVerificationPending(false);
+      setVerificationCode('');
+      await actions.refresh();
+    }).catch(() => {
+      setVerificationError(t(locale, '인증번호를 확인해 주세요.', 'Check the verification code and try again.'));
     });
-    setSaved(true);
   }
 
   async function signOut() {
@@ -218,6 +261,13 @@ export function SettingsView() {
                     ? t(locale, '미국 파일럿은 +1로 시작하는 번호를 지원해요.', 'The US pilot supports numbers beginning with +1.')
                     : t(locale, '+1과 지역 번호를 포함한 미국 번호를 입력하세요.', 'Enter a US number with +1 and area code.')}
                 </p>
+                {member.phone && (
+                  <p className="text-xs font-medium" data-testid="settings-phone-status">
+                    {member.phoneVerified
+                      ? t(locale, '인증된 번호', 'Verified number')
+                      : t(locale, '문자 알림을 받으려면 번호 인증이 필요해요.', 'Verify this number to receive text notifications.')}
+                  </p>
+                )}
               </div>
               <div className="flex items-start gap-2.5 rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">
                 <Bell aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
@@ -231,12 +281,50 @@ export function SettingsView() {
           <Button
             className="h-11 w-full"
             data-testid="settings-save"
-            disabled={!phoneValid || !namesValid}
+            disabled={!phoneValid || !namesValid || saving}
             type="submit"
           >
             {saved && <CheckCircle2 aria-hidden="true" />}
-            {saved ? t(locale, '저장했어요', 'Saved') : t(locale, '설정 저장', 'Save settings')}
+            {saving
+              ? t(locale, '저장 중…', 'Saving…')
+              : saved ? t(locale, '저장했어요', 'Saved') : t(locale, '설정 저장', 'Save settings')}
           </Button>
+
+          {verificationPending && (
+            <Card data-testid="phone-verification-card">
+              <CardHeader>
+                <CardTitle>{t(locale, '휴대폰 번호 인증', 'Verify your mobile number')}</CardTitle>
+                <CardDescription>
+                  {t(locale, '문자로 받은 6자리 인증번호를 입력하세요. 10분 동안 유효해요.', 'Enter the six-digit code we texted you. It expires in 10 minutes.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex gap-2">
+                <Label className="sr-only" htmlFor="phone-verification-code">{t(locale, '인증번호', 'Verification code')}</Label>
+                <Input
+                  autoComplete="one-time-code"
+                  data-testid="phone-verification-code"
+                  id="phone-verification-code"
+                  inputMode="numeric"
+                  maxLength={6}
+                  onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="123456"
+                  value={verificationCode}
+                />
+                <Button
+                  data-testid="phone-verification-submit"
+                  disabled={!/^\d{6}$/.test(verificationCode)}
+                  onClick={verifyPhone}
+                  type="button"
+                >
+                  {t(locale, '인증', 'Verify')}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {verificationError && (
+            <p className="text-sm text-destructive" role="alert">{verificationError}</p>
+          )}
         </form>
 
         <Separator />
