@@ -1,14 +1,21 @@
 'use client';
 
 import { BookHeart, Globe2, LockKeyhole, UsersRound } from 'lucide-react';
+import { useSyncExternalStore } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
 import { oauthStartUrl } from './provider-config';
 
+const subscribeToEnvironment = () => () => undefined;
+
 export function AuthView() {
   const { state, actions } = useHanaApp();
   const ko = state.locale === 'ko';
-  const demoEnabled = process.env.NEXT_PUBLIC_AUTH_DEMO_MODE === 'true';
+  const demoEnabled = useSyncExternalStore(
+    subscribeToEnvironment,
+    () => process.env.NEXT_PUBLIC_AUTH_DEMO_MODE === 'true',
+    () => false,
+  );
 
   function beginSignIn(provider: 'google' | 'apple') {
     window.location.assign(oauthStartUrl(provider));

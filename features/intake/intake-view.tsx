@@ -323,6 +323,7 @@ export function IntakeView() {
   const uploadUrlRef = useRef<string | undefined>(undefined);
   const lookupSequenceRef = useRef(0);
   const lookupAbortRef = useRef<AbortController | null>(null);
+  const cameraAttemptRef = useRef(0);
 
   const stopCamera = useCallback(() => {
     zxingControlsRef.current?.stop();
@@ -337,6 +338,7 @@ export function IntakeView() {
   }, []);
 
   useEffect(() => () => {
+    cameraAttemptRef.current += 1;
     stopCamera();
     lookupAbortRef.current?.abort();
     if (uploadUrlRef.current) URL.revokeObjectURL(uploadUrlRef.current);
@@ -452,22 +454,42 @@ export function IntakeView() {
     setFormError('');
     setAutoDetectionAvailable(true);
     setStage('permission');
+    const attempt = ++cameraAttemptRef.current;
+    let timeoutId: number | undefined;
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('camera-unavailable');
       stopCamera();
-      streamRef.current = await navigator.mediaDevices.getUserMedia({
+      const pendingStream = navigator.mediaDevices.getUserMedia({
         audio: false,
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
       });
+      void pendingStream.then((lateStream) => {
+        if (attempt !== cameraAttemptRef.current) {
+          for (const track of lateStream.getTracks()) track.stop();
+        }
+      }).catch(() => undefined);
+      const timeout = new Promise<never>((_resolve, reject) => {
+        timeoutId = window.setTimeout(() => reject(new Error('camera-timeout')), 10_000);
+      });
+      const stream = await Promise.race([pendingStream, timeout]);
+      if (attempt !== cameraAttemptRef.current) {
+        for (const track of stream.getTracks()) track.stop();
+        return;
+      }
+      streamRef.current = stream;
       setStage('scanning');
     } catch {
+      cameraAttemptRef.current += 1;
       stopCamera();
       setErrorKind('camera');
       setStage('error');
+    } finally {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
     }
   };
 
   const reset = () => {
+    cameraAttemptRef.current += 1;
     lookupSequenceRef.current += 1;
     lookupAbortRef.current?.abort();
     lookupAbortRef.current = null;
