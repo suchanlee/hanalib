@@ -38,6 +38,8 @@ EMAIL_FROM=
 # Outbox scheduler authentication. Generate at least 32 random bytes.
 INTERNAL_JOB_SECRET=
 
+# Phone endpoints remain inactive until their ownership is verified.
+
 # Member contact privacy. AES key is base64url-encoded 32 bytes; hash key is 32+ characters.
 CONTACT_ENCRYPTION_KEY=
 CONTACT_HASH_KEY=
