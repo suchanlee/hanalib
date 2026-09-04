@@ -155,6 +155,34 @@ void test('retries older 978 editions with the equivalent ISBN-10 on Google Book
   assert.deepEqual(queries, ['isbn:9780140328721', 'isbn:0140328726']);
 });
 
+void test('selects the most edition-specific exact title when Korean authorities are unavailable', async () => {
+  const google = {
+    items: [{ volumeInfo: {
+      title: 'Talk to me in Korean workbook', authors: ['TalkToMeInKorean'], publishedDate: '2018', language: 'en',
+      industryIdentifiers: [{ type: 'ISBN_13', identifier: '9791186701140' }],
+    } }],
+  };
+  const edition = {
+    title: 'Talk to Me in Korean Workbook', subtitle: 'Level 5', authors: [{ key: '/authors/OL123A' }],
+    publish_date: '2018', languages: [{ key: '/languages/eng' }, { key: '/languages/kor' }],
+    isbn_13: ['9791186701140'],
+  };
+  const fetchImpl: FetchLike = async (input) => {
+    const url = new URL(input instanceof Request ? input.url : String(input));
+    if (url.hostname === 'www.googleapis.com') return Response.json(google);
+    if (url.pathname.startsWith('/authors/')) return Response.json({ name: 'TalkToMeInKorean' });
+    if (url.pathname === '/search.json') return Response.json({ docs: [] });
+    if (url.hostname === 'openlibrary.org') return Response.json(edition);
+    throw new Error(`Unexpected provider URL: ${url}`);
+  };
+  const result = await resolveBookMetadata(
+    '9791186701140', 'ko', { googleBooksApiKey: 'google-key' }, { fetchImpl },
+  );
+  assert.equal(result.metadata?.title, 'Talk to Me in Korean Workbook: Level 5');
+  assert.equal(result.metadata?.provenance.title, 'open-library');
+  assert.equal(result.metadata?.language, 'other');
+});
+
 void test('reports a provider outage without substituting a different edition', async () => {
   const result = await resolveBookMetadata(
     '9788936434267', 'ko', {}, { fetchImpl: providerFetch({ failOpenLibrary: true }) },

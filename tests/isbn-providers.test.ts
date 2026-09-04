@@ -109,6 +109,15 @@ void test('normalizes exact Open Library editions in Korean and English', () => 
   assert.equal(english?.publishedYear, 1988);
 });
 
+void test('marks bilingual Open Library editions as other rather than guessing one language', () => {
+  const result = normalizeOpenLibraryEditionResponse('9791186701140', {
+    title: 'Talk to Me in Korean Workbook', subtitle: 'Level 5', isbn_13: ['9791186701140'],
+    languages: [{ key: '/languages/eng' }, { key: '/languages/kor' }],
+  });
+  assert.equal(result?.title, 'Talk to Me in Korean Workbook: Level 5');
+  assert.equal(result?.language, 'other');
+});
+
 void test('rejects an Open Library response for a different edition', () => {
   const result = normalizeOpenLibraryEditionResponse('9780140328721', {
     title: 'Wrong edition', isbn_13: ['9780140328738'],

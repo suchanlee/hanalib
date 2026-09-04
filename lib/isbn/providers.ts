@@ -113,17 +113,45 @@ function firstValue<T>(candidates: MetadataCandidate[], sourceOrder: MetadataSou
   return undefined;
 }
 
+function bestEditionTitle(candidates: MetadataCandidate[], locale: AppLocale, sourceOrder: MetadataSource[]) {
+  if (locale === 'ko') {
+    const authoritative = firstValue(candidates, ['nlk', 'naver'], (candidate) => candidate.title);
+    if (authoritative) return authoritative;
+  }
+
+  return candidates
+    .flatMap((candidate) => candidate.title?.trim() ? [{ candidate, title: candidate.title.trim() }] : [])
+    .sort((left, right) => {
+      const score = ({ candidate, title }: typeof left) => {
+        const hasHangul = /[\uac00-\ud7a3]/.test(title);
+        const scriptMatches = locale === 'ko' ? hasHangul : !hasHangul;
+        const languageMatches = candidate.language === locale;
+        const sourceRank = sourceOrder.indexOf(candidate.source);
+        return (scriptMatches ? 1_000 : 0)
+          + (languageMatches ? 500 : 0)
+          + Math.min(title.length, 160)
+          + (sourceRank < 0 ? 0 : sourceOrder.length - sourceRank);
+      };
+      return score(right) - score(left);
+    })
+    .map(({ candidate, title }) => ({ value: title, source: candidate.source }))
+    .at(0);
+}
+
 export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: MetadataCandidate[]): StitchedBookMetadata {
   const bibliographicOrder: MetadataSource[] = locale === 'ko'
     ? ['nlk', 'naver', 'google-books', 'open-library', 'fixture', 'member']
     : ['google-books', 'open-library', 'naver', 'nlk', 'fixture', 'member'];
   const coverOrder: MetadataSource[] = ['naver', 'google-books', 'nlk', 'open-library', 'fixture', 'member'];
-  const title = firstValue(candidates, bibliographicOrder, (candidate) => candidate.title);
+  const title = bestEditionTitle(candidates, locale, bibliographicOrder);
   const titleEn = firstValue(candidates, ['google-books', 'open-library', 'naver', 'nlk', 'fixture'], (candidate) => candidate.titleEn);
   const authors = firstValue(candidates, bibliographicOrder, (candidate) => candidate.authors);
   const publisher = firstValue(candidates, bibliographicOrder, (candidate) => candidate.publisher);
   const publishedYear = firstValue(candidates, bibliographicOrder, (candidate) => candidate.publishedYear);
-  const language = firstValue(candidates, bibliographicOrder, (candidate) => candidate.language);
+  const titleCandidate = title ? candidates.find((candidate) => candidate.source === title.source) : undefined;
+  const language = titleCandidate?.language
+    ? { value: titleCandidate.language, source: titleCandidate.source }
+    : firstValue(candidates, bibliographicOrder, (candidate) => candidate.language);
   const pageCount = firstValue(candidates, ['google-books', 'open-library', 'nlk', 'naver', 'fixture'], (candidate) => candidate.pageCount);
   const description = firstValue(candidates, locale === 'ko'
     ? ['naver', 'google-books', 'nlk', 'open-library', 'fixture']

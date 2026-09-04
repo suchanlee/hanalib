@@ -95,6 +95,15 @@ function includesIsbn13(values: string[], isbn13: string) {
   });
 }
 
+function openLibraryLanguage(values: string[]): MetadataCandidate['language'] {
+  const mapped = new Set(values.map((value) => {
+    const code = value.split('/').pop();
+    return code === 'kor' ? 'ko' : code === 'eng' ? 'en' : code ? 'other' : undefined;
+  }).filter((value): value is NonNullable<MetadataCandidate['language']> => Boolean(value)));
+  if (mapped.size > 1) return 'other';
+  return mapped.values().next().value;
+}
+
 export function normalizeGoogleBooksResponse(isbn13: string, response: GoogleVolumesResponse): Omit<MetadataCandidate, 'source'> | null {
   const exact = response.items?.flatMap(({ volumeInfo }) => volumeInfo && includesIsbn13(
     volumeInfo?.industryIdentifiers?.flatMap(({ identifier }) => identifier ? [identifier] : []) ?? [],
@@ -199,7 +208,7 @@ export function normalizeOpenLibraryEditionResponse(
   if (authors.length === 0 && statementAuthor) authors.push(statementAuthor);
   const coverId = response.covers?.find((value) => Number.isInteger(value) && value > 0);
   const rawDescription = typeof response.description === 'string' ? response.description : response.description?.value;
-  const languageKey = response.languages?.[0]?.key?.split('/').pop();
+  const detectedLanguage = openLibraryLanguage(response.languages?.flatMap(({ key }) => key ? [key] : []) ?? []);
 
   return {
     isbn13,
@@ -207,7 +216,7 @@ export function normalizeOpenLibraryEditionResponse(
     authors,
     publisher: response.publishers?.find((value) => value.trim())?.trim(),
     publishedYear: year(response.publish_date),
-    language: languageKey === 'kor' ? 'ko' : languageKey === 'eng' ? 'en' : languageKey ? 'other' : undefined,
+    language: detectedLanguage,
     pageCount: Number.isInteger(response.number_of_pages) && (response.number_of_pages ?? 0) > 0 ? response.number_of_pages : undefined,
     description: cleanMarkup(rawDescription),
     coverUrl: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false` : undefined,
@@ -224,14 +233,7 @@ export function normalizeOpenLibrarySearchResponse(
 
   const authors = exact.author_name?.map((value) => cleanMarkup(value)).filter((value): value is string => Boolean(value));
   const publishers = [...new Set(exact.publisher?.map((value) => cleanMarkup(value)).filter((value): value is string => Boolean(value)) ?? [])];
-  const languages = exact.language ?? [];
-  const detectedLanguage = languages.includes('kor')
-    ? 'ko'
-    : languages.includes('eng')
-      ? 'en'
-      : languages.length > 0
-        ? 'other'
-        : undefined;
+  const detectedLanguage = openLibraryLanguage(exact.language ?? []);
   const coverId = Number.isInteger(exact.cover_i) && (exact.cover_i ?? 0) > 0 ? exact.cover_i : undefined;
 
   return {
