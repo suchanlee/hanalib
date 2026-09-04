@@ -135,7 +135,7 @@ export function BookDetailView() {
           {item.edition.titleEn && item.edition.titleEn !== item.edition.title ? (
             <p className="mt-2 text-base text-muted-foreground">{item.edition.titleEn}</p>
           ) : null}
-          <p className="mt-4 text-lg">{item.edition.authors.join(', ')}</p>
+          <p className="mt-4 text-lg">{item.edition.authors.join(', ') || (state.locale === 'ko' ? '저자 정보 없음' : 'Author not listed')}</p>
           {item.edition.authorsEn?.length ? <p className="mt-1 text-sm text-muted-foreground">{item.edition.authorsEn.join(', ')}</p> : null}
 
           <div className="mt-6 flex items-center gap-3 rounded-2xl border bg-card p-4">
@@ -281,7 +281,7 @@ export function BookDetailView() {
         <h2 id="book-metadata-heading" className="text-lg font-semibold">{t.details}</h2>
         {item.edition.description ? <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">{item.edition.description}</p> : null}
         <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Metadata icon={<CalendarDays />} label={t.published} value={`${item.edition.publisher} · ${item.edition.publishedYear}`} />
+          <Metadata icon={<CalendarDays />} label={t.published} value={item.edition.publisher ? `${item.edition.publisher} · ${item.edition.publishedYear}` : String(item.edition.publishedYear)} />
           <Metadata icon={<Hash />} label={t.isbn} value={item.edition.isbn13} />
           <Metadata icon={<Languages />} label={t.language} value={languageLabel(state.locale, item.edition.language)} />
           <Metadata icon={<BookMarked />} label={t.condition} value={conditionLabel(state.locale, item.condition)} />

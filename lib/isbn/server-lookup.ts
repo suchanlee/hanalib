@@ -1,13 +1,16 @@
 import type { AppLocale } from '../domain/types.ts';
 import { lookupFixtureMetadata, stitchMetadata, type MetadataCandidate, type StitchedBookMetadata } from './providers.ts';
+import { isbn13To10 } from './isbn.ts';
 import {
   normalizeGoogleBooksResponse,
   normalizeNaverBooksResponse,
   normalizeNlkResponse,
   normalizeOpenLibraryEditionResponse,
+  normalizeOpenLibrarySearchResponse,
   type GoogleVolumesResponse,
   type NaverBooksResponse,
   type OpenLibraryEditionResponse,
+  type OpenLibrarySearchResponse,
 } from './server-normalizers.ts';
 
 export type ProviderStatus = 'ok' | 'not-found' | 'failed' | 'not-configured';
@@ -29,7 +32,7 @@ export interface ServerLookupResult {
 
 export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
-const DEFAULT_TIMEOUT_MS = 5_000;
+const DEFAULT_TIMEOUT_MS = 8_000;
 
 function providerSignal(timeoutMs: number) {
   return AbortSignal.timeout(Math.max(100, Math.min(timeoutMs, 15_000)));
@@ -62,18 +65,29 @@ export async function fetchGoogleBooksMetadata(
   apiKey: string,
   options: { fetchImpl?: FetchLike; timeoutMs?: number } = {},
 ) {
-  const url = new URL('https://www.googleapis.com/books/v1/volumes');
-  url.searchParams.set('q', `isbn:${isbn13}`);
-  url.searchParams.set('maxResults', '10');
-  url.searchParams.set('printType', 'books');
-  url.searchParams.set('key', apiKey);
-  const response = await (options.fetchImpl ?? fetch)(url, {
-    headers: { accept: 'application/json' },
-    signal: providerSignal(options.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-  });
-  if (!response.ok) throw new Error(`Google Books responded with ${response.status}.`);
-  const normalized = normalizeGoogleBooksResponse(isbn13, await response.json() as GoogleVolumesResponse);
-  return normalized ? { ...normalized, source: 'google-books' as const } : null;
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const lookup = async (identifier: string) => {
+    const url = new URL('https://www.googleapis.com/books/v1/volumes');
+    url.searchParams.set('q', `isbn:${identifier}`);
+    url.searchParams.set('maxResults', '10');
+    url.searchParams.set('printType', 'books');
+    url.searchParams.set('key', apiKey);
+    const response = await fetchImpl(url, {
+      headers: { accept: 'application/json' },
+      signal: providerSignal(options.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+    });
+    if (!response.ok) throw new Error(`Google Books responded with ${response.status}.`);
+    return normalizeGoogleBooksResponse(isbn13, await response.json() as GoogleVolumesResponse);
+  };
+
+  const primary = await lookup(isbn13);
+  if (primary) return { ...primary, source: 'google-books' as const };
+
+  // Some older English editions are indexed only by their equivalent ISBN-10.
+  const isbn10 = isbn13To10(isbn13);
+  if (!isbn10) return null;
+  const fallback = await lookup(isbn10);
+  return fallback ? { ...fallback, source: 'google-books' as const } : null;
 }
 
 export async function fetchNaverBooksMetadata(
@@ -103,26 +117,61 @@ export async function fetchOpenLibraryMetadata(
   options: { fetchImpl?: FetchLike; timeoutMs?: number } = {},
 ) {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const signal = providerSignal(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   const headers = {
     accept: 'application/json',
     'user-agent': 'Hana Community Library/1.0 (https://hana-community-library.lee-suchan.chatgpt.site/)',
   };
-  const response = await fetchImpl(`https://openlibrary.org/isbn/${isbn13}.json`, { headers, signal });
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Open Library responded with ${response.status}.`);
-  const edition = await response.json() as OpenLibraryEditionResponse;
-  const authorKeys = [...new Set((edition.authors ?? []).flatMap(({ key }) => key ? [key] : []))].slice(0, 12);
-  const authorResponses = await Promise.allSettled(authorKeys.map(async (key) => {
-    if (!/^\/authors\/OL\d+A$/.test(key)) return undefined;
-    const authorResponse = await fetchImpl(`https://openlibrary.org${key}.json`, { headers, signal });
-    if (!authorResponse.ok) return undefined;
-    const payload = await authorResponse.json() as { name?: string };
-    return payload.name?.trim() || undefined;
-  }));
-  const authorNames = authorResponses.flatMap((result) => result.status === 'fulfilled' && result.value ? [result.value] : []);
-  const normalized = normalizeOpenLibraryEditionResponse(isbn13, edition, authorNames);
-  return normalized ? { ...normalized, source: 'open-library' as const } : null;
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+
+  const editionLookup = async () => {
+    const signal = providerSignal(timeoutMs);
+    const response = await fetchImpl(`https://openlibrary.org/isbn/${isbn13}.json`, { headers, signal });
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error(`Open Library edition lookup responded with ${response.status}.`);
+    const edition = await response.json() as OpenLibraryEditionResponse;
+    const authorKeys = [...new Set((edition.authors ?? []).flatMap(({ key }) => key ? [key] : []))].slice(0, 12);
+    const authorResponses = await Promise.allSettled(authorKeys.map(async (key) => {
+      if (!/^\/authors\/OL\d+A$/.test(key)) return undefined;
+      const authorResponse = await fetchImpl(`https://openlibrary.org${key}.json`, { headers, signal });
+      if (!authorResponse.ok) return undefined;
+      const payload = await authorResponse.json() as { name?: string };
+      return payload.name?.trim() || undefined;
+    }));
+    const authorNames = authorResponses.flatMap((result) => result.status === 'fulfilled' && result.value ? [result.value] : []);
+    return normalizeOpenLibraryEditionResponse(isbn13, edition, authorNames);
+  };
+
+  const searchLookup = async () => {
+    const url = new URL('https://openlibrary.org/search.json');
+    url.searchParams.set('q', `isbn:${isbn13}`);
+    url.searchParams.set('fields', 'title,author_name,publisher,first_publish_year,language,isbn,cover_i');
+    url.searchParams.set('limit', '10');
+    const response = await fetchImpl(url, { headers, signal: providerSignal(timeoutMs) });
+    if (!response.ok) throw new Error(`Open Library search responded with ${response.status}.`);
+    return normalizeOpenLibrarySearchResponse(isbn13, await response.json() as OpenLibrarySearchResponse);
+  };
+
+  const [editionResult, searchResult] = await Promise.allSettled([editionLookup(), searchLookup()]);
+  const edition = editionResult.status === 'fulfilled' ? editionResult.value : null;
+  const search = searchResult.status === 'fulfilled' ? searchResult.value : null;
+  if (!edition && !search) {
+    if (editionResult.status === 'rejected' && searchResult.status === 'rejected') throw editionResult.reason;
+    return null;
+  }
+
+  const preferred = edition ?? search!;
+  const fallback = edition ? search : null;
+  const normalized = {
+    ...preferred,
+    authors: preferred.authors?.length ? preferred.authors : fallback?.authors,
+    publisher: preferred.publisher ?? fallback?.publisher,
+    publishedYear: preferred.publishedYear ?? fallback?.publishedYear,
+    language: preferred.language ?? fallback?.language,
+    pageCount: preferred.pageCount ?? fallback?.pageCount,
+    description: preferred.description ?? fallback?.description,
+    coverUrl: preferred.coverUrl ?? fallback?.coverUrl,
+  };
+  return { ...normalized, source: 'open-library' as const };
 }
 
 export async function resolveBookMetadata(

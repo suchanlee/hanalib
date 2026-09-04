@@ -5,6 +5,7 @@ import {
   normalizeNaverBooksResponse,
   normalizeNlkResponse,
   normalizeOpenLibraryEditionResponse,
+  normalizeOpenLibrarySearchResponse,
 } from '../lib/isbn/server-normalizers.ts';
 
 void test('normalizes an exact Google Books ISBN match', () => {
@@ -112,4 +113,28 @@ void test('rejects an Open Library response for a different edition', () => {
     title: 'Wrong edition', isbn_13: ['9780140328738'],
   }, ['Roald Dahl']);
   assert.equal(result, null);
+});
+
+void test('normalizes an exact Open Library ISBN search fallback', () => {
+  const result = normalizeOpenLibrarySearchResponse('9780140328721', {
+    docs: [{
+      title: 'Fantastic Mr. Fox', author_name: ['Roald Dahl'], publisher: ['Puffin'],
+      first_publish_year: 1970, language: ['eng'], isbn: ['0140328726', '9780140328721'], cover_i: 8739161,
+    }],
+  });
+  assert.equal(result?.title, 'Fantastic Mr. Fox');
+  assert.deepEqual(result?.authors, ['Roald Dahl']);
+  assert.equal(result?.publisher, 'Puffin');
+  assert.equal(result?.language, 'en');
+  assert.equal(result?.coverUrl, 'https://covers.openlibrary.org/b/id/8739161-L.jpg?default=false');
+});
+
+void test('rejects mismatched search results and ambiguous aggregate publishers', () => {
+  assert.equal(normalizeOpenLibrarySearchResponse('9780140328721', {
+    docs: [{ title: 'Wrong edition', isbn: ['9780140328738'] }],
+  }), null);
+  const aggregate = normalizeOpenLibrarySearchResponse('9780140328721', {
+    docs: [{ title: 'Fantastic Mr. Fox', isbn: ['9780140328721'], publisher: ['Puffin', 'Knopf'] }],
+  });
+  assert.equal(aggregate?.publisher, undefined);
 });

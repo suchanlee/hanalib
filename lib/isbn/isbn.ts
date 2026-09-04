@@ -41,6 +41,19 @@ export function isbn10To13(value: string) {
   return `${body}${checkDigit}`;
 }
 
+export function isbn13To10(value: string) {
+  const isbn13 = normalizeIsbn(value);
+  if (!isValidIsbn13(isbn13) || !isbn13.startsWith('978')) return undefined;
+
+  const body = isbn13.slice(3, 12);
+  const weighted = body.split('').reduce(
+    (total, character, index) => total + Number(character) * (10 - index),
+    0,
+  );
+  const checkValue = (11 - (weighted % 11)) % 11;
+  return `${body}${checkValue === 10 ? 'X' : checkValue}`;
+}
+
 export interface ParsedIsbn {
   input: string;
   isbn13: string;

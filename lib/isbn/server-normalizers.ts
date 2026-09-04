@@ -51,6 +51,18 @@ export interface OpenLibraryEditionResponse {
   description?: string | { value?: string };
 }
 
+export interface OpenLibrarySearchResponse {
+  docs?: Array<{
+    title?: string;
+    author_name?: string[];
+    publisher?: string[];
+    first_publish_year?: number;
+    language?: string[];
+    isbn?: string[];
+    cover_i?: number;
+  }>;
+}
+
 function language(value?: string): MetadataCandidate['language'] {
   if (value === 'ko') return 'ko';
   if (value === 'en') return 'en';
@@ -198,6 +210,40 @@ export function normalizeOpenLibraryEditionResponse(
     language: languageKey === 'kor' ? 'ko' : languageKey === 'eng' ? 'en' : languageKey ? 'other' : undefined,
     pageCount: Number.isInteger(response.number_of_pages) && (response.number_of_pages ?? 0) > 0 ? response.number_of_pages : undefined,
     description: cleanMarkup(rawDescription),
+    coverUrl: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false` : undefined,
+  };
+}
+
+export function normalizeOpenLibrarySearchResponse(
+  isbn13: string,
+  response: OpenLibrarySearchResponse,
+): Omit<MetadataCandidate, 'source'> | null {
+  const exact = response.docs?.find((document) => includesIsbn13(document.isbn ?? [], isbn13));
+  const title = cleanMarkup(exact?.title);
+  if (!exact || !title) return null;
+
+  const authors = exact.author_name?.map((value) => cleanMarkup(value)).filter((value): value is string => Boolean(value));
+  const publishers = [...new Set(exact.publisher?.map((value) => cleanMarkup(value)).filter((value): value is string => Boolean(value)) ?? [])];
+  const languages = exact.language ?? [];
+  const detectedLanguage = languages.includes('kor')
+    ? 'ko'
+    : languages.includes('eng')
+      ? 'en'
+      : languages.length > 0
+        ? 'other'
+        : undefined;
+  const coverId = Number.isInteger(exact.cover_i) && (exact.cover_i ?? 0) > 0 ? exact.cover_i : undefined;
+
+  return {
+    isbn13,
+    title,
+    authors,
+    // Search documents can aggregate multiple editions. Only trust an unambiguous publisher.
+    publisher: publishers.length === 1 ? publishers[0] : undefined,
+    publishedYear: Number.isInteger(exact.first_publish_year) && (exact.first_publish_year ?? 0) > 0
+      ? exact.first_publish_year
+      : undefined,
+    language: detectedLanguage,
     coverUrl: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false` : undefined,
   };
 }

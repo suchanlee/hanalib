@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       naverClientId: process.env.NAVER_CLIENT_ID,
       naverClientSecret: process.env.NAVER_CLIENT_SECRET,
       googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY,
-      timeoutMs: 5_000,
+      timeoutMs: 8_000,
     },
     { allowFixture },
   );
@@ -32,10 +32,11 @@ export async function GET(request: Request) {
 
   const statuses = Object.values(result.providerStatus);
   if (statuses.every((status) => status === 'not-configured')) {
-    return Response.json({ error: 'provider-not-configured' }, { status: 503, headers });
+    return Response.json({ error: 'provider-not-configured', providerStatus: result.providerStatus }, { status: 503, headers });
   }
   if (statuses.some((status) => status === 'failed')) {
-    return Response.json({ error: 'providers-unavailable' }, { status: 502, headers });
+    console.warn('book-metadata-lookup-miss', { providerStatus: result.providerStatus });
+    return Response.json({ error: 'providers-unavailable', providerStatus: result.providerStatus }, { status: 502, headers });
   }
-  return Response.json({ error: 'not-found' }, { status: 404, headers });
+  return Response.json({ error: 'not-found', providerStatus: result.providerStatus }, { status: 404, headers });
 }

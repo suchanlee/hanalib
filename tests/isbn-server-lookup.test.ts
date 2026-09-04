@@ -28,6 +28,13 @@ const openLibraryPayload = {
   languages: [{ key: '/languages/eng' }], isbn_13: ['9788936434267'],
 };
 
+const openLibrarySearchPayload = {
+  docs: [{
+    title: 'Almond', author_name: ['Won-pyung Sohn'], publisher: ['HarperVia'], first_publish_year: 2020,
+    language: ['eng'], isbn: ['9788936434267'], cover_i: 12345,
+  }],
+};
+
 function providerFetch(options: { failNlk?: boolean; timeoutNlk?: boolean; failOpenLibrary?: boolean } = {}): FetchLike {
   return async (input, init) => {
     const url = new URL(input instanceof Request ? input.url : String(input));
@@ -44,6 +51,7 @@ function providerFetch(options: { failNlk?: boolean; timeoutNlk?: boolean; failO
     if (url.hostname === 'openlibrary.org') {
       if (options.failOpenLibrary) return Response.json({ error: 'down' }, { status: 503 });
       if (url.pathname.startsWith('/authors/')) return Response.json({ name: 'Won-pyung Sohn' });
+      if (url.pathname === '/search.json') return Response.json(openLibrarySearchPayload);
       return Response.json(openLibraryPayload);
     }
     throw new Error(`Unexpected provider URL: ${url}`);
@@ -108,6 +116,43 @@ void test('uses the credential-free exact-edition provider when configured provi
   assert.deepEqual(result.providerStatus, {
     nlk: 'not-configured', naver: 'not-configured', 'google-books': 'not-configured', 'open-library': 'ok',
   });
+});
+
+void test('falls back to Open Library search when its exact-edition endpoint fails', async () => {
+  const fetchImpl: FetchLike = async (input) => {
+    const url = new URL(input instanceof Request ? input.url : String(input));
+    if (url.pathname.startsWith('/isbn/')) return Response.json({ error: 'down' }, { status: 503 });
+    if (url.pathname === '/search.json') return Response.json(openLibrarySearchPayload);
+    throw new Error(`Unexpected provider URL: ${url}`);
+  };
+  const result = await resolveBookMetadata('9788936434267', 'en', {}, { fetchImpl });
+  assert.equal(result.metadata?.title, 'Almond');
+  assert.deepEqual(result.metadata?.authors, ['Won-pyung Sohn']);
+  assert.equal(result.providerStatus['open-library'], 'ok');
+});
+
+void test('retries older 978 editions with the equivalent ISBN-10 on Google Books', async () => {
+  const queries: string[] = [];
+  const fetchImpl: FetchLike = async (input) => {
+    const url = new URL(input instanceof Request ? input.url : String(input));
+    if (url.hostname === 'www.googleapis.com') {
+      queries.push(url.searchParams.get('q') ?? '');
+      if (url.searchParams.get('q') === 'isbn:0140328726') {
+        return Response.json({ items: [{ volumeInfo: {
+          title: 'Fantastic Mr. Fox', authors: ['Roald Dahl'], language: 'en',
+          industryIdentifiers: [{ type: 'ISBN_10', identifier: '0140328726' }],
+        } }] });
+      }
+      return Response.json({ totalItems: 0 });
+    }
+    if (url.hostname === 'openlibrary.org') return Response.json({ error: 'down' }, { status: 503 });
+    throw new Error(`Unexpected provider URL: ${url}`);
+  };
+  const result = await resolveBookMetadata(
+    '9780140328721', 'en', { googleBooksApiKey: 'google-key' }, { fetchImpl },
+  );
+  assert.equal(result.metadata?.title, 'Fantastic Mr. Fox');
+  assert.deepEqual(queries, ['isbn:9780140328721', 'isbn:0140328726']);
 });
 
 void test('reports a provider outage without substituting a different edition', async () => {

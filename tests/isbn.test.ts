@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { isbn10To13, isValidIsbn10, isValidIsbn13, normalizeIsbn, parseIsbn } from '../lib/isbn/isbn.ts';
+import { isbn10To13, isbn13To10, isValidIsbn10, isValidIsbn13, normalizeIsbn, parseIsbn } from '../lib/isbn/isbn.ts';
 
 void test('normalizes and validates Korean and English ISBN-13 fixtures', () => {
   assert.equal(normalizeIsbn('978-89-3643-426-7'), '9788936434267');
@@ -20,6 +20,9 @@ void test('validates ISBN-10 and converts it to ISBN-13', () => {
   });
   assert.equal(isValidIsbn10('0-8044-2957-X'), true);
   assert.equal(isbn10To13('0-8044-2957-X'), '9780804429573');
+  assert.equal(isbn13To10('9780804429573'), '080442957X');
+  assert.equal(isbn13To10('9780140328721'), '0140328726');
+  assert.equal(isbn13To10('9791186701140'), undefined);
 });
 
 void test('rejects malformed barcode input', () => {
