@@ -182,6 +182,34 @@ void test('accepting a request creates the loan, day-7 check, and both outbox ev
   assert.deepEqual(Object.keys(JSON.parse(String(due.values[2]))).sort(), ['actorName', 'bookTitle', 'recipientName', 'returnUrl']);
 });
 
+void test('catalog intake accepts editions without a named author or publisher', async () => {
+  const database = new RecordedD1((sql, values) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('idempotency_key = ?')) return null;
+    if (sql.includes('FROM catalog_items ci')) {
+      return {
+        itemId: String(values[0]), ownerId: 'borrower', itemStatus: 'available', itemCondition: 'good',
+        ownerNotes: null, itemCreatedAt: fixedNow.getTime(), editionId: 'edition-created', isbn10: null,
+        isbn13: '9791191071238', title: 'The Nickel Boys (Korean Edition)', titleEn: null,
+        authorsJson: '[]', authorsEnJson: '[]', publisher: '', publishedOn: '2021', language: 'other',
+        pageCount: null, description: null, coverSourceUrl: null, coverStoragePath: null,
+        coverTone: 'blue', provenanceJson: '{"title":"open-library"}',
+      };
+    }
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  const item = await repository.createCatalogItem(context, {
+    isbn13: '9791191071238', title: 'The Nickel Boys (Korean Edition)', authors: [], publisher: '',
+    publishedYear: 2021, language: 'other', condition: 'good', provenance: { title: 'open-library' },
+  });
+
+  assert.deepEqual(item.edition.authors, []);
+  assert.equal(item.edition.publisher, '');
+  assert.equal(database.batches.length, 1);
+});
+
 void test('all repository operations reject inactive community actors before preparing mutations', async () => {
   const database = new RecordedD1(() => null);
   const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });

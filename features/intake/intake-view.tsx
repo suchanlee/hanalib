@@ -93,9 +93,9 @@ const intakeCopy = {
     confirmHelp: '여러 제공처의 정보를 합쳤어요. 필요한 부분만 고쳐 주세요.',
     titleLabel: '제목',
     titleEnLabel: '영문 제목 (선택)',
-    authorLabel: '저자',
+    authorLabel: '저자 (선택)',
     authorHelp: '여러 명이면 쉼표로 구분해 주세요.',
-    publisherLabel: '출판사',
+    publisherLabel: '출판사 (선택)',
     yearLabel: '출판 연도',
     languageLabel: '언어',
     pagesLabel: '쪽수 (선택)',
@@ -108,7 +108,7 @@ const intakeCopy = {
     coverError: '8MB 이하의 이미지 파일을 선택해 주세요.',
     uploadFailed: '표지 사진을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
     saveFailed: '도서를 추가하지 못했어요. 잠시 후 다시 시도해 주세요.',
-    requiredError: '제목, 저자, 출판사, 출판 연도를 확인해 주세요.',
+    requiredError: '제목과 출판 연도를 확인해 주세요.',
     back: 'ISBN으로 돌아가기',
     create: '내 도서로 추가',
     creating: '도서 추가 중…',
@@ -158,9 +158,9 @@ const intakeCopy = {
     confirmHelp: 'We combined the best fields from multiple providers. Change anything that needs fixing.',
     titleLabel: 'Title',
     titleEnLabel: 'English title (optional)',
-    authorLabel: 'Author',
+    authorLabel: 'Author (optional)',
     authorHelp: 'Separate multiple authors with commas.',
-    publisherLabel: 'Publisher',
+    publisherLabel: 'Publisher (optional)',
     yearLabel: 'Published year',
     languageLabel: 'Language',
     pagesLabel: 'Page count (optional)',
@@ -173,7 +173,7 @@ const intakeCopy = {
     coverError: 'Choose an image file no larger than 8MB.',
     uploadFailed: 'We couldn’t save the cover photo. Please try again.',
     saveFailed: 'We couldn’t add the book. Please try again.',
-    requiredError: 'Check the title, author, publisher, and published year.',
+    requiredError: 'Check the title and published year.',
     back: 'Back to ISBN',
     create: 'Add to my library',
     creating: 'Adding book…',
@@ -546,7 +546,7 @@ export function IntakeView() {
     const authors = draft.authors.split(',').map((author) => author.trim()).filter(Boolean);
     const publishedYear = Number(draft.publishedYear);
     const pageCount = draft.pageCount ? Number(draft.pageCount) : undefined;
-    if (!draft.title.trim() || authors.length === 0 || !draft.publisher.trim() || !Number.isInteger(publishedYear) || publishedYear < 1000 || publishedYear > 2200) {
+    if (!draft.title.trim() || !Number.isInteger(publishedYear) || publishedYear < 1000 || publishedYear > 2200) {
       setFormError(c.requiredError);
       return;
     }
@@ -774,12 +774,12 @@ export function IntakeView() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="book-authors">{c.authorLabel}</Label>
-              <Input className="h-11" data-testid="author-input" id="book-authors" onChange={(event) => editDraft('authors', event.target.value)} required value={draft.authors} />
+              <Input className="h-11" data-testid="author-input" id="book-authors" onChange={(event) => editDraft('authors', event.target.value)} value={draft.authors} />
               <p className="text-xs text-muted-foreground">{c.authorHelp}</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="book-publisher">{c.publisherLabel}</Label>
-              <Input className="h-11" data-testid="publisher-input" id="book-publisher" onChange={(event) => editDraft('publisher', event.target.value)} required value={draft.publisher} />
+              <Input className="h-11" data-testid="publisher-input" id="book-publisher" onChange={(event) => editDraft('publisher', event.target.value)} value={draft.publisher} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">

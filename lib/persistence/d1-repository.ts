@@ -450,7 +450,6 @@ export class D1LibraryRepository implements LibraryRepository {
       typeof input.title !== 'string' ||
       !Array.isArray(input.authors) ||
       !input.authors.every((author) => typeof author === 'string') ||
-      !input.authors.some((author) => author.trim()) ||
       typeof input.publisher !== 'string' ||
       (input.titleEn !== undefined && typeof input.titleEn !== 'string') ||
       (input.ownerNotes !== undefined && typeof input.ownerNotes !== 'string') ||
@@ -461,11 +460,11 @@ export class D1LibraryRepository implements LibraryRepository {
       typeof input.provenance !== 'object' ||
       Array.isArray(input.provenance)
     ) {
-      throw libraryError('invalid-input', 'ISBN, title, author, publisher, language, and provenance are required.');
+      throw libraryError('invalid-input', 'ISBN, title, language, and provenance are required.');
     }
     const parsedIsbn = parseIsbn(input.isbn13);
-    if (!parsedIsbn || !input.title.trim() || !input.authors.length || !validCondition(input.condition)) {
-      throw libraryError('invalid-input', 'ISBN, title, author, and condition are required.');
+    if (!parsedIsbn || !input.title.trim() || !validCondition(input.condition)) {
+      throw libraryError('invalid-input', 'ISBN, title, and condition are required.');
     }
     if (!Number.isInteger(input.publishedYear) || input.publishedYear < 1000 || input.publishedYear > 9999) {
       throw libraryError('invalid-input', 'Published year must be a four-digit year.');

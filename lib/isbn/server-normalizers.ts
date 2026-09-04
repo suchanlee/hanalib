@@ -84,28 +84,32 @@ function includesIsbn13(values: string[], isbn13: string) {
 }
 
 export function normalizeGoogleBooksResponse(isbn13: string, response: GoogleVolumesResponse): Omit<MetadataCandidate, 'source'> | null {
-  const exact = response.items?.find(({ volumeInfo }) => includesIsbn13(
+  const exact = response.items?.flatMap(({ volumeInfo }) => volumeInfo && includesIsbn13(
     volumeInfo?.industryIdentifiers?.flatMap(({ identifier }) => identifier ? [identifier] : []) ?? [],
     isbn13,
-  ));
-  const info = exact?.volumeInfo;
-  if (!info?.title) return null;
-  const rawCover = info.imageLinks?.extraLarge
-    ?? info.imageLinks?.large
-    ?? info.imageLinks?.medium
-    ?? info.imageLinks?.small
-    ?? info.imageLinks?.thumbnail
-    ?? info.imageLinks?.smallThumbnail;
+  ) ? [volumeInfo] : []) ?? [];
+  const first = <T>(select: (info: GoogleVolumeInfo) => T | undefined) => exact.map(select).find((value) => {
+    if (Array.isArray(value)) return value.length > 0;
+    return value !== undefined && value !== '';
+  });
+  const title = first((info) => info.title);
+  if (!title) return null;
+  const rawCover = first((info) => info.imageLinks?.extraLarge)
+    ?? first((info) => info.imageLinks?.large)
+    ?? first((info) => info.imageLinks?.medium)
+    ?? first((info) => info.imageLinks?.small)
+    ?? first((info) => info.imageLinks?.thumbnail)
+    ?? first((info) => info.imageLinks?.smallThumbnail);
 
   return {
     isbn13,
-    title: info.title,
-    authors: info.authors,
-    publisher: info.publisher,
-    publishedYear: year(info.publishedDate),
-    language: language(info.language),
-    pageCount: info.pageCount,
-    description: info.description,
+    title,
+    authors: first((info) => info.authors),
+    publisher: first((info) => info.publisher),
+    publishedYear: year(first((info) => info.publishedDate)),
+    language: language(first((info) => info.language)),
+    pageCount: first((info) => info.pageCount),
+    description: first((info) => info.description),
     coverUrl: rawCover?.replace(/^http:/, 'https:'),
   };
 }

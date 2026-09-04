@@ -28,6 +28,17 @@ void test('accepts an ISBN-10 identifier for the exact Google Books edition', ()
   assert.equal(result?.title, 'Fantastic Mr. Fox');
 });
 
+void test('stitches complementary exact-edition Google records', () => {
+  const result = normalizeGoogleBooksResponse('9788936434267', {
+    items: [
+      { volumeInfo: { title: '아몬드', authors: ['손원평'], industryIdentifiers: [{ identifier: '9788936434267' }] } },
+      { volumeInfo: { title: '아몬드', publisher: '창비', publishedDate: '2017', pageCount: 263, industryIdentifiers: [{ identifier: '8936434268' }] } },
+    ],
+  });
+  assert.equal(result?.publisher, '창비');
+  assert.equal(result?.pageCount, 263);
+});
+
 void test('normalizes the NLK ISBN bibliographic response', () => {
   const result = normalizeNlkResponse('9788936434267', {
     docs: [{ TITLE: '아몬드', AUTHOR: '손원평', EA_ISBN: '978-89-3643-426-7', PUBLISHER: '창비', PUBLISH_PREDATE: '20170331', PAGE: '263 p.', TITLE_URL: 'http://example.test/almond.jpg' }],
