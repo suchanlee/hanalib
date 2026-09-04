@@ -65,22 +65,25 @@ export function normalizeNlkResponse(isbn13: string, response: UnknownRecord): O
     ...records(response.RESULT),
     ...records(response.result),
   ];
-  const exact = candidates.find((item) => text(item, 'EA_ISBN')?.replace(/\D/g, '') === isbn13) ?? candidates[0];
-  if (!exact) return null;
-  const title = text(exact, 'TITLE');
+  const candidatesWithIsbn = candidates.filter((item) => text(item, 'EA_ISBN'));
+  const exact = candidates.find((item) => text(item, 'EA_ISBN')?.replace(/\D/g, '') === isbn13);
+  if (candidatesWithIsbn.length > 0 && !exact) return null;
+  const selected = exact ?? candidates[0];
+  if (!selected) return null;
+  const title = text(selected, 'TITLE');
   if (!title) return null;
-  const author = text(exact, 'AUTHOR');
-  const pageText = text(exact, 'PAGE');
+  const author = text(selected, 'AUTHOR');
+  const pageText = text(selected, 'PAGE');
   const parsedPages = pageText ? Number(pageText.match(/\d+/)?.[0]) : undefined;
 
   return {
     isbn13,
     title,
     authors: author?.split(/[;,/]/).map((value) => value.trim()).filter(Boolean),
-    publisher: text(exact, 'PUBLISHER'),
-    publishedYear: year(text(exact, 'PUBLISH_PREDATE')),
+    publisher: text(selected, 'PUBLISHER'),
+    publishedYear: year(text(selected, 'PUBLISH_PREDATE')),
     language: 'ko',
     pageCount: parsedPages && Number.isFinite(parsedPages) ? parsedPages : undefined,
-    coverUrl: text(exact, 'TITLE_URL')?.replace(/^http:/, 'https:'),
+    coverUrl: text(selected, 'TITLE_URL')?.replace(/^http:/, 'https:'),
   };
 }

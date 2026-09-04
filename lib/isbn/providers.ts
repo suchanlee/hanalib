@@ -62,6 +62,29 @@ export class GoogleBooksProvider extends ServerProxyProvider {
   }
 }
 
+/** Resolves and stitches all configured metadata sources on the server. */
+export class ResolvedBookProvider {
+  private readonly endpoint: string;
+  private readonly allowDevelopmentFixture: boolean;
+
+  constructor(
+    endpoint = '/api/isbn/lookup',
+    allowDevelopmentFixture = false,
+  ) {
+    this.endpoint = endpoint;
+    this.allowDevelopmentFixture = allowDevelopmentFixture;
+  }
+
+  async lookup(isbn13: string, locale: AppLocale, signal?: AbortSignal): Promise<StitchedBookMetadata | null> {
+    const search = new URLSearchParams({ isbn: isbn13, locale });
+    if (this.allowDevelopmentFixture) search.set('fixture', '1');
+    const response = await fetch(`${this.endpoint}?${search}`, { headers: { accept: 'application/json' }, signal });
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error(`Book metadata lookup failed (${response.status})`);
+    return await response.json() as StitchedBookMetadata;
+  }
+}
+
 export interface StitchedBookMetadata extends Omit<AddBookInput, 'condition' | 'ownerNotes'> {
   description?: string;
 }
