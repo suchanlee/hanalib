@@ -36,6 +36,7 @@ export async function sendResendEmail(
   to: string,
   message: NotificationTemplate,
   fetcher: typeof fetch = fetch,
+  idempotencyKey?: string,
 ): Promise<DeliveryResult> {
   if (!config.resendApiKey || !config.emailFrom) {
     throw new Error('Email delivery is not configured.');
@@ -46,6 +47,7 @@ export async function sendResendEmail(
     headers: {
       Authorization: `Bearer ${config.resendApiKey}`,
       'Content-Type': 'application/json',
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
     },
     body: JSON.stringify({
       from: config.emailFrom,
@@ -98,10 +100,11 @@ export async function sendNotification(
   target: DeliveryTarget,
   message: NotificationTemplate,
   fetcher: typeof fetch = fetch,
+  idempotencyKey?: string,
 ) {
   const jobs: Array<Promise<DeliveryResult>> = [];
   if ((target.channel === 'email' || target.channel === 'both') && target.email) {
-    jobs.push(sendResendEmail(config, target.email, message, fetcher));
+    jobs.push(sendResendEmail(config, target.email, message, fetcher, idempotencyKey));
   }
   if ((target.channel === 'sms' || target.channel === 'both') && target.phone) {
     jobs.push(sendTwilioSms(config, target.phone, message, fetcher));

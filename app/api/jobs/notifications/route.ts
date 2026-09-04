@@ -1,0 +1,24 @@
+import { getD1Database } from '@/db';
+import { expireStaleBorrowRequests, processReadyOutbox } from '@/lib/notifications/outbox-worker';
+
+function authorized(request: Request) {
+  const secret = process.env.INTERNAL_JOB_SECRET;
+  const provided = request.headers.get('authorization');
+  return Boolean(secret && secret.length >= 32 && provided === `Bearer ${secret}`);
+}
+
+export async function POST(request: Request) {
+  if (!authorized(request)) return Response.json({ error: 'unauthorized' }, { status: 401 });
+  const db = getD1Database();
+  const expired = await expireStaleBorrowRequests(db);
+  const delivery = await processReadyOutbox(db, {
+    contactEncryptionKey: process.env.CONTACT_ENCRYPTION_KEY,
+    publicAppUrl: process.env.PUBLIC_APP_URL,
+    resendApiKey: process.env.RESEND_API_KEY,
+    emailFrom: process.env.EMAIL_FROM,
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+    twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
+  });
+  return Response.json({ data: { expired, delivery } }, { headers: { 'cache-control': 'no-store' } });
+}
