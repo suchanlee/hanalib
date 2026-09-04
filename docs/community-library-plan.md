@@ -206,7 +206,7 @@ No branch is a dead end. Camera denial immediately reveals photo upload and manu
 
 The server owns provider calls, secrets, normalization, caching, and attribution.
 
-1. Query all eligible exact-ISBN providers within a shared latency budget. The initial adapters are the National Library of Korea, Google Books, and Naver Book Search; quota-aware caching may skip a provider only when a fresh result already satisfies the quality threshold.
+1. Query all eligible exact-ISBN providers within a shared latency budget. The launch adapters are the National Library of Korea and Google Books; quota-aware caching may skip a provider only when a fresh result already satisfies the quality threshold. Naver Book Search was removed because the service retired on July 31, 2026.
 2. Benchmark Korean and English samples before launch, then assign provider reliability weights per field and market. No provider is permanently treated as best for an entire record.
 3. Reject provider results whose normalized ISBN does not exactly match the scanned ISBN.
 4. Score and stitch fields separately—title, authors, publisher, date, description, and cover may come from different exact-match responses. Rank by benchmarked accuracy, completeness, image quality, and recency while retaining provenance.
@@ -214,7 +214,7 @@ The server owns provider calls, secrets, normalization, caching, and attribution
 6. Store source IDs, source URLs, fetch time, and the provider chosen for each field.
 7. Before production, review each provider's display, attribution, caching, and cover-image terms. If storing a cover is not allowed, store its permitted source URL or use a member-uploaded image.
 
-The feasibility basis is current official documentation: the National Library of Korea exposes exact `isbn` lookup and Korean bibliographic fields; Naver provides JSON book search with a documented daily quota; Google Books exposes title, authors, identifiers, language, and image links. The browser Barcode Detection API supports EAN-13 but remains limited/experimental, which is why the ZXing and manual fallbacks are requirements rather than enhancements.
+The feasibility basis is current official documentation: the National Library of Korea exposes ISBN bibliographic data and Korean fields, while Google Books supports ISBN-qualified volume search with title, authors, identifiers, language, and image links. Naver Book Search is no longer eligible because it retired on July 31, 2026. The browser Barcode Detection API supports EAN-13 but remains limited/experimental, which is why the ZXing and manual fallbacks are requirements rather than enhancements.
 
 ### 5.4 Book detail and owner controls
 
@@ -368,7 +368,7 @@ Mobile browser / PWA
         v
 Next.js web application
   |     |          |
-  |     |          +--> ISBN resolver adapters --> NLK / Google Books / Naver
+  |     |          +--> ISBN resolver adapters --> NLK / Google Books
   |     +--------------> Supabase Auth
   +--------------------> Supabase Postgres + Storage
                                   |
@@ -866,7 +866,7 @@ The release is complete when a newly registered Korean-first user can authentica
 ## 21. Reference feasibility notes
 
 - [National Library of Korea ISBN bibliographic API](https://www.nl.go.kr/NL/contents/N31101030500.do)
-- [Naver Book Search API](https://developers.naver.com/docs/serviceapi/search/book/book.md)
+- [Naver notice: Book Search API retired July 31, 2026](https://developers.naver.com/notice/article/32564)
 - [Google Books API](https://developers.google.com/books/docs/v1/using)
 - [MDN Barcode Detection API](https://developer.mozilla.org/en-US/docs/Web/API/Barcode_Detection_API)
 - [Supabase Google sign-in](https://supabase.com/docs/guides/auth/social-login/auth-google)

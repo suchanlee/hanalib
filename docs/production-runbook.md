@@ -14,7 +14,7 @@ Provision D1 as `DB` and R2 as `FILES` in US West-compatible infrastructure. App
 
 ## 3. ISBN resolver
 
-Configure NLK, Google Books, and Naver credentials. Resolve providers in parallel, retain per-field provenance, normalize ISBN before querying, and rank exact ISBN matches above fuzzy results. Cache the stitched result. Provider cover URLs may be retained only when their terms permit it; otherwise require a member upload or show the generated placeholder.
+Configure NLK and Google Books credentials. Resolve providers in parallel, retain per-field provenance, normalize ISBN before querying, and rank exact ISBN matches above fuzzy results. Cache the stitched result. Provider cover URLs may be retained only when their terms permit it; otherwise require a member upload or show the generated placeholder. Do not call Naver Book Search: that API retired on July 31, 2026.
 
 ## 4. Notifications and inbound SMS
 

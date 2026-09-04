@@ -26,10 +26,10 @@ function LibraryShell() {
 
   if (!state.isAuthenticated) {
     return (
-      <main className="min-h-dvh bg-background text-foreground">
+      <>
         <WebMcpBridge />
         <AuthView />
-      </main>
+      </>
     );
   }
 
@@ -74,7 +74,7 @@ function LibraryShell() {
             </div>
           </header>
 
-          <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-5 sm:px-6 lg:px-8 lg:pb-10 lg:pt-8">
+          <main className="mx-auto w-full max-w-5xl pb-28 lg:pb-10">
             {state.screen === 'catalog' && <CatalogView />}
             {state.screen === 'detail' && <BookDetailView />}
             {state.screen === 'intake' && <IntakeView />}
@@ -101,7 +101,7 @@ function LibraryShell() {
         </div>
       </nav>
 
-      <div role="status" aria-live="polite" className="sr-only">{state.announcement}</div>
+      <output aria-live="polite" className="sr-only">{state.announcement}</output>
     </div>
   );
 }

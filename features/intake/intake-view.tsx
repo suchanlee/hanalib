@@ -27,7 +27,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useHanaApp } from '@/features/app/app-context';
 import type { AddBookInput, AppLocale, CatalogItem } from '@/lib/domain/types';
 import { parseIsbn } from '@/lib/isbn/isbn';
-import { lookupFixtureMetadata, type StitchedBookMetadata } from '@/lib/isbn/providers';
+import { GoogleBooksProvider, lookupFixtureMetadata, lookupWithProviders, NlkProvider, type StitchedBookMetadata } from '@/lib/isbn/providers';
+import type { IScannerControls } from '@zxing/browser';
 
 type IntakeStage = 'idle' | 'permission' | 'scanning' | 'lookup' | 'confirm' | 'error' | 'success';
 
@@ -68,7 +69,7 @@ const intakeCopy = {
     permission: '카메라 연결 중…',
     scanning: 'ISBN 바코드를 프레임 안에 맞춰 주세요',
     scanningHelp: '자동으로 읽히면 바로 도서 정보를 찾아요.',
-    detectorUnavailable: '이 브라우저에서는 자동 인식이 제한돼요. 촬영 화면 아래 ISBN 입력을 이용해 주세요.',
+    detectorUnavailable: '자동 인식을 시작하지 못했어요. 촬영 화면 아래 ISBN 입력을 이용해 주세요.',
     simulate: '샘플 바코드 스캔',
     stop: '스캔 그만두기',
     manualTitle: 'ISBN 직접 입력',
@@ -76,7 +77,7 @@ const intakeCopy = {
     isbnPlaceholder: '예: 9788936434267',
     find: '도서 찾기',
     looking: '가장 좋은 도서 정보를 찾는 중…',
-    lookingHelp: '국립중앙도서관, Google Books, 네이버 결과를 비교해요.',
+    lookingHelp: '국립중앙도서관과 Google Books 결과를 비교해요.',
     invalidTitle: 'ISBN을 확인해 주세요',
     invalidBody: '10자리 또는 13자리 ISBN을 정확히 입력해 주세요. 하이픈은 있어도 괜찮아요.',
     notFoundTitle: '일치하는 도서를 찾지 못했어요',
@@ -128,7 +129,7 @@ const intakeCopy = {
     permission: 'Connecting to your camera…',
     scanning: 'Place the ISBN barcode inside the frame',
     scanningHelp: 'We’ll look up the book as soon as it is detected.',
-    detectorUnavailable: 'Automatic detection is limited in this browser. Enter the ISBN below the camera instead.',
+    detectorUnavailable: 'Automatic detection could not start. Enter the ISBN below the camera instead.',
     simulate: 'Scan sample barcode',
     stop: 'Stop scanning',
     manualTitle: 'Enter ISBN instead',
@@ -136,7 +137,7 @@ const intakeCopy = {
     isbnPlaceholder: 'e.g. 9788936434267',
     find: 'Find book',
     looking: 'Finding the best book information…',
-    lookingHelp: 'Comparing results from NLK, Google Books, and Naver.',
+    lookingHelp: 'Comparing results from NLK and Google Books.',
     invalidTitle: 'Check the ISBN',
     invalidBody: 'Enter a valid 10- or 13-digit ISBN. Hyphens are okay.',
     notFoundTitle: 'We couldn’t find a matching book',
@@ -281,14 +282,17 @@ export function IntakeView() {
   const [formError, setFormError] = useState('');
   const [coverError, setCoverError] = useState('');
   const [createdItemId, setCreatedItemId] = useState<string>();
-  const [autoDetectionAvailable, setAutoDetectionAvailable] = useState(() => Boolean(barcodeDetectorConstructor()));
+  const [autoDetectionAvailable, setAutoDetectionAvailable] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const detectionTimerRef = useRef<number | undefined>(undefined);
+  const zxingControlsRef = useRef<IScannerControls | null>(null);
   const uploadUrlRef = useRef<string | undefined>(undefined);
   const lookupSequenceRef = useRef(0);
 
   const stopCamera = useCallback(() => {
+    zxingControlsRef.current?.stop();
+    zxingControlsRef.current = null;
     if (detectionTimerRef.current !== undefined) {
       window.clearTimeout(detectionTimerRef.current);
       detectionTimerRef.current = undefined;
@@ -316,7 +320,12 @@ export function IntakeView() {
     setManualIsbn(parsed.isbn13);
     setStage('lookup');
     await new Promise((resolve) => window.setTimeout(resolve, 360));
-    const metadata = await lookupFixtureMetadata(parsed.isbn13, locale);
+    const fixtureMetadata = await lookupFixtureMetadata(parsed.isbn13, locale);
+    const metadata = fixtureMetadata ?? await lookupWithProviders(
+      parsed.isbn13,
+      locale,
+      [new NlkProvider(), new GoogleBooksProvider()],
+    );
     if (sequence !== lookupSequenceRef.current) return;
     if (!metadata) {
       setDraft(blankDraft(parsed.isbn13, locale));
@@ -336,9 +345,39 @@ export function IntakeView() {
     void video.play();
 
     const Detector = barcodeDetectorConstructor();
-    if (!Detector) return;
-    const detector = new Detector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
     let canceled = false;
+
+    if (!Detector) {
+      const startZxing = async () => {
+        try {
+          const [{ BrowserMultiFormatOneDReader }, { BarcodeFormat, DecodeHintType }] = await Promise.all([
+            import('@zxing/browser'),
+            import('@zxing/library'),
+          ]);
+          if (canceled || !streamRef.current) return;
+          const hints = new Map();
+          hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E]);
+          const reader = new BrowserMultiFormatOneDReader(hints, { delayBetweenScanAttempts: 250, delayBetweenScanSuccess: 500 });
+          zxingControlsRef.current = await reader.decodeFromStream(streamRef.current, video, (result, _error, controls) => {
+            const value = result?.getText();
+            if (value && parseIsbn(value)) {
+              controls.stop();
+              void performLookup(value);
+            }
+          });
+        } catch {
+          if (!canceled) setAutoDetectionAvailable(false);
+        }
+      };
+      void startZxing();
+      return () => {
+        canceled = true;
+        zxingControlsRef.current?.stop();
+        zxingControlsRef.current = null;
+      };
+    }
+
+    const detector = new Detector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
 
     const detect = async () => {
       if (canceled || stage !== 'scanning') return;
@@ -366,7 +405,7 @@ export function IntakeView() {
 
   const startCamera = async () => {
     setFormError('');
-    setAutoDetectionAvailable(Boolean(barcodeDetectorConstructor()));
+    setAutoDetectionAvailable(true);
     setStage('permission');
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('camera-unavailable');
@@ -460,7 +499,7 @@ export function IntakeView() {
   const errorBody = errorKind === 'invalid' ? c.invalidBody : errorKind === 'not-found' ? c.notFoundBody : c.cameraBody;
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 pb-28 pt-5 sm:px-6" data-testid="intake-view">
+    <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-5 sm:px-6" data-testid="intake-view">
       {stage === 'idle' && (
         <div className="space-y-5">
           <section className="pt-3">
@@ -704,6 +743,6 @@ export function IntakeView() {
           </div>
         </section>
       )}
-    </main>
+    </div>
   );
 }

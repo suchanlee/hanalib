@@ -46,12 +46,12 @@ export function BookDetailView() {
 
   if (!item || item.status === 'archived') {
     return (
-      <main className="mx-auto flex min-h-[65dvh] w-full max-w-lg flex-col items-center justify-center px-6 pb-28 text-center" data-testid="detail-missing">
+      <div className="mx-auto flex min-h-[65dvh] w-full max-w-lg flex-col items-center justify-center px-6 pb-28 text-center" data-testid="detail-missing">
         <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground"><BookMarked className="size-7" /></div>
         <h1 className="mt-4 text-xl font-semibold">{t.missingTitle}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t.missingHelp}</p>
         <Button type="button" className="mt-6 h-11" onClick={() => actions.setScreen('catalog')} data-testid="detail-back">{t.back}</Button>
-      </main>
+      </div>
     );
   }
 
@@ -112,7 +112,7 @@ export function BookDetailView() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 pb-32 pt-3 sm:px-6 sm:pt-6" data-testid="book-detail-view">
+    <div className="mx-auto w-full max-w-5xl px-4 pb-32 pt-3 sm:px-6 sm:pt-6" data-testid="book-detail-view">
       <Button type="button" variant="ghost" className="-ml-2 h-11" onClick={() => actions.setScreen('catalog')} data-testid="detail-back">
         <ArrowLeft className="size-5" />
         {t.back}
@@ -292,7 +292,7 @@ export function BookDetailView() {
           <dd className="mt-1 text-sm leading-relaxed">{item.ownerNotes || t.noOwnerNote}</dd>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 

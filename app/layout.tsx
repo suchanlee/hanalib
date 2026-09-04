@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
 import './globals.css';
 
@@ -12,12 +12,15 @@ export const metadata: Metadata = {
   description: 'A private community library for sharing books.',
   manifest: '/manifest.webmanifest',
   applicationName: '하나도서관',
-  themeColor: '#215e4a',
   appleWebApp: {
     capable: true,
     title: '하나도서관',
     statusBarStyle: 'default',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#215e4a',
 };
 
 export default function RootLayout({

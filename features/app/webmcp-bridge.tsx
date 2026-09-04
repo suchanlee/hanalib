@@ -9,7 +9,7 @@ interface ModelTool {
   description: string;
   inputSchema: Record<string, unknown>;
   annotations: { readOnlyHint: boolean; untrustedContentHint: boolean };
-  execute(input: unknown): unknown | Promise<unknown>;
+  execute(input: unknown): object | Promise<object>;
 }
 
 interface ModelContext {
@@ -44,6 +44,7 @@ export function WebMcpBridge() {
       inputSchema: { type: 'object', properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: false },
       execute() {
+        if (!state.isAuthenticated) return { authenticated: false };
         return { authenticated: state.isAuthenticated, memberId: state.isAuthenticated ? state.currentUserId : null, screen: state.screen, catalogItems: state.items.filter((item) => item.status !== 'archived').length, pendingRequests: state.requests.filter((request) => request.status === 'pending').length, activeLoans: state.loans.filter((loan) => loan.status === 'active').length };
       },
     });

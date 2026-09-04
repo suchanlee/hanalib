@@ -5,7 +5,7 @@ export interface OAuthProviderConfig {
   label: string;
   startPath: string;
   clientIdSecretName: string;
-  clientSecretName: string;
+  serverSecretNames: readonly string[];
 }
 
 export const oauthProviders: Readonly<Record<AuthProvider, OAuthProviderConfig>> = {
@@ -14,17 +14,18 @@ export const oauthProviders: Readonly<Record<AuthProvider, OAuthProviderConfig>>
     label: 'Google',
     startPath: '/api/auth/google/start',
     clientIdSecretName: 'GOOGLE_CLIENT_ID',
-    clientSecretName: 'GOOGLE_CLIENT_SECRET',
+    serverSecretNames: ['GOOGLE_CLIENT_SECRET'],
   },
   apple: {
     id: 'apple',
     label: 'Apple',
     startPath: '/api/auth/apple/start',
     clientIdSecretName: 'APPLE_CLIENT_ID',
-    clientSecretName: 'APPLE_CLIENT_SECRET',
+    serverSecretNames: ['APPLE_TEAM_ID', 'APPLE_KEY_ID', 'APPLE_PRIVATE_KEY'],
   },
 };
 
 export function oauthStartUrl(provider: AuthProvider, returnTo = '/') {
-  return `${oauthProviders[provider].startPath}?returnTo=${encodeURIComponent(returnTo)}`;
+  const safeReturnTo = returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/';
+  return `${oauthProviders[provider].startPath}?returnTo=${encodeURIComponent(safeReturnTo)}`;
 }

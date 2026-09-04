@@ -10,8 +10,6 @@ export interface ServerConfig {
   metadata: {
     nlkApiKey?: string;
     googleBooksApiKey?: string;
-    naverClientId?: string;
-    naverClientSecret?: string;
   };
   messaging: {
     twilioAccountSid?: string;
@@ -40,8 +38,6 @@ export function readServerConfig(source: EnvSource = process.env): ServerConfig 
     metadata: {
       nlkApiKey: source.NLK_API_KEY,
       googleBooksApiKey: source.GOOGLE_BOOKS_API_KEY,
-      naverClientId: source.NAVER_CLIENT_ID,
-      naverClientSecret: source.NAVER_CLIENT_SECRET,
     },
     messaging: {
       twilioAccountSid: source.TWILIO_ACCOUNT_SID,

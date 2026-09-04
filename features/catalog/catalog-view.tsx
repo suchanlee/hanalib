@@ -127,7 +127,7 @@ export function CatalogView() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6 sm:pt-8" data-testid="catalog-view">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6 sm:pt-8" data-testid="catalog-view">
       <section className="mb-6 sm:mb-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{t.eyebrow}</p>
         <h1 className="mt-2 max-w-xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t.title}</h1>
@@ -267,6 +267,6 @@ export function CatalogView() {
           <Button type="button" variant="outline" className="mt-5 h-11" onClick={clearAll}>{t.clearAll}</Button>
         </section>
       )}
-    </main>
+    </div>
   );
 }
