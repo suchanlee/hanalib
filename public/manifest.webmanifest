@@ -1,0 +1,11 @@
+{
+  "name": "하나도서관 · Hana Library",
+  "short_name": "하나도서관",
+  "description": "A mobile-first community library for sharing Korean and English books.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fbfa",
+  "theme_color": "#215e4a",
+  "lang": "ko",
+  "categories": ["books", "lifestyle", "utilities"]
+}

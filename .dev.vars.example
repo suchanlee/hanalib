@@ -1,0 +1,24 @@
+# Local/production integration contract. Never commit real values.
+DEPLOYMENT_REGION=us-west
+PUBLIC_APP_URL=http://localhost:3000
+
+# External OAuth. Configure callback URLs in Google Cloud and Apple Developer.
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+APPLE_CLIENT_ID=
+APPLE_TEAM_ID=
+APPLE_KEY_ID=
+APPLE_PRIVATE_KEY=
+
+# ISBN metadata stitching.
+NLK_API_KEY=
+GOOGLE_BOOKS_API_KEY=
+NAVER_CLIENT_ID=
+NAVER_CLIENT_SECRET=
+
+# US SMS and transactional email.
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_FROM_NUMBER=
+RESEND_API_KEY=
+EMAIL_FROM=

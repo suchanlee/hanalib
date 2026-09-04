@@ -20,6 +20,20 @@ export const profiles = sqliteTable('profiles', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 });
 
+export const authIdentities = sqliteTable(
+  'auth_identities',
+  {
+    id: text('id').primaryKey(),
+    profileId: text('profile_id').notNull().references(() => profiles.id),
+    provider: text('provider').notNull(),
+    providerSubject: text('provider_subject').notNull(),
+    email: text('email').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    lastSignedInAt: integer('last_signed_in_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [uniqueIndex('auth_identities_provider_subject_unique').on(table.provider, table.providerSubject)],
+);
+
 export const communityMembers = sqliteTable(
   'community_members',
   {
@@ -79,6 +93,21 @@ export const catalogItems = sqliteTable(
   ],
 );
 
+export const uploadedAssets = sqliteTable(
+  'uploaded_assets',
+  {
+    id: text('id').primaryKey(),
+    ownerId: text('owner_id').notNull().references(() => profiles.id),
+    catalogItemId: text('catalog_item_id').references(() => catalogItems.id),
+    storagePath: text('storage_path').notNull(),
+    contentType: text('content_type').notNull(),
+    byteSize: integer('byte_size').notNull(),
+    kind: text('kind').notNull().default('cover'),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [uniqueIndex('uploaded_assets_storage_path_unique').on(table.storagePath)],
+);
+
 export const loanRequests = sqliteTable(
   'loan_requests',
   {
@@ -130,6 +159,52 @@ export const notificationEndpoints = sqliteTable('notification_endpoints', {
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
 });
 
+export const notificationDeliveries = sqliteTable(
+  'notification_deliveries',
+  {
+    id: text('id').primaryKey(),
+    eventId: text('event_id').notNull(),
+    recipientId: text('recipient_id').notNull().references(() => profiles.id),
+    channel: text('channel').notNull(),
+    providerMessageId: text('provider_message_id'),
+    status: text('status').notNull().default('queued'),
+    attemptCount: integer('attempt_count').notNull().default(0),
+    lastErrorCode: text('last_error_code'),
+    sentAt: integer('sent_at', { mode: 'timestamp_ms' }),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [uniqueIndex('notification_deliveries_event_channel_unique').on(table.eventId, table.channel)],
+);
+
+export const inboundMessages = sqliteTable(
+  'inbound_messages',
+  {
+    id: text('id').primaryKey(),
+    provider: text('provider').notNull(),
+    providerMessageId: text('provider_message_id').notNull(),
+    senderHash: text('sender_hash').notNull(),
+    command: text('command'),
+    matchedRequestId: text('matched_request_id').references(() => loanRequests.id),
+    outcome: text('outcome').notNull(),
+    receivedAt: integer('received_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [uniqueIndex('inbound_messages_provider_id_unique').on(table.provider, table.providerMessageId)],
+);
+
+export const returnCheckins = sqliteTable(
+  'return_checkins',
+  {
+    id: text('id').primaryKey(),
+    loanId: text('loan_id').notNull().references(() => loans.id),
+    scheduledFor: integer('scheduled_for', { mode: 'timestamp_ms' }).notNull(),
+    sentAt: integer('sent_at', { mode: 'timestamp_ms' }),
+    response: text('response'),
+    respondedAt: integer('responded_at', { mode: 'timestamp_ms' }),
+    nextScheduledFor: integer('next_scheduled_for', { mode: 'timestamp_ms' }),
+  },
+  (table) => [uniqueIndex('return_checkins_loan_schedule_unique').on(table.loanId, table.scheduledFor)],
+);
+
 export const outboxEvents = sqliteTable(
   'outbox_events',
   {
@@ -145,4 +220,29 @@ export const outboxEvents = sqliteTable(
     processedAt: integer('processed_at', { mode: 'timestamp_ms' }),
   },
   (table) => [index('outbox_ready_idx').on(table.processedAt, table.availableAt)],
+);
+
+export const auditEvents = sqliteTable(
+  'audit_events',
+  {
+    id: text('id').primaryKey(),
+    actorId: text('actor_id').references(() => profiles.id),
+    action: text('action').notNull(),
+    aggregateType: text('aggregate_type').notNull(),
+    aggregateId: text('aggregate_id').notNull(),
+    occurredAt: integer('occurred_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [index('audit_events_aggregate_idx').on(table.aggregateType, table.aggregateId, table.occurredAt)],
+);
+
+export const analyticsEvents = sqliteTable(
+  'analytics_events',
+  {
+    id: text('id').primaryKey(),
+    eventName: text('event_name').notNull(),
+    anonymousSessionId: text('anonymous_session_id'),
+    locale: text('locale'),
+    occurredAt: integer('occurred_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [index('analytics_events_name_time_idx').on(table.eventName, table.occurredAt)],
 );
