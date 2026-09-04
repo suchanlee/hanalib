@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const communities = sqliteTable('communities', {
@@ -16,6 +17,9 @@ export const profiles = sqliteTable('profiles', {
   displayNameKo: text('display_name_ko').notNull(),
   avatarUrl: text('avatar_url'),
   locale: text('locale').notNull().default('ko'),
+  notificationChannel: text('notification_channel').notNull().default('email'),
+  phone: text('phone').notNull().default(''),
+  email: text('email').notNull().default(''),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 });
@@ -53,8 +57,10 @@ export const bookEditions = sqliteTable(
     isbn10: text('isbn10'),
     isbn13: text('isbn13'),
     title: text('title').notNull(),
+    titleEn: text('title_en'),
     subtitle: text('subtitle'),
     authorsJson: text('authors_json').notNull().default('[]'),
+    authorsEnJson: text('authors_en_json').notNull().default('[]'),
     publisher: text('publisher'),
     publishedOn: text('published_on'),
     language: text('language'),
@@ -62,6 +68,7 @@ export const bookEditions = sqliteTable(
     description: text('description'),
     coverSourceUrl: text('cover_source_url'),
     coverStoragePath: text('cover_storage_path'),
+    coverTone: text('cover_tone').notNull().default('blue'),
     fieldProvenanceJson: text('field_provenance_json').notNull().default('{}'),
     resolverVersion: integer('resolver_version').notNull().default(1),
     resolvedAt: integer('resolved_at', { mode: 'timestamp_ms' }),
@@ -82,6 +89,7 @@ export const catalogItems = sqliteTable(
     status: text('status').notNull().default('available'),
     condition: text('condition').notNull().default('good'),
     ownerNotes: text('owner_notes'),
+    idempotencyKey: text('idempotency_key'),
     archivedAt: integer('archived_at', { mode: 'timestamp_ms' }),
     version: integer('version').notNull().default(1),
     createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
@@ -90,6 +98,7 @@ export const catalogItems = sqliteTable(
   (table) => [
     index('catalog_items_community_status_idx').on(table.communityId, table.status),
     index('catalog_items_owner_idx').on(table.ownerId),
+    uniqueIndex('catalog_items_idempotency_unique').on(table.idempotencyKey),
   ],
 );
 
@@ -125,6 +134,9 @@ export const loanRequests = sqliteTable(
   },
   (table) => [
     uniqueIndex('loan_requests_idempotency_unique').on(table.idempotencyKey),
+    uniqueIndex('loan_requests_one_pending_member_item_unique')
+      .on(table.catalogItemId, table.requesterId)
+      .where(sql`${table.status} = 'pending'`),
     index('loan_requests_item_status_idx').on(table.catalogItemId, table.status),
   ],
 );
@@ -146,7 +158,12 @@ export const loans = sqliteTable(
     returnedBy: text('returned_by').references(() => profiles.id),
     version: integer('version').notNull().default(1),
   },
-  (table) => [index('loans_item_status_idx').on(table.catalogItemId, table.status)],
+  (table) => [
+    index('loans_item_status_idx').on(table.catalogItemId, table.status),
+    uniqueIndex('loans_one_active_item_unique')
+      .on(table.catalogItemId)
+      .where(sql`${table.status} = 'active'`),
+  ],
 );
 
 export const notificationEndpoints = sqliteTable('notification_endpoints', {
