@@ -2,6 +2,14 @@
 DEPLOYMENT_REGION=us-west
 PUBLIC_APP_URL=http://localhost:3000
 APP_RUNTIME_MODE=development
+LAUNCH_COMMUNITY_ID=
+LAUNCH_COMMUNITY_NAME=
+AUTH_SESSION_SECRET=
+AUTH_TRANSACTION_SECRET=
+
+# Development only. Set both to true to expose the explicit demo sign-in path.
+AUTH_DEMO_MODE=
+NEXT_PUBLIC_AUTH_DEMO_MODE=
 
 # External OAuth. Configure callback URLs in Google Cloud and Apple Developer.
 GOOGLE_CLIENT_ID=
@@ -17,8 +25,6 @@ GOOGLE_BOOKS_API_KEY=
 # Local/test only. Production always rejects fixture fallback even if set.
 ISBN_FIXTURES_ENABLED=true
 
-# Signed member sessions. Use at least 32 random characters in production.
-SESSION_SIGNING_SECRET=
 # Local browser demo only. Never enable in production.
 ALLOW_DEMO_AUTH=true
 

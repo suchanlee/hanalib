@@ -61,6 +61,18 @@ export function SettingsView() {
     setSaved(true);
   }
 
+  async function signOut() {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { accept: 'application/json' },
+      });
+    } finally {
+      actions.signOut();
+    }
+  }
+
   return (
     <section className="mx-auto w-full max-w-3xl px-4 pt-5 pb-28 sm:px-6" data-testid="settings-view">
       <header className="mb-5">
@@ -260,7 +272,7 @@ export function SettingsView() {
         <Button
           className="h-11 w-full"
           data-testid="settings-sign-out"
-          onClick={() => actions.signOut()}
+          onClick={() => void signOut()}
           variant="ghost"
         >
           <LogOut aria-hidden="true" />

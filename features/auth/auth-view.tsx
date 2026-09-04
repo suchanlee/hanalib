@@ -1,12 +1,43 @@
 'use client';
 
+import { useEffect } from 'react';
 import { BookHeart, Globe2, LockKeyhole, UsersRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
+import { oauthStartUrl } from './provider-config';
 
 export function AuthView() {
   const { state, actions } = useHanaApp();
   const ko = state.locale === 'ko';
+  const demoEnabled = process.env.NEXT_PUBLIC_AUTH_DEMO_MODE === 'true';
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch('/api/auth/session', {
+      credentials: 'same-origin',
+      headers: { accept: 'application/json' },
+      signal: controller.signal,
+    }).then(async (response) => {
+      if (!response.ok) return;
+      const payload = await response.json() as { member?: { provider?: string } };
+      if (payload.member?.provider === 'apple') actions.signIn('apple');
+      else if (payload.member) actions.signIn('google');
+    }).catch(() => undefined);
+    return () => controller.abort();
+  }, [actions]);
+
+  function beginSignIn(provider: 'google' | 'apple') {
+    window.location.assign(oauthStartUrl(provider));
+  }
+
+  async function demoSignIn() {
+    const response = await fetch('/api/auth/demo', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { accept: 'application/json' },
+    });
+    if (response.ok) actions.signIn('google');
+  }
 
   return (
     <main className="relative isolate min-h-dvh overflow-hidden bg-background px-5 py-7 sm:px-8">
@@ -79,7 +110,7 @@ export function AuthView() {
           <Button
             className="h-12 w-full rounded-xl bg-foreground text-base text-background hover:bg-foreground/85"
             data-testid="auth-google"
-            onClick={() => actions.signIn('google')}
+            onClick={() => beginSignIn('google')}
           >
             <span aria-hidden="true" className="text-base font-bold">G</span>
             {ko ? 'Google로 계속' : 'Continue with Google'}
@@ -87,17 +118,24 @@ export function AuthView() {
           <Button
             className="h-12 w-full rounded-xl text-base"
             data-testid="auth-apple"
-            onClick={() => actions.signIn('apple')}
+            onClick={() => beginSignIn('apple')}
             variant="outline"
           >
             <span aria-hidden="true" className="text-lg leading-none">●</span>
             {ko ? 'Apple로 계속' : 'Continue with Apple'}
           </Button>
-          <p className="px-4 text-center text-xs leading-5 text-muted-foreground" data-testid="auth-demo-note">
-            {ko
-              ? '로컬 미리보기에서는 지우의 데모 계정으로 로그인합니다. 실제 배포에서는 OAuth 서버 연결로 교체됩니다.'
-              : 'Local preview signs in as Jiwoo’s demo account. Production uses the configured OAuth server flow.'}
-          </p>
+          {demoEnabled && (
+            <div className="rounded-xl border border-dashed p-3 text-center" data-testid="auth-demo-note">
+              <p className="text-xs leading-5 text-muted-foreground">
+                {ko
+                  ? '개발 모드가 켜져 있어요. 아래 계정은 로컬 미리보기에서만 사용할 수 있습니다.'
+                  : 'Development mode is enabled. This account is available only in local preview.'}
+              </p>
+              <Button className="mt-2" data-testid="auth-demo" onClick={() => void demoSignIn()} size="sm" variant="secondary">
+                {ko ? '데모 계정으로 계속' : 'Continue with demo account'}
+              </Button>
+            </div>
+          )}
         </section>
       </div>
     </main>
