@@ -166,15 +166,19 @@ export const loans = sqliteTable(
   ],
 );
 
-export const notificationEndpoints = sqliteTable('notification_endpoints', {
-  id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => profiles.id),
-  kind: text('kind').notNull(),
-  addressEncrypted: text('address_encrypted').notNull(),
-  addressHash: text('address_hash').notNull(),
-  verifiedAt: integer('verified_at', { mode: 'timestamp_ms' }),
-  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
-});
+export const notificationEndpoints = sqliteTable(
+  'notification_endpoints',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => profiles.id),
+    kind: text('kind').notNull(),
+    addressEncrypted: text('address_encrypted').notNull(),
+    addressHash: text('address_hash').notNull(),
+    verifiedAt: integer('verified_at', { mode: 'timestamp_ms' }),
+    enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+  },
+  (table) => [uniqueIndex('notification_endpoints_user_kind_unique').on(table.userId, table.kind)],
+);
 
 export const notificationDeliveries = sqliteTable(
   'notification_deliveries',

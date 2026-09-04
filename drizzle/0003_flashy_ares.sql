@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `notification_endpoints_user_kind_unique` ON `notification_endpoints` (`user_id`,`kind`);
