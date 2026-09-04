@@ -186,24 +186,52 @@ export async function resolveBookMetadata(
     'google-books': config.googleBooksApiKey ? 'failed' : 'not-configured',
     'open-library': 'failed',
   };
-  const tasks: Array<{ id: ProviderId; promise: Promise<MetadataCandidate | null> }> = [];
+  const tasks: Array<{ id: ProviderId; run: () => Promise<MetadataCandidate | null> }> = [];
   const providerOptions = { fetchImpl: options.fetchImpl, timeoutMs: config.timeoutMs };
-  if (config.nlkApiKey) tasks.push({ id: 'nlk', promise: fetchNlkMetadata(isbn13, config.nlkApiKey, providerOptions) });
-  if (config.naverClientId && config.naverClientSecret) tasks.push({ id: 'naver', promise: fetchNaverBooksMetadata(isbn13, config.naverClientId, config.naverClientSecret, providerOptions) });
-  if (config.googleBooksApiKey) tasks.push({ id: 'google-books', promise: fetchGoogleBooksMetadata(isbn13, config.googleBooksApiKey, providerOptions) });
-  tasks.push({ id: 'open-library', promise: fetchOpenLibraryMetadata(isbn13, providerOptions) });
+  if (config.nlkApiKey) tasks.push({ id: 'nlk', run: () => fetchNlkMetadata(isbn13, config.nlkApiKey!, providerOptions) });
+  if (config.naverClientId && config.naverClientSecret) tasks.push({
+    id: 'naver',
+    run: () => fetchNaverBooksMetadata(isbn13, config.naverClientId!, config.naverClientSecret!, providerOptions),
+  });
+  if (config.googleBooksApiKey) tasks.push({
+    id: 'google-books',
+    run: () => fetchGoogleBooksMetadata(isbn13, config.googleBooksApiKey!, providerOptions),
+  });
+  tasks.push({ id: 'open-library', run: () => fetchOpenLibraryMetadata(isbn13, providerOptions) });
 
-  const settled = await Promise.allSettled(tasks.map(({ promise }) => promise));
+  const settled = await Promise.allSettled(tasks.map(({ run }) => run()));
   const candidates: MetadataCandidate[] = [];
+  const failedTasks: typeof tasks = [];
   settled.forEach((result, index) => {
     const id = tasks[index].id;
     if (result.status === 'rejected') {
       providerStatus[id] = 'failed';
+      failedTasks.push(tasks[index]);
       return;
     }
     providerStatus[id] = result.value ? 'ok' : 'not-found';
     if (result.value) candidates.push(result.value);
   });
+
+  const preliminary = candidates.length > 0 ? stitchMetadata(isbn13, locale, candidates) : null;
+  const usefulFields = preliminary ? [
+    preliminary.authors.length > 0,
+    Boolean(preliminary.publisher),
+    Boolean(preliminary.pageCount),
+    Boolean(preliminary.coverUrl),
+  ].filter(Boolean).length : 0;
+
+  // A provider can fail transiently while another returns only a title and year. Retry only
+  // in that sparse case so the common path stays fast while intake remains resilient.
+  if (preliminary && usefulFields < 2 && failedTasks.length > 0) {
+    const retries = await Promise.allSettled(failedTasks.map(({ run }) => run()));
+    retries.forEach((result, index) => {
+      const id = failedTasks[index].id;
+      if (result.status === 'rejected') return;
+      providerStatus[id] = result.value ? 'ok' : 'not-found';
+      if (result.value) candidates.push(result.value);
+    });
+  }
 
   if (candidates.length > 0) {
     return { metadata: stitchMetadata(isbn13, locale, candidates), providerStatus, usedFixture: false };
