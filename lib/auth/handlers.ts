@@ -14,6 +14,7 @@ import {
   oauthTransactionFromRequest,
 } from './oauth-transaction';
 import { provisionAuthenticatedMember } from './member';
+import { demoIdentity } from './demo';
 import { clearSessionCookie, createSessionToken, isSameOriginMutation, sessionCookie } from './session';
 
 const noStoreHeaders = {
@@ -131,12 +132,13 @@ export async function handleDemoSignIn(request: Request, source: AuthEnvSource =
   if (!isSameOriginMutation(request, config.publicAppUrl)) {
     return Response.json({ error: 'invalid-origin' }, { status: 403, headers: noStoreHeaders });
   }
-  const member = await provisionAuthenticatedMember({
-    provider: 'demo',
-    providerSubject: 'local-preview-member',
-    email: 'preview@localhost.invalid',
-    displayName: 'Jiwoo Preview',
-  }, config);
+  let requestedPersona: unknown;
+  try {
+    requestedPersona = (await request.json() as { persona?: unknown }).persona;
+  } catch {
+    // Existing clients send no body and continue to use the owner persona.
+  }
+  const member = await provisionAuthenticatedMember(demoIdentity(requestedPersona), config);
   const secure = isSecureDeployment(config);
   const token = await createSessionToken({
     profileId: member.id,

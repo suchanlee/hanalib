@@ -2,14 +2,13 @@
 
 import { BookHeart, Globe2, LockKeyhole, UsersRound } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
 import { oauthStartUrl } from './provider-config';
 
-const subscribeToEnvironment = () => () => undefined;
-
 interface AuthProviders {
+  demo: boolean;
   google: boolean;
   apple: boolean;
 }
@@ -17,11 +16,6 @@ interface AuthProviders {
 export function AuthView() {
   const { state, actions } = useHanaApp();
   const ko = state.locale === 'ko';
-  const demoEnabled = useSyncExternalStore(
-    subscribeToEnvironment,
-    () => process.env.NEXT_PUBLIC_AUTH_DEMO_MODE === 'true',
-    () => false,
-  );
   const [providers, setProviders] = useState<AuthProviders>();
 
   useEffect(() => {
@@ -38,7 +32,7 @@ export function AuthView() {
       .then(setProviders)
       .catch((error: unknown) => {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
-          setProviders({ google: false, apple: false });
+          setProviders({ demo: false, google: false, apple: false });
         }
       });
     return () => controller.abort();
@@ -48,11 +42,12 @@ export function AuthView() {
     window.location.assign(oauthStartUrl(provider));
   }
 
-  async function demoSignIn() {
+  async function demoSignIn(persona: 'owner' | 'borrower') {
     const response = await fetch('/api/auth/demo', {
       method: 'POST',
       credentials: 'same-origin',
-      headers: { accept: 'application/json' },
+      headers: { accept: 'application/json', 'content-type': 'application/json' },
+      body: JSON.stringify({ persona }),
     });
     if (response.ok) await actions.refresh();
   }
@@ -151,16 +146,21 @@ export function AuthView() {
                 : 'Sign-in setup is still in progress. Access will open after the provider configuration is complete.'}
             </output>
           )}
-          {demoEnabled && (
+          {providers?.demo && (
             <div className="rounded-xl border border-dashed p-3 text-center" data-testid="auth-demo-note">
               <p className="text-xs leading-5 text-muted-foreground">
                 {ko
                   ? '개발 모드가 켜져 있어요. 아래 계정은 로컬 미리보기에서만 사용할 수 있습니다.'
                   : 'Development mode is enabled. This account is available only in local preview.'}
               </p>
-              <Button className="mt-2" data-testid="auth-demo" onClick={() => void demoSignIn()} size="sm" variant="secondary">
-                {ko ? '데모 계정으로 계속' : 'Continue with demo account'}
-              </Button>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <Button data-testid="auth-demo-owner" onClick={() => void demoSignIn('owner')} size="sm" variant="secondary">
+                  {ko ? '소유자로 계속' : 'Continue as owner'}
+                </Button>
+                <Button data-testid="auth-demo-borrower" onClick={() => void demoSignIn('borrower')} size="sm" variant="outline">
+                  {ko ? '대여자로 계속' : 'Continue as borrower'}
+                </Button>
+              </div>
             </div>
           )}
           <p className="px-2 text-center text-xs leading-5 text-muted-foreground">

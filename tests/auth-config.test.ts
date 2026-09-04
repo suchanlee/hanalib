@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { demoIdentity } from '../lib/auth/demo.ts';
 import { oauthProviders, oauthStartUrl } from '../features/auth/provider-config.ts';
 
 void test('builds same-origin OAuth start URLs only', () => {
@@ -10,4 +11,10 @@ void test('builds same-origin OAuth start URLs only', () => {
 
 void test('documents the complete Apple server credential set', () => {
   assert.deepEqual(oauthProviders.apple.serverSecretNames, ['APPLE_TEAM_ID', 'APPLE_KEY_ID', 'APPLE_PRIVATE_KEY']);
+});
+
+void test('keeps deterministic owner and borrower identities development-only', () => {
+  assert.equal(demoIdentity('owner').providerSubject, 'local-preview-member');
+  assert.equal(demoIdentity('borrower').providerSubject, 'local-preview-borrower');
+  assert.notEqual(demoIdentity('owner').email, demoIdentity('borrower').email);
 });
