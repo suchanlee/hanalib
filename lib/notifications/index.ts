@@ -1,4 +1,5 @@
 export * from './analytics';
+export * from './contact-crypto';
 export * from './domain';
 export * from './provider';
 export * from './sender';
