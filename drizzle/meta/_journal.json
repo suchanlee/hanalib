@@ -15,6 +15,27 @@
       "when": 1788544958696,
       "tag": "0001_clammy_red_shift",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788547262568,
+      "tag": "0002_wealthy_shriek",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1788547488635,
+      "tag": "0003_flashy_ares",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1788548034907,
+      "tag": "0004_spooky_ozymandias",
+      "breakpoints": true
     }
   ]
 }
