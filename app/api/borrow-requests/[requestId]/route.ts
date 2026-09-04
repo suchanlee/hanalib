@@ -13,7 +13,7 @@ export async function PATCH(request: Request, route: RouteContext) {
       throw libraryError('invalid-input', 'decision must be accepted or declined.');
     }
     return repository.respondToBorrowRequest(context, requestId, body.decision);
-  }, { mutation: true });
+  }, { dispatchNotifications: true, mutation: true });
 }
 
 export async function DELETE(request: Request, route: RouteContext) {

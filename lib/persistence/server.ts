@@ -1,11 +1,13 @@
 import { getD1Database } from '../../db/index';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '../auth/member.ts';
 import { isSameOriginMutation } from '../auth/session.ts';
+import { processReadyOutbox } from '../notifications/outbox-worker.ts';
 import type { RequestContext } from './contracts.ts';
 import { D1LibraryRepository } from './d1-repository.ts';
 import { LibraryError, libraryError } from './errors.ts';
 
 interface HandlerOptions {
+  dispatchNotifications?: boolean;
   mutation?: boolean;
   status?: number;
 }
@@ -53,6 +55,17 @@ export async function withLibraryApi<T>(
       contactHashKey: config.contactHashKey,
     });
     const data = await handler(repository, context);
+    if (options.dispatchNotifications) {
+      await processReadyOutbox(getD1Database(), {
+        contactEncryptionKey: process.env.CONTACT_ENCRYPTION_KEY,
+        publicAppUrl: process.env.PUBLIC_APP_URL,
+        resendApiKey: process.env.RESEND_API_KEY,
+        emailFrom: process.env.EMAIL_FROM,
+        twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+        twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+        twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
+      });
+    }
     return Response.json({ data }, {
       status: options.status ?? 200,
       headers: { 'Cache-Control': 'private, no-store' },
