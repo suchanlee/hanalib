@@ -4,7 +4,7 @@ import {
   jsonBase64Url,
   parseJsonBase64Url,
   utf8,
-} from './encoding';
+} from './encoding.ts';
 
 const MIN_SECRET_LENGTH = 32;
 

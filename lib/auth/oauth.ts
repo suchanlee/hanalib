@@ -1,6 +1,6 @@
-import { base64UrlDecode, base64UrlEncode, jsonBase64Url, parseJsonBase64Url, utf8 } from './encoding';
-import { callbackUrl, type AuthProviderId, type ProviderAuthConfig } from './config';
-import { pkceChallenge, type OAuthTransaction } from './oauth-transaction';
+import { base64UrlDecode, base64UrlEncode, jsonBase64Url, parseJsonBase64Url, utf8 } from './encoding.ts';
+import { callbackUrl, type AuthProviderId, type ProviderAuthConfig } from './config.ts';
+import { pkceChallenge, type OAuthTransaction } from './oauth-transaction.ts';
 
 export const GOOGLE_AUTHORIZATION_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
 export const GOOGLE_TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
@@ -10,8 +10,11 @@ export const APPLE_TOKEN_ENDPOINT = 'https://appleid.apple.com/auth/token';
 export const APPLE_JWKS_ENDPOINT = 'https://appleid.apple.com/auth/keys';
 
 export class OAuthProtocolError extends Error {
-  constructor(readonly code: 'invalid_authorization' | 'token_exchange_failed' | 'invalid_identity_token') {
+  readonly code: 'invalid_authorization' | 'token_exchange_failed' | 'invalid_identity_token';
+
+  constructor(code: 'invalid_authorization' | 'token_exchange_failed' | 'invalid_identity_token') {
     super(code);
+    this.code = code;
   }
 }
 

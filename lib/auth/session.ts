@@ -1,6 +1,6 @@
-import type { AuthProviderId } from './config';
-import { cookieName, parseCookies, serializeCookie } from './cookies';
-import { signToken, verifyToken } from './signed-token';
+import type { AuthProviderId } from './config.ts';
+import { cookieName, parseCookies, serializeCookie } from './cookies.ts';
+import { signToken, verifyToken } from './signed-token.ts';
 
 export const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 

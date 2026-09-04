@@ -1,7 +1,7 @@
-import type { AuthProviderId } from './config';
-import { cookieName, parseCookies, serializeCookie } from './cookies';
-import { randomBase64Url } from './encoding';
-import { signToken, verifyToken } from './signed-token';
+import type { AuthProviderId } from './config.ts';
+import { cookieName, parseCookies, serializeCookie } from './cookies.ts';
+import { randomBase64Url } from './encoding.ts';
+import { signToken, verifyToken } from './signed-token.ts';
 
 export const OAUTH_TRANSACTION_TTL_SECONDS = 10 * 60;
 
@@ -36,11 +36,14 @@ export function newOAuthTransaction(provider: AuthProviderId, returnTo: string, 
 }
 
 export async function oauthTransactionCookie(transaction: OAuthTransaction, secret: string, secure: boolean) {
+  if (transaction.provider === 'apple' && !secure) {
+    throw new Error('Apple OAuth transactions require a secure callback origin');
+  }
   const token = await signToken(transaction, secret);
   return serializeCookie(cookieName('hana_oauth', secure), token, {
     httpOnly: true,
     maxAge: OAUTH_TRANSACTION_TTL_SECONDS,
-    sameSite: 'Lax',
+    sameSite: transaction.provider === 'apple' ? 'None' : 'Lax',
     secure,
   });
 }

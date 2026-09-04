@@ -78,6 +78,9 @@ export function readAuthServerConfig(source: AuthEnvSource = process.env): AuthS
 
 export function readProviderAuthConfig(provider: AuthProviderId, source: AuthEnvSource = process.env) {
   const base = readAuthBaseConfig(source);
+  if (provider === 'apple' && new URL(base.publicAppUrl).protocol !== 'https:') {
+    throw new Error('Sign in with Apple requires PUBLIC_APP_URL to use HTTPS');
+  }
   return provider === 'google'
     ? {
         ...base,
