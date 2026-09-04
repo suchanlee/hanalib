@@ -1,6 +1,14 @@
 # Local/production integration contract. Never commit real values.
 DEPLOYMENT_REGION=us-west
 PUBLIC_APP_URL=http://localhost:3000
+LAUNCH_COMMUNITY_ID=
+LAUNCH_COMMUNITY_NAME=
+AUTH_SESSION_SECRET=
+AUTH_TRANSACTION_SECRET=
+
+# Development only. Set both to true to expose the explicit demo sign-in path.
+AUTH_DEMO_MODE=
+NEXT_PUBLIC_AUTH_DEMO_MODE=
 
 # External OAuth. Configure callback URLs in Google Cloud and Apple Developer.
 GOOGLE_CLIENT_ID=
