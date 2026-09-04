@@ -66,19 +66,26 @@ export class GoogleBooksProvider extends ServerProxyProvider {
 export class ResolvedBookProvider {
   private readonly endpoint: string;
   private readonly allowDevelopmentFixture: boolean;
+  private readonly developmentMemberId?: string;
 
   constructor(
     endpoint = '/api/isbn/lookup',
     allowDevelopmentFixture = false,
+    developmentMemberId?: string,
   ) {
     this.endpoint = endpoint;
     this.allowDevelopmentFixture = allowDevelopmentFixture;
+    this.developmentMemberId = developmentMemberId;
   }
 
   async lookup(isbn13: string, locale: AppLocale, signal?: AbortSignal): Promise<StitchedBookMetadata | null> {
     const search = new URLSearchParams({ isbn: isbn13, locale });
     if (this.allowDevelopmentFixture) search.set('fixture', '1');
-    const response = await fetch(`${this.endpoint}?${search}`, { headers: { accept: 'application/json' }, signal });
+    const headers = new Headers({ accept: 'application/json' });
+    if (process.env.NODE_ENV !== 'production' && this.developmentMemberId) {
+      headers.set('x-hana-demo-member-id', this.developmentMemberId);
+    }
+    const response = await fetch(`${this.endpoint}?${search}`, { credentials: 'same-origin', headers, signal });
     if (response.status === 404) return null;
     if (!response.ok) throw new Error(`Book metadata lookup failed (${response.status})`);
     return await response.json() as StitchedBookMetadata;

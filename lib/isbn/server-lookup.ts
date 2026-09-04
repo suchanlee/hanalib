@@ -105,8 +105,9 @@ export async function resolveBookMetadata(
 
 export function fixtureLookupAllowed(
   requested: boolean,
-  environment: { NODE_ENV?: string; ISBN_FIXTURES_ENABLED?: string } = process.env,
+  environment: { APP_RUNTIME_MODE?: string; NODE_ENV?: string; ISBN_FIXTURES_ENABLED?: string } = process.env,
 ) {
-  if (environment.NODE_ENV !== 'development' && environment.NODE_ENV !== 'test') return false;
+  const runtimeMode = environment.APP_RUNTIME_MODE ?? environment.NODE_ENV;
+  if (runtimeMode !== 'development' && runtimeMode !== 'test') return false;
   return requested || environment.ISBN_FIXTURES_ENABLED === 'true';
 }

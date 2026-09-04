@@ -5,6 +5,7 @@ import {
   createCoverObjectKey,
   isCoverContentType,
   MAX_COVER_BYTES,
+  readBytesWithLimit,
   safeOriginalFilename,
   validateCoverUpload,
 } from '@/lib/storage/covers';
@@ -13,6 +14,10 @@ import { requireActiveMember, unauthorizedResponse } from '@/lib/storage/request
 export async function POST(request: Request) {
   const member = await requireActiveMember(request);
   if (!member) return unauthorizedResponse();
+  const origin = request.headers.get('origin');
+  if (origin && origin !== new URL(request.url).origin) {
+    return Response.json({ error: 'cross-origin-upload-rejected' }, { status: 403, headers: { 'cache-control': 'no-store' } });
+  }
 
   const declaredType = request.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase() ?? '';
   if (!isCoverContentType(declaredType)) {
@@ -23,9 +28,10 @@ export async function POST(request: Request) {
     return Response.json({ error: 'cover-too-large', maxBytes: MAX_COVER_BYTES }, { status: 413, headers: { 'cache-control': 'no-store' } });
   }
 
-  const bytes = new Uint8Array(await request.arrayBuffer());
+  let bytes: Uint8Array;
   let validated: ReturnType<typeof validateCoverUpload>;
   try {
+    bytes = await readBytesWithLimit(request.body);
     validated = validateCoverUpload(declaredType, bytes);
   } catch (error) {
     if (!(error instanceof CoverValidationError)) throw error;
@@ -65,4 +71,3 @@ export async function POST(request: Request) {
     { status: 201, headers: { 'cache-control': 'no-store' } },
   );
 }
-

@@ -1,7 +1,10 @@
 import { parseIsbn } from '@/lib/isbn/isbn';
 import { fixtureLookupAllowed, resolveBookMetadata } from '@/lib/isbn/server-lookup';
+import { requireActiveMember, unauthorizedResponse } from '@/lib/storage/request-member';
 
 export async function GET(request: Request) {
+  const member = await requireActiveMember(request);
+  if (!member) return unauthorizedResponse();
   const search = new URL(request.url).searchParams;
   const parsed = parseIsbn(search.get('isbn') ?? '');
   if (!parsed) return Response.json({ error: 'invalid-isbn' }, { status: 400, headers: { 'cache-control': 'no-store' } });

@@ -61,6 +61,34 @@ export function validateCoverUpload(declaredType: string, bytes: Uint8Array) {
   return { contentType: detectedType, extension: extensions[detectedType], byteSize: bytes.byteLength };
 }
 
+export async function readBytesWithLimit(stream: ReadableStream<Uint8Array> | null, maxBytes = MAX_COVER_BYTES) {
+  if (!stream) return new Uint8Array();
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let byteSize = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      byteSize += value.byteLength;
+      if (byteSize > maxBytes) {
+        await reader.cancel('cover-too-large');
+        throw new CoverValidationError('file-too-large', 'The cover exceeds the upload limit.');
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(byteSize);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
 export function createCoverObjectKey(
   memberId: string,
   extension: string,

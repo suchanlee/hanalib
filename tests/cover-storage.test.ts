@@ -5,6 +5,7 @@ import {
   CoverValidationError,
   createCoverObjectKey,
   MAX_COVER_BYTES,
+  readBytesWithLimit,
   safeOriginalFilename,
   sniffCoverContentType,
   validateCoverUpload,
@@ -35,3 +36,11 @@ void test('uses randomized, partitioned object keys and sanitizes supplied filen
   assert.equal(safeOriginalFilename('../../secret/book.png\u0000'), 'book.png');
 });
 
+void test('stops reading request bodies as soon as the upload limit is crossed', async () => {
+  const accepted = await readBytesWithLimit(new Blob([jpeg]).stream(), 8);
+  assert.deepEqual(accepted, jpeg);
+  await assert.rejects(
+    readBytesWithLimit(new Blob([jpeg, jpeg]).stream(), 8),
+    (error: unknown) => error instanceof CoverValidationError && error.code === 'file-too-large',
+  );
+});

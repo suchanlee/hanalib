@@ -92,4 +92,5 @@ void test('allows fixtures only when explicitly enabled outside production', () 
   assert.equal(fixtureLookupAllowed(true, { NODE_ENV: 'development', ISBN_FIXTURES_ENABLED: undefined }), true);
   assert.equal(fixtureLookupAllowed(false, { NODE_ENV: 'test', ISBN_FIXTURES_ENABLED: 'true' }), true);
   assert.equal(fixtureLookupAllowed(true, { NODE_ENV: 'production', ISBN_FIXTURES_ENABLED: 'true' }), false);
+  assert.equal(fixtureLookupAllowed(true, { APP_RUNTIME_MODE: 'production', NODE_ENV: 'development', ISBN_FIXTURES_ENABLED: 'true' }), false);
 });

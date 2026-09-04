@@ -1,7 +1,10 @@
 import { parseIsbn } from '@/lib/isbn/isbn';
 import { fetchNlkMetadata } from '@/lib/isbn/server-lookup';
+import { requireActiveMember, unauthorizedResponse } from '@/lib/storage/request-member';
 
 export async function GET(request: Request) {
+  const member = await requireActiveMember(request);
+  if (!member) return unauthorizedResponse();
   const parsed = parseIsbn(new URL(request.url).searchParams.get('isbn') ?? '');
   if (!parsed) return Response.json({ error: 'invalid-isbn' }, { status: 400 });
   const apiKey = process.env.NLK_API_KEY;

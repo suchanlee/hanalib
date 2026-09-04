@@ -9,7 +9,8 @@ export interface ActiveMember {
 }
 
 function demoMemberId(request: Request) {
-  const enabled = process.env.NODE_ENV !== 'production' && process.env.ALLOW_DEMO_AUTH === 'true';
+  const runtimeMode = process.env.APP_RUNTIME_MODE ?? process.env.NODE_ENV;
+  const enabled = (runtimeMode === 'development' || runtimeMode === 'test') && process.env.ALLOW_DEMO_AUTH === 'true';
   if (!enabled) return undefined;
   const memberId = request.headers.get('x-hana-demo-member-id') ?? '';
   return /^[a-zA-Z0-9_-]{1,128}$/.test(memberId) ? memberId : undefined;
@@ -43,4 +44,3 @@ export function unauthorizedResponse() {
     { status: 401, headers: { 'cache-control': 'no-store', 'www-authenticate': 'Session realm="Hana Library"' } },
   );
 }
-

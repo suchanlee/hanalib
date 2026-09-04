@@ -27,7 +27,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useHanaApp } from '@/features/app/app-context';
 import type { AddBookInput, AppLocale, CatalogItem } from '@/lib/domain/types';
 import { parseIsbn } from '@/lib/isbn/isbn';
-import { GoogleBooksProvider, lookupFixtureMetadata, lookupWithProviders, NlkProvider, type StitchedBookMetadata } from '@/lib/isbn/providers';
+import { ResolvedBookProvider, type StitchedBookMetadata } from '@/lib/isbn/providers';
 import type { IScannerControls } from '@zxing/browser';
 
 type IntakeStage = 'idle' | 'permission' | 'scanning' | 'lookup' | 'confirm' | 'error' | 'success';
@@ -82,6 +82,8 @@ const intakeCopy = {
     invalidBody: '10자리 또는 13자리 ISBN을 정확히 입력해 주세요. 하이픈은 있어도 괜찮아요.',
     notFoundTitle: '일치하는 도서를 찾지 못했어요',
     notFoundBody: 'ISBN은 유효하지만 제공처에 정보가 없어요. 기본 정보를 직접 입력해 추가할 수 있어요.',
+    lookupTitle: '도서 정보 제공처에 연결할 수 없어요',
+    lookupBody: '잠시 후 다시 시도하거나 아래에서 ISBN과 도서 정보를 직접 입력해 주세요.',
     cameraTitle: '카메라를 열 수 없어요',
     cameraBody: '브라우저의 카메라 권한을 확인하거나 ISBN을 직접 입력해 주세요.',
     enterManually: '정보 직접 입력',
@@ -104,9 +106,11 @@ const intakeCopy = {
     uploadCover: '표지 사진 올리기',
     coverHelp: '제공처 표지가 없거나 정확하지 않다면 휴대폰 사진으로 바꿀 수 있어요. 최대 8MB.',
     coverError: '8MB 이하의 이미지 파일을 선택해 주세요.',
+    uploadFailed: '표지 사진을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
     requiredError: '제목, 저자, 출판사, 출판 연도를 확인해 주세요.',
     back: 'ISBN으로 돌아가기',
     create: '내 도서로 추가',
+    creating: '도서 추가 중…',
     createdEyebrow: '추가 완료',
     createdTitle: '도서관에 책을 추가했어요',
     createdBody: '이제 다른 회원들이 도서를 찾고 대여를 요청할 수 있어요.',
@@ -142,6 +146,8 @@ const intakeCopy = {
     invalidBody: 'Enter a valid 10- or 13-digit ISBN. Hyphens are okay.',
     notFoundTitle: 'We couldn’t find a matching book',
     notFoundBody: 'The ISBN is valid, but the providers had no metadata. You can still add the details yourself.',
+    lookupTitle: 'The book providers are unavailable',
+    lookupBody: 'Try again shortly, or enter the ISBN and book details manually below.',
     cameraTitle: 'We couldn’t open the camera',
     cameraBody: 'Check camera permission in your browser, or enter the ISBN manually.',
     enterManually: 'Enter details manually',
@@ -164,9 +170,11 @@ const intakeCopy = {
     uploadCover: 'Upload cover photo',
     coverHelp: 'If the provider cover is missing or wrong, use a phone photo up to 8MB.',
     coverError: 'Choose an image file no larger than 8MB.',
+    uploadFailed: 'We couldn’t save the cover photo. Please try again.',
     requiredError: 'Check the title, author, publisher, and published year.',
     back: 'Back to ISBN',
     create: 'Add to my library',
+    creating: 'Adding book…',
     createdEyebrow: 'All set',
     createdTitle: 'Your book is in the library',
     createdBody: 'Other members can now discover it and ask to borrow it.',
@@ -213,6 +221,26 @@ function blankDraft(isbn13: string, locale: AppLocale): IntakeDraft {
 
 function barcodeDetectorConstructor() {
   return (globalThis as typeof globalThis & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
+}
+
+interface UploadedCover {
+  assetId: string;
+  coverUrl: string;
+  byteSize: number;
+  contentType: string;
+}
+
+async function uploadMemberCover(file: File, memberId: string) {
+  const headers = new Headers({ 'content-type': file.type, 'x-file-name': file.name });
+  if (process.env.NODE_ENV !== 'production') headers.set('x-hana-demo-member-id', memberId);
+  const response = await fetch('/api/covers', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers,
+    body: file,
+  });
+  if (!response.ok) throw new Error(`Cover upload failed (${response.status}).`);
+  return await response.json() as UploadedCover;
 }
 
 function ManualIsbnForm({
@@ -278,9 +306,12 @@ export function IntakeView() {
   const [stage, setStage] = useState<IntakeStage>('idle');
   const [manualIsbn, setManualIsbn] = useState('');
   const [draft, setDraft] = useState<IntakeDraft | null>(null);
-  const [errorKind, setErrorKind] = useState<'invalid' | 'not-found' | 'camera'>('invalid');
+  const [errorKind, setErrorKind] = useState<'invalid' | 'not-found' | 'camera' | 'lookup'>('invalid');
   const [formError, setFormError] = useState('');
   const [coverError, setCoverError] = useState('');
+  const [coverFile, setCoverFile] = useState<File>();
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [createdItemId, setCreatedItemId] = useState<string>();
   const [autoDetectionAvailable, setAutoDetectionAvailable] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -289,6 +320,7 @@ export function IntakeView() {
   const zxingControlsRef = useRef<IScannerControls | null>(null);
   const uploadUrlRef = useRef<string | undefined>(undefined);
   const lookupSequenceRef = useRef(0);
+  const lookupAbortRef = useRef<AbortController | null>(null);
 
   const stopCamera = useCallback(() => {
     zxingControlsRef.current?.stop();
@@ -304,10 +336,11 @@ export function IntakeView() {
 
   useEffect(() => () => {
     stopCamera();
+    lookupAbortRef.current?.abort();
     if (uploadUrlRef.current) URL.revokeObjectURL(uploadUrlRef.current);
   }, [stopCamera]);
 
-  const performLookup = useCallback(async (rawIsbn: string) => {
+  const performLookup = useCallback(async (rawIsbn: string, allowDevelopmentFixture = false) => {
     const parsed = parseIsbn(rawIsbn);
     stopCamera();
     if (!parsed) {
@@ -317,15 +350,25 @@ export function IntakeView() {
     }
 
     const sequence = ++lookupSequenceRef.current;
+    lookupAbortRef.current?.abort();
+    const controller = new AbortController();
+    lookupAbortRef.current = controller;
     setManualIsbn(parsed.isbn13);
     setStage('lookup');
-    await new Promise((resolve) => window.setTimeout(resolve, 360));
-    const fixtureMetadata = await lookupFixtureMetadata(parsed.isbn13, locale);
-    const metadata = fixtureMetadata ?? await lookupWithProviders(
-      parsed.isbn13,
-      locale,
-      [new NlkProvider(), new GoogleBooksProvider()],
-    );
+    let metadata: StitchedBookMetadata | null;
+    try {
+      metadata = await new ResolvedBookProvider('/api/isbn/lookup', allowDevelopmentFixture, state.currentUserId).lookup(
+        parsed.isbn13,
+        locale,
+        controller.signal,
+      );
+    } catch (error) {
+      if (controller.signal.aborted || sequence !== lookupSequenceRef.current) return;
+      console.error('book-metadata-lookup-failed', error);
+      setErrorKind('lookup');
+      setStage('error');
+      return;
+    }
     if (sequence !== lookupSequenceRef.current) return;
     if (!metadata) {
       setDraft(blankDraft(parsed.isbn13, locale));
@@ -336,7 +379,7 @@ export function IntakeView() {
     setDraft(createDraft(metadata));
     setFormError('');
     setStage('confirm');
-  }, [locale, stopCamera]);
+  }, [locale, state.currentUserId, stopCamera]);
 
   useEffect(() => {
     if (stage !== 'scanning' || !streamRef.current || !videoRef.current) return;
@@ -424,9 +467,15 @@ export function IntakeView() {
 
   const reset = () => {
     lookupSequenceRef.current += 1;
+    lookupAbortRef.current?.abort();
+    lookupAbortRef.current = null;
     stopCamera();
+    if (uploadUrlRef.current) URL.revokeObjectURL(uploadUrlRef.current);
+    uploadUrlRef.current = undefined;
+    setCoverPreviewUrl('');
     setStage('idle');
     setDraft(null);
+    setCoverFile(undefined);
     setManualIsbn('');
     setCreatedItemId(undefined);
     setFormError('');
@@ -452,7 +501,7 @@ export function IntakeView() {
   const handleCoverUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/') || file.size > 8 * 1024 * 1024) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) {
       setCoverError(c.coverError);
       event.target.value = '';
       return;
@@ -460,12 +509,13 @@ export function IntakeView() {
     if (uploadUrlRef.current) URL.revokeObjectURL(uploadUrlRef.current);
     const previewUrl = URL.createObjectURL(file);
     uploadUrlRef.current = previewUrl;
-    editDraft('coverUrl', previewUrl);
+    setCoverFile(file);
+    setCoverPreviewUrl(previewUrl);
     setDraft((current) => current ? { ...current, provenance: { ...current.provenance, coverUrl: 'member' } } : current);
     setCoverError('');
   };
 
-  const createBook = (event: SyntheticEvent<HTMLFormElement>) => {
+  const createBook = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!draft) return;
     const authors = draft.authors.split(',').map((author) => author.trim()).filter(Boolean);
@@ -474,6 +524,19 @@ export function IntakeView() {
     if (!draft.title.trim() || authors.length === 0 || !draft.publisher.trim() || !Number.isInteger(publishedYear) || publishedYear < 1000 || publishedYear > 2200) {
       setFormError(c.requiredError);
       return;
+    }
+
+    setIsSaving(true);
+    let persistedCoverUrl = draft.coverUrl || undefined;
+    if (coverFile) {
+      try {
+        const upload = await uploadMemberCover(coverFile, state.currentUserId);
+        persistedCoverUrl = upload.coverUrl;
+      } catch {
+        setFormError(c.uploadFailed);
+        setIsSaving(false);
+        return;
+      }
     }
 
     const itemId = actions.addBook({
@@ -485,18 +548,23 @@ export function IntakeView() {
       publishedYear,
       language: draft.language,
       pageCount: pageCount && pageCount > 0 ? pageCount : undefined,
-      coverUrl: draft.coverUrl || undefined,
+      coverUrl: persistedCoverUrl,
       condition: draft.condition,
       ownerNotes: draft.ownerNotes.trim() || undefined,
       provenance: draft.provenance,
     });
     setCreatedItemId(itemId);
+    setCoverFile(undefined);
+    if (uploadUrlRef.current) URL.revokeObjectURL(uploadUrlRef.current);
+    uploadUrlRef.current = undefined;
+    setCoverPreviewUrl('');
+    setIsSaving(false);
     setStage('success');
     actions.setScreen('intake');
   };
 
-  const errorTitle = errorKind === 'invalid' ? c.invalidTitle : errorKind === 'not-found' ? c.notFoundTitle : c.cameraTitle;
-  const errorBody = errorKind === 'invalid' ? c.invalidBody : errorKind === 'not-found' ? c.notFoundBody : c.cameraBody;
+  const errorTitle = errorKind === 'invalid' ? c.invalidTitle : errorKind === 'not-found' ? c.notFoundTitle : errorKind === 'camera' ? c.cameraTitle : c.lookupTitle;
+  const errorBody = errorKind === 'invalid' ? c.invalidBody : errorKind === 'not-found' ? c.notFoundBody : errorKind === 'camera' ? c.cameraBody : c.lookupBody;
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-5 sm:px-6" data-testid="intake-view">
@@ -532,7 +600,7 @@ export function IntakeView() {
           </Card>
 
           <ManualIsbnForm disabled={false} locale={locale} onChange={setManualIsbn} onSubmit={() => void performLookup(manualIsbn)} value={manualIsbn} />
-          <Button className="h-10 w-full text-muted-foreground" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN)} variant="ghost">
+          <Button className="h-10 w-full text-muted-foreground" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)} variant="ghost">
             <Sparkles aria-hidden="true" />
             {c.simulate}
           </Button>
@@ -571,7 +639,7 @@ export function IntakeView() {
             </Alert>
           )}
           <div className="grid grid-cols-2 gap-2">
-            <Button className="h-11" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN)}>
+            <Button className="h-11" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)}>
               <Sparkles aria-hidden="true" />
               {c.simulate}
             </Button>
@@ -636,8 +704,8 @@ export function IntakeView() {
 
           <div className="grid grid-cols-[112px_minmax(0,1fr)] gap-4 rounded-2xl bg-muted/60 p-4 sm:grid-cols-[144px_minmax(0,1fr)]">
             <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-primary/10 shadow-sm">
-              {draft.coverUrl ? (
-                <Image alt={`${draft.title || c.coverLabel} cover`} className="object-cover" fill sizes="144px" src={draft.coverUrl} unoptimized />
+              {(coverPreviewUrl || draft.coverUrl) ? (
+                <Image alt={`${draft.title || c.coverLabel} cover`} className="object-cover" fill sizes="144px" src={coverPreviewUrl || draft.coverUrl} unoptimized />
               ) : (
                 <div className="grid h-full place-items-center px-3 text-center text-xs text-muted-foreground">
                   <BookOpen aria-hidden="true" className="mx-auto mb-2 size-8" />
@@ -652,7 +720,7 @@ export function IntakeView() {
               <Label className="mt-4 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border bg-background px-3 text-sm font-medium">
                 <ImagePlus aria-hidden="true" className="size-4" />
                 {c.uploadCover}
-                <Input accept="image/*" capture="environment" className="sr-only" data-testid="cover-upload" onChange={handleCoverUpload} type="file" />
+                <Input accept="image/jpeg,image/png,image/webp" capture="environment" className="sr-only" data-testid="cover-upload" onChange={handleCoverUpload} type="file" />
               </Label>
             </div>
           </div>
@@ -712,13 +780,13 @@ export function IntakeView() {
           {formError && (
             <Alert variant="destructive">
               <CircleAlert aria-hidden="true" />
-              <AlertTitle>{c.requiredError}</AlertTitle>
+              <AlertTitle>{formError}</AlertTitle>
             </Alert>
           )}
           <div className="sticky bottom-20 -mx-4 border-t bg-background/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
-            <Button className="h-12 w-full text-base" data-testid="create-book" type="submit">
-              <Check aria-hidden="true" className="size-5" />
-              {c.create}
+            <Button className="h-12 w-full text-base" data-testid="create-book" disabled={isSaving} type="submit">
+              {isSaving ? <LoaderCircle aria-hidden="true" className="size-5 animate-spin" /> : <Check aria-hidden="true" className="size-5" />}
+              {isSaving ? c.creating : c.create}
             </Button>
           </div>
         </form>
