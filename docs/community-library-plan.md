@@ -352,13 +352,14 @@ If another action already changed the copy, the command does nothing and sends a
 - **Next.js App Router + TypeScript** for server-rendered catalog/detail views, route handlers, and an installable PWA shell.
 - **React Server Components** by default; client components only for scanner, search interaction, dialogs, and local optimistic state.
 - **`next-intl` or equivalent dictionary layer** under `app/[locale]`, with typed message keys and `ko` as the default.
-- **Supabase** for Postgres, Auth, Storage, Row Level Security, Edge Functions, and scheduled jobs.
-- **Supabase Auth** with Google and Apple OAuth using PKCE and secure HTTP-only session cookies.
-- **Postgres `pg_trgm`** plus normalized search text for bilingual catalog matching.
+- **OpenAI Sites on Cloudflare Workers** for the application runtime and deployment.
+- **Application-owned Google and Apple OAuth** using PKCE, provider ID-token verification, and signed secure HTTP-only session cookies.
+- **Cloudflare D1** for durable relational state, normalized bilingual catalog search, authorization checks, idempotency records, and the transactional outbox.
+- **Cloudflare R2** for authenticated member-uploaded cover images.
 - **Twilio Messaging** for outbound/inbound SMS.
 - **Resend** (or one selected transactional email provider) for email; abstract it behind a `NotificationProvider` interface.
 - **Sentry + structured application logs** for errors and traces; product events sent to a privacy-conscious analytics tool only after consent review.
-- Deploy the application and Supabase project in a US West region, keeping application/database traffic regional. The launch accepts US (`+1`) SMS endpoints only.
+- Deploy through Sites with the closest available US infrastructure. US-only or US-West data residency is not a launch requirement. The launch accepts US (`+1`) SMS endpoints only.
 
 ### Deployment shape
 
@@ -366,25 +367,25 @@ If another action already changed the copy, the command does nothing and sends a
 Mobile browser / PWA
         |
         v
-Next.js web application
+Vinext / Cloudflare Worker application
   |     |          |
   |     |          +--> ISBN resolver adapters --> NLK / Google Books
-  |     +--------------> Supabase Auth
-  +--------------------> Supabase Postgres + Storage
-                                  |
-                                  +--> transactional outbox
-                                  +--> Cron -> notification Edge Function
-                                                     |--> Twilio SMS
-                                                     +--> Email provider
-Twilio inbound webhook -----------------------------> Edge Function -> domain RPCs
+  |     +--------------> Google / Apple OAuth
+  +--------------------> D1 + R2
+                              |
+                              +--> transactional outbox
+                              +--> HTTPS scheduler -> notification worker
+                                                         |--> Twilio SMS
+                                                         +--> Resend email
+Twilio inbound webhook ---------------------------------> signed Worker route -> domain commands
 ```
 
-Keep state transitions in versioned Postgres functions/RPCs. The web app and background functions call the same commands, preventing SMS and in-app actions from implementing subtly different rules.
+Keep state transitions in one versioned repository/domain layer. The web app, notification worker, and signed SMS route call the same commands, preventing SMS and in-app actions from implementing subtly different rules.
 
 ### Why this shape
 
-- One managed data/auth platform keeps a small community app operationally simple.
-- RLS gives a second authorization boundary even when the browser queries safe read models.
+- One managed Worker, D1, and R2 deployment keeps a small community app operationally simple.
+- Server-side membership and ownership checks protect every read and mutation boundary.
 - A transactional outbox prevents committed borrow state from losing its notification.
 - Server-only metadata adapters hide provider keys and allow providers to change without scanner UI changes.
 - The scanner remains a replaceable feature module because browser capability is not uniform.
@@ -477,7 +478,7 @@ Avoid storing unnecessary provider payloads or full SMS bodies. Retain minimum a
 - All participants must be active members of the same community at command time.
 - A return transition is monotonic: returned loans cannot become active again.
 
-### RLS policy summary
+### Server authorization summary
 
 - Community members can read non-archived items and edition metadata in their communities.
 - Members can read other members' community-visible profile fields only.
@@ -486,7 +487,7 @@ Avoid storing unnecessary provider payloads or full SMS bodies. Retain minimum a
 - Loan owner and borrower can read their loan; other members see only item availability.
 - Users can read/update only their own notification endpoints through verification commands.
 - No client role can read the outbox, inbound provider data, private endpoints, or raw audit payloads.
-- Provider service keys exist only in server/Edge Function secret stores.
+- Provider service keys exist only in Sites-managed Worker secrets.
 
 ## 9. Application contracts
 
@@ -558,10 +559,10 @@ Build and index a normalized `search_text` from title, subtitle, authors, publis
 
 - NFC-normalize Korean text and lowercase Latin text.
 - Use exact btree indexes for ISBN and owner/status filters.
-- Use `pg_trgm` GIN index for Hangul/Latin substring and typo tolerance.
+- Use normalized D1 columns and indexed exact filters for ISBN, owner, status, and language; perform bounded community-scale substring matching for Hangul and Latin text.
 - Apply a deterministic ranking function: exact ISBN > exact title > title prefix > title similarity > author similarity > publisher.
 - Keyset paginate by `(rank, created_at, id)` rather than offset.
-- On the first community-sized dataset, Postgres is sufficient. Revisit a Korean morphological engine only if measured search quality or scale requires it.
+- On the first community-sized dataset, D1 is sufficient. Revisit FTS or a Korean morphological engine only if measured search quality or scale requires it.
 
 Search integration tests must include decomposed/composed Hangul, spaces in Korean names, romanized titles, hyphenated ISBNs, mixed scripts, and common typo cases.
 
@@ -569,7 +570,7 @@ Search integration tests must include decomposed/composed Hangul, spaces in Kore
 
 ### Transactional outbox
 
-Domain transactions insert an outbox event alongside their state change. A worker claims events using `FOR UPDATE SKIP LOCKED`, sends them, and records delivery outcome. Retries use exponential backoff with jitter and a maximum attempt count; exhausted events go to an operational review queue.
+Domain transactions insert an outbox event alongside their state change. A worker claims each due D1 event with a conditional update lease, sends it, and records delivery outcome. Retries use bounded exponential backoff; exhausted events belong in an operational review queue.
 
 ### Templates
 
@@ -586,14 +587,14 @@ Domain transactions insert an outbox event alongside their state change. A worke
 - Daily in community timezone: create due return check-ins and reminders.
 - Daily: retry transient failures and alert on a growing dead-letter count.
 
-Supabase Cron can invoke Edge Functions, and secrets used by scheduled functions should live in Vault/managed secret storage.
+An external HTTPS scheduler invokes the authenticated Worker job endpoint. Scheduler credentials live only in its secret store and Sites runtime secrets.
 
 ## 12. Security, privacy, and abuse controls
 
 - Require HTTPS; camera APIs and secure auth depend on it.
 - Verify OAuth redirect allowlists per environment.
 - Rotate the Apple OAuth client secret before its six-month expiry; assign an explicit owner and alert.
-- Use RLS and least-privilege grants on every exposed table; test policies as anonymous, member, owner, borrower, and service roles.
+- Expose no D1 binding to browsers; test every server route as anonymous, member, owner, borrower, and system roles.
 - Validate Twilio signatures with the official SDK and use the exact externally visible webhook URL.
 - Encrypt notification destinations at rest; redact them from logs and analytics.
 - Use signed, single-use, short-lived action tokens for email links. Bind the decision to the authenticated owner.
@@ -647,7 +648,7 @@ Never send title, ISBN, member name, contact detail, or message body to analytic
 
 - Migration-up and clean-reset tests.
 - Unique/partial constraints and concurrency races.
-- RLS matrix using distinct users and communities.
+- Server-authorization matrix using distinct users and communities.
 - Transactional acceptance: two owners/actions cannot create two active loans.
 - Outbox insertion in the same transaction as every notifiable state change.
 
@@ -697,7 +698,7 @@ Never send title, ISBN, member name, contact detail, or message body to analytic
 
 - Project skeleton, CI, environment validation.
 - Google/Apple auth, open default-community registration, profile completion.
-- Initial schema, migrations, RLS harness, typed domain contracts.
+- Initial D1 schema, migrations, authorization harness, typed domain contracts.
 - One seeded catalog page and detail read model in both locales.
 
 **Gate:** one member can sign in and see only their community; policy tests pass.
@@ -743,11 +744,11 @@ Parallel work starts only after Agent A lands and tags the shared contract basel
 
 ### Agent A — foundation, schema, and security contracts
 
-**Owns:** `supabase/migrations/**`, `supabase/tests/**`, `src/lib/domain/**`, environment schema, shared generated database types.
+**Owns:** `drizzle/**`, `db/**`, `lib/auth/**`, `lib/domain/**`, environment schema, shared database types.
 
-**Delivers:** project skeleton, auth/session integration, schema, RLS, RPC command signatures, error enum, seeded fixtures, contract documentation.
+**Delivers:** project skeleton, auth/session integration, schema, server authorization, repository command signatures, error enum, seeded fixtures, contract documentation.
 
-**Done when:** migrations reset cleanly; RLS matrix and concurrency tests pass; publishes `contract-v1` tag/commit for other agents.
+**Done when:** migrations reset cleanly; authorization and concurrency tests pass; publishes a shared contract commit for other agents.
 
 ### Agent B — application shell, catalog, detail, and i18n
 
@@ -767,7 +768,7 @@ Parallel work starts only after Agent A lands and tags the shared contract basel
 
 ### Agent D — borrowing, notifications, and schedules
 
-**Owns:** `src/features/circulation/**`, circulation API routes, `supabase/functions/**`, notification templates, webhook fixtures.
+**Owns:** `features/circulation/**`, circulation API routes, `lib/notifications/**`, notification templates, webhook fixtures.
 
 **Depends on:** Agent A circulation RPCs/outbox tables and Agent B shell integration point.
 
@@ -801,30 +802,24 @@ This role begins near the end of Phase 2 and does not own feature behavior.
 ## 17. Repository shape
 
 ```text
-src/
-  app/[locale]/
-  app/api/
-  components/
-  features/
-    catalog/
-    intake/
-    circulation/
-    settings/
-  lib/
-    auth/
-    domain/
-    i18n/
-    observability/
-  server/
-    isbn/
-    notifications/
-supabase/
-  migrations/
-  functions/
-  tests/
+app/
+  api/
+components/
+features/
+  catalog/
+  intake/
+  circulation/
+  settings/
+lib/
+  auth/
+  domain/
+  i18n/
+  isbn/
+  notifications/
+  persistence/
+db/
+drizzle/
 tests/
-  e2e/
-  fixtures/
 docs/
 ```
 
@@ -842,7 +837,7 @@ Enforce dependency direction: UI → application commands/queries → domain con
 | Return authority | Borrower or owner | Both call the same idempotent return command |
 | Covers | Provider URL when permitted; member upload otherwise | Provider terms remain a launch gate |
 | Book metadata | Benchmark-driven field-level stitching across eligible providers | Provider weights are per field/market, not one global source order |
-| Hosting region | US West | Co-locate application, database, and background functions |
+| Hosting region | Sites/Cloudflare; no strict residency requirement | Use the managed deployment location closest to the US pilot |
 | Analytics | Minimal, content-free event metadata | Never emit titles, ISBNs, names, contacts, or message bodies |
 
 ## 19. Risks and mitigations
@@ -854,7 +849,7 @@ Enforce dependency direction: UI → application commands/queries → domain con
 | Bare SMS replies are ambiguous | One actionable SMS per number, exact sender match, no-op on ambiguity, in-app fallback |
 | Two accept actions race | Database lock, unique active-loan constraint, idempotent RPC |
 | Notifications fail after state commits | Transactional outbox, retries, delivery status, dead-letter alert |
-| Private contact data leaks through catalog reads | Separate private endpoint table, strict RLS/grants, redacted logs |
+| Private contact data leaks through catalog reads | Separate private endpoint table, server-only D1 access, explicit projections, redacted logs |
 | Apple sign-in breaks after secret expiry | Six-month rotation owner, 30/14/7-day alerts, runbook |
 | Provider terms block cover caching | Legal/terms review gate, permitted hotlinking or user-upload fallback |
 | Large shared changes cause agent conflicts | Contract-first baseline, directory ownership, additive migrations, scheduled checkpoints |
@@ -869,9 +864,9 @@ The release is complete when a newly registered Korean-first user can authentica
 - [Naver notice: Book Search API retired July 31, 2026](https://developers.naver.com/notice/article/32564)
 - [Google Books API](https://developers.google.com/books/docs/v1/using)
 - [MDN Barcode Detection API](https://developer.mozilla.org/en-US/docs/Web/API/Barcode_Detection_API)
-- [Supabase Google sign-in](https://supabase.com/docs/guides/auth/social-login/auth-google)
-- [Supabase Apple sign-in](https://supabase.com/docs/guides/auth/social-login/auth-apple)
-- [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)
-- [Supabase scheduled Edge Functions](https://supabase.com/docs/guides/functions/schedule-functions)
+- [Google OpenID Connect](https://developers.google.com/identity/openid-connect/openid-connect)
+- [Sign in with Apple REST API](https://developer.apple.com/documentation/signinwithapplerestapi)
+- [Cloudflare D1](https://developers.cloudflare.com/d1/)
+- [Cloudflare R2](https://developers.cloudflare.com/r2/)
 - [Twilio incoming messaging webhooks](https://www.twilio.com/docs/messaging/guides/webhook-request)
 - [Next.js internationalization guidance](https://nextjs.org/docs/app/guides/internationalization)

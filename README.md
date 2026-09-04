@@ -34,7 +34,7 @@ npm run build
 - `db/schema.ts` defines durable Cloudflare D1 data. Generated SQL migrations in `drizzle/` are immutable after application.
 - Cover uploads use the `FILES` R2 binding; structured state uses the `DB` D1 binding declared in `.openai/hosting.json`.
 
-The current browser preview is a fully interactive deterministic product prototype. Production activation requires the credentials in `.dev.vars.example`, a platform-approved Google/Apple OAuth callback path, encrypted notification endpoints, verified Twilio/transactional-email webhooks, and scheduled outbox/check-in workers. The server contracts and database shape are included; the preview never pretends that an external message or OAuth exchange occurred.
+The application is deployed through OpenAI Sites on Cloudflare Workers with managed D1 and R2 bindings. Core application secrets are managed by Sites, and local secrets remain ignored. Public launch still requires the third-party credentials and callback/webhook setup in [`docs/production-runbook.md`](docs/production-runbook.md); development fixtures and demo authentication are disabled in production.
 
 ## Operational invariants
 
@@ -45,4 +45,4 @@ The current browser preview is a fully interactive deterministic product prototy
 - A return can be recorded by the borrower or owner.
 - The first return check is seven days after loan start and repeats weekly without a due date.
 - SMS commands apply only when exactly one actionable request exists for the sender; `1` accepts and `2` declines.
-- Production is scoped to the United States in a US West deployment region.
+- The pilot and SMS numbers are US-scoped; strict data-residency placement is not required.
