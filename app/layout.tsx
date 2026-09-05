@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   description: 'A private community library for sharing books.',
   manifest: '/manifest.webmanifest',
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-    shortcut: '/favicon.svg',
+    icon: [{ url: '/seed-logo.svg', type: 'image/svg+xml' }],
+    shortcut: '/seed-logo.svg',
     apple: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
   },
   applicationName: '씨앗책장',
