@@ -1,12 +1,12 @@
 # Hana Library — product, UX, and technical implementation plan
 
-> **Current implementation decision (September 2026):** Kakao is the sole member-authentication provider. Kakao sign-in requests `talk_message` consent so circulation alerts can be sent privately through KakaoTalk's **Send to me** API with buttons back to the authorization-checked app. This supersedes the Google/Apple authentication and Twilio reply-by-`1`/`2` sections retained below as historical planning context. There is no shared Kakao Channel conversation, and a normal Channel chatbot cannot initiate these alerts.
+> **Current implementation decision (September 2026):** Kakao is the sole member-authentication provider. Circulation delivery uses standards-based Web Push so installed iPhone/Android web apps and supported desktop browsers can notify members even while the page is closed. Subscriptions are encrypted in D1, and notification clicks deep-link to the authorization-checked app. This supersedes the Google/Apple authentication, Twilio reply-by-`1`/`2`, and Kakao **Send to me** sections retained below as historical planning context.
 
 Status: planning only  
 Primary locale: Korean (`ko`)  
 Secondary locale: English (`en`)  
 Primary device: mobile web / installable PWA  
-Working product name: **Hana Library / 하나도서관**
+Working product name: **Hana Library / 하나의씨앗 도서관**
 
 ## 1. Product definition
 

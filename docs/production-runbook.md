@@ -1,10 +1,10 @@
 # Production activation runbook
 
-The application runs on OpenAI Sites backed by Cloudflare Workers. Sites owns the production `DB` D1 database and `FILES` R2 bucket declared in `.openai/hosting.json`. The owner-private production deployment is the staging gate; change Sites access to public only after the provider checks below pass. A public Sites page does not require a ChatGPT account, while the application catalog still requires Kakao authentication.
+The application runs publicly on OpenAI Sites backed by Cloudflare Workers. Sites owns the production `DB` D1 database and `FILES` R2 bucket declared in `.openai/hosting.json`. Opening the public page does not require a ChatGPT account, while the application catalog still requires Kakao authentication.
 
 ## 1. Identity and membership
 
-Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` and `talk_message` consent items. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
+Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` consent item. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
 `https://hana-community-library.lee-suchan.chatgpt.site/api/auth/kakao/callback`
 
@@ -18,13 +18,13 @@ Sites applies the immutable `drizzle/*.sql` migrations to D1 and binds R2 as `FI
 
 Open Library is the credential-free baseline. Set `NLK_API_KEY` and `GOOGLE_BOOKS_API_KEY` for Korean and English enrichment; optionally set both `NAVER_CLIENT_ID` and `NAVER_CLIENT_SECRET` for Naver Books enrichment. The resolver queries configured providers plus Open Library in parallel, accepts partial provider failure, rejects non-exact ISBN editions, and stitches fields with per-field provenance. Production fixtures are disabled. Review each provider’s current attribution, caching, and cover-image terms before public launch; retain a provider URL only when permitted and use member-uploaded R2 covers otherwise.
 
-## 4. Private KakaoTalk notifications
+## 4. Web Push notifications
 
-Members who grant `talk_message` receive circulation cards in their private KakaoTalk My Chatroom. The OAuth callback stores the access and refresh tokens as an AES-GCM-encrypted credential in `notification_endpoints`; the server refreshes short-lived access tokens with the Kakao REST API key and client secret. Never expose either token to the browser or logs.
+Generate one VAPID P-256 key pair and set `WEB_PUSH_PUBLIC_KEY`, `WEB_PUSH_PRIVATE_KEY`, and an HTTPS `WEB_PUSH_SUBJECT`. Keep the private key server-only. The browser registers `/sw.js`, requests notification permission only after a member presses the enable button, and stores each subscription as AES-GCM-encrypted JSON plus a keyed endpoint hash in `web_push_subscriptions`. The endpoint is a bearer capability and must never appear in logs.
 
-Borrow requests include a same-origin **요청 확인 / View request** button. Decisions and weekly return checks include corresponding authenticated app buttons. A normal Kakao Channel chatbot cannot initiate these alerts; this implementation deliberately uses Kakao's **Send to me** API, which delivers to the authorized member's My Chatroom and does not expose a shared group conversation.
+On iOS/iPadOS, Safari exposes Push only after the member adds the site to the Home Screen and opens the installed app. Android Chrome and supported desktop browsers can subscribe directly; installation is still offered when the browser supports it. The Settings card includes a real test send so members and operators can validate the complete subscription, encryption, push-service, service-worker, and display path.
 
-Borrow and decision mutations attempt delivery immediately. Every message also uses the transactional outbox so a provider failure can be retried without losing the domain change. Logs must never include message bodies, OAuth tokens, book titles, member names, or encrypted notification payloads. Legacy Twilio and email adapters remain isolated in source for rollback, but they are not exposed by the Kakao-only production UI and their credentials are not required.
+Borrow requests, decisions, and weekly return checks deep-link to the relevant authenticated screen. Mutations attempt delivery immediately through the transactional outbox, so a delivery failure cannot undo or lose the domain change. Invalid or expired browser subscriptions are disabled automatically. Legacy Kakao, Twilio, and email adapters remain isolated as fallbacks; their credentials are not required for members who have enabled Web Push.
 
 ## 5. Return-check scheduler
 
@@ -51,8 +51,8 @@ API responses include `x-request-id`; use that value, the route, and the approxi
 
 - Validate real Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
 - Validate Korean and English ISBNs against live NLK and Google Books data.
-- Grant `talk_message` consent, then verify the Settings connection state and repeat sign-in behavior.
-- Trigger each circulation event and verify the private My Chatroom card and its in-app action button.
+- Install the app on a physical iPhone and Android phone, enable notifications, and verify the Settings test alert while the app is closed.
+- Trigger each circulation event and verify its device notification and authenticated deep link.
 - Connect the scheduler and observe a retry plus a due return check in staging.
 - Complete physical iOS Safari and Android Chrome camera tests; the automated browser cannot prove camera permission UX on real hardware.
 - Review keyboard/screen-reader behavior, backup/restore, retention/deletion, abuse response, and monitoring.
