@@ -1,6 +1,6 @@
 'use client';
 
-import { Globe2, MessageCircle } from 'lucide-react';
+import { Globe2 } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -108,7 +108,14 @@ export function AuthView() {
               onClick={() => beginSignIn('google')}
               variant="outline"
             >
-              <span aria-hidden="true" className="text-base font-bold text-[#4285F4]">G</span>
+              <Image
+                alt=""
+                aria-hidden="true"
+                className="size-5 shrink-0 rounded-sm"
+                height={20}
+                src="/google-logo.png"
+                width={20}
+              />
               {ko ? 'Google로 계속' : 'Continue with Google'}
             </Button>
             <Button
@@ -117,7 +124,14 @@ export function AuthView() {
               disabled={providers?.kakao !== true || signingIn}
               onClick={() => beginSignIn('kakao')}
             >
-              <MessageCircle aria-hidden="true" className="size-5 fill-current" />
+              <Image
+                alt=""
+                aria-hidden="true"
+                className="size-6 shrink-0 rounded-md"
+                height={24}
+                src="/kakao-talk-logo.png"
+                width={24}
+              />
               {ko ? '카카오로 계속' : 'Continue with Kakao'}
             </Button>
             {providerFailed && <Button variant="outline" className="w-full" onClick={() => { actions.dismissIssue(); setProviderFailed(false); setAttempt((value) => value + 1); }}>{ko ? '로그인 옵션 다시 불러오기' : 'Reload sign-in options'}</Button>}
