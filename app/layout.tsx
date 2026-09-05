@@ -8,7 +8,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: '하나의 책장 · Hana Seed Books',
+  title: '씨앗책장 · Hana Seed Books',
   description: 'A private community library for sharing books.',
   manifest: '/manifest.webmanifest',
   icons: {
@@ -16,10 +16,10 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
     apple: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
   },
-  applicationName: '하나의 책장',
+  applicationName: '씨앗책장',
   appleWebApp: {
     capable: true,
-    title: '하나의 책장',
+    title: '씨앗책장',
     statusBarStyle: 'default',
   },
 };

@@ -6,7 +6,7 @@ Status: planning only
 Primary locale: Korean (`ko`)  
 Secondary locale: English (`en`)  
 Primary device: mobile web / installable PWA  
-Working product name: **Hana Seed Books / 하나의 책장**
+Working product name: **Hana Seed Books / 씨앗책장**
 
 ## 1. Product definition
 
@@ -257,7 +257,7 @@ The feasibility basis is current official documentation: the National Library of
 Korean SMS example:
 
 ```text
-[하나의 책장] 민지님이 “아몬드” 대여를 요청했어요.
+[씨앗책장] 민지님이 “아몬드” 대여를 요청했어요.
 수락 1 · 거절 2
 앱에서 보기: {short-link}
 ```

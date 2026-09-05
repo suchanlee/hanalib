@@ -24,7 +24,7 @@ export function LegalPage({
           <span className="grid size-9 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
             <BookHeart aria-hidden="true" className="size-5" />
           </span>
-          <span>하나의 책장 · Hana Seed Books</span>
+          <span>씨앗책장 · Hana Seed Books</span>
         </Link>
 
         <header className="mt-10 border-b pb-8">

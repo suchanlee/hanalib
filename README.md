@@ -1,4 +1,4 @@
-# 하나의 책장 · Hana Seed Books
+# 씨앗책장 · Hana Seed Books
 
 Mobile-first community-library application for sharing Korean and English books. The working preview includes Kakao-only member authentication, a bilingual catalog, owner/status/language filters, book details, barcode-first intake, circulation, weekly return check-ins, profile settings, and deterministic demo identities for end-to-end testing.
 
