@@ -30,6 +30,20 @@ void test('accepts an ISBN-10 identifier for the exact Google Books edition', ()
   assert.equal(result?.title, 'Fantastic Mr. Fox');
 });
 
+void test('upgrades Google thumbnail-only covers without risking a placeholder zoom', () => {
+  const result = normalizeGoogleBooksResponse('9780571368709', {
+    items: [{ volumeInfo: {
+      title: 'Small Things Like These',
+      imageLinks: { thumbnail: 'http://books.google.com/books/content?id=volume&img=1&zoom=1&edge=curl&source=gbs_api' },
+      industryIdentifiers: [{ type: 'ISBN_13', identifier: '9780571368709' }],
+    } }],
+  });
+  assert.equal(
+    result?.coverUrl,
+    'https://books.google.com/books/content?id=volume&img=1&zoom=1&source=gbs_api&w=800',
+  );
+});
+
 void test('stitches complementary exact-edition Google records', () => {
   const result = normalizeGoogleBooksResponse('9788936434267', {
     items: [

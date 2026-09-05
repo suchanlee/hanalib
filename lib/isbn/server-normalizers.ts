@@ -1,5 +1,6 @@
 import type { MetadataCandidate } from './providers';
 import { isbn10To13, normalizeIsbn } from './isbn.ts';
+import { highResolutionCoverUrl } from './cover-url.ts';
 
 interface GoogleVolumeInfo {
   title?: string;
@@ -131,7 +132,7 @@ export function normalizeGoogleBooksResponse(isbn13: string, response: GoogleVol
     language: language(first((info) => info.language)),
     pageCount: first((info) => info.pageCount),
     description: first((info) => info.description),
-    coverUrl: rawCover?.replace(/^http:/, 'https:'),
+    coverUrl: rawCover ? highResolutionCoverUrl(rawCover) : undefined,
   };
 }
 

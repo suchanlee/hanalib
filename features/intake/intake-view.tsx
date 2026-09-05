@@ -26,6 +26,7 @@ import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Textarea } from '@/components/ui/textarea';
 import { useHanaApp } from '@/features/app/app-context';
 import type { AddBookInput, AppLocale, CatalogItem } from '@/lib/domain/types';
+import { highResolutionCoverUrl } from '@/lib/isbn/cover-url';
 import { parseIsbn } from '@/lib/isbn/isbn';
 import { ResolvedBookProvider, type StitchedBookMetadata } from '@/lib/isbn/providers';
 import type { IScannerControls } from '@zxing/browser';
@@ -741,7 +742,7 @@ export function IntakeView() {
           <div className="grid grid-cols-[112px_minmax(0,1fr)] gap-4 rounded-2xl bg-muted/60 p-4 sm:grid-cols-[144px_minmax(0,1fr)]">
             <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-primary/10 shadow-sm">
               {(coverPreviewUrl || draft.coverUrl) ? (
-                <Image alt={`${draft.title || c.coverLabel} cover`} className="object-cover" fill sizes="144px" src={coverPreviewUrl || draft.coverUrl} unoptimized />
+                <Image alt={`${draft.title || c.coverLabel} cover`} className="object-cover" fill sizes="144px" src={coverPreviewUrl || highResolutionCoverUrl(draft.coverUrl)} unoptimized />
               ) : (
                 <div className="grid h-full place-items-center px-3 text-center text-xs text-muted-foreground">
                   <BookOpen aria-hidden="true" className="mx-auto mb-2 size-8" />

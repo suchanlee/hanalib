@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { BookOpen } from 'lucide-react';
 import type { BookEdition } from '@/lib/domain/types';
+import { highResolutionCoverUrl } from '@/lib/isbn/cover-url';
 import { cn } from '@/lib/utils';
 
 interface BookCoverProps {
@@ -13,9 +14,9 @@ export function BookCover({ edition, className, eager = false }: BookCoverProps)
   if (edition.coverUrl) {
     return (
       <div className={cn('relative overflow-hidden rounded-[1.1rem] bg-muted shadow-[0_16px_36px_-20px_rgba(15,55,46,0.65)]', className)}>
-        {/* Provider and member-uploaded covers are rendered without transformation. */}
+        {/* Provider and member-uploaded covers are rendered directly; Google thumbnail URLs request their widest available source. */}
         <Image
-          src={edition.coverUrl}
+          src={highResolutionCoverUrl(edition.coverUrl)}
           alt=""
           fill
           unoptimized
