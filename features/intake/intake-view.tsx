@@ -63,8 +63,7 @@ const DEMO_ISBN = '9788936434267';
 
 const intakeCopy = {
   ko: {
-    eyebrow: '새 도서 추가',
-    title: '바코드 한 번이면 끝나요',
+    title: '새 도서 추가',
     intro: '책 뒤의 ISBN 바코드를 비추면 한국어·영어 도서 정보를 찾아 한 화면에서 확인할 수 있어요.',
     scan: '바코드 스캔',
     scanHelp: '카메라는 바코드를 읽는 동안에만 사용해요.',
@@ -128,8 +127,7 @@ const intakeCopy = {
     required: '필수 입력',
   },
   en: {
-    eyebrow: 'Add a new book',
-    title: 'One scan, then you’re done',
+    title: 'Add a new book',
     intro: 'Point your camera at the ISBN barcode. We’ll find Korean or English metadata for you to review in one place.',
     scan: 'Scan barcode',
     scanHelp: 'Your camera is used only while the scanner is open.',
@@ -585,7 +583,6 @@ export function IntakeView() {
       {stage === 'idle' && (
         <div className="space-y-5">
           <section className="pt-3">
-            <p className="mb-2 text-xs font-semibold tracking-[0.16em] text-primary uppercase">{c.eyebrow}</p>
             <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{c.title}</h1>
             <p className="mt-3 max-w-xl text-pretty leading-7 text-muted-foreground">{c.intro}</p>
           </section>
