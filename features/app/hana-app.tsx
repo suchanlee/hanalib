@@ -13,6 +13,7 @@ import type { AppScreen } from '@/lib/domain/types';
 import { HanaAppProvider, useHanaApp } from './app-context';
 import { ErrorNotice } from './error-notice';
 import { WebMcpBridge } from './webmcp-bridge';
+import { PwaOnboarding } from './pwa-onboarding';
 
 const navItems: Array<{ screen: Exclude<AppScreen, 'detail'>; icon: typeof BookOpen; ko: string; en: string; testId: string }> = [
   { screen: 'catalog', icon: BookOpen, ko: '도서', en: 'Catalog', testId: 'nav-catalog' },
@@ -145,5 +146,5 @@ function GlobalFeedback() {
 }
 
 export function HanaApp({ initialScreen = 'catalog' }: { initialScreen?: AppScreen }) {
-  return <HanaAppProvider initialScreen={initialScreen}><LibraryShell /><GlobalFeedback /></HanaAppProvider>;
+  return <HanaAppProvider initialScreen={initialScreen}><PwaOnboarding /><LibraryShell /><GlobalFeedback /></HanaAppProvider>;
 }
