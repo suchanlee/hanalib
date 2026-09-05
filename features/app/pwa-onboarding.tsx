@@ -46,8 +46,6 @@ interface InstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const DISMISSED_KEY = 'hana-pwa-onboarding-dismissed';
-
 function t(locale: AppLocale, ko: string, en: string) {
   return locale === 'ko' ? ko : en;
 }
@@ -58,22 +56,6 @@ function mediaMatches(query: string) {
     typeof window.matchMedia === 'function' &&
     window.matchMedia(query).matches
   );
-}
-
-function wasDismissed() {
-  try {
-    return sessionStorage.getItem(DISMISSED_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function rememberDismissed() {
-  try {
-    sessionStorage.setItem(DISMISSED_KEY, '1');
-  } catch {
-    // The prompt can still be hidden for this render when storage is unavailable.
-  }
 }
 
 function currentDevice() {
@@ -115,6 +97,7 @@ export function PwaOnboarding() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [checkVersion, setCheckVersion] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
   const locale = state.locale;
   const ios = typeof navigator !== 'undefined' && currentDevice().ios;
 
@@ -128,7 +111,7 @@ export function PwaOnboarding() {
       setInstallPrompt(event as InstallPromptEvent);
     }
     function installed() {
-      rememberDismissed();
+      setDismissed(true);
       setPromptState('hidden');
       setInstallPrompt(undefined);
     }
@@ -145,7 +128,7 @@ export function PwaOnboarding() {
     void (async () => {
       await Promise.resolve();
       const device = currentDevice();
-      if (!state.isAuthenticated || !device.mobile || wasDismissed()) {
+      if (!state.isAuthenticated || !device.mobile || dismissed) {
         if (active) setPromptState('hidden');
         return;
       }
@@ -177,10 +160,10 @@ export function PwaOnboarding() {
     return () => {
       active = false;
     };
-  }, [checkVersion, installPrompt, state.isAuthenticated]);
+  }, [checkVersion, dismissed, installPrompt, state.isAuthenticated]);
 
   const dismiss = useCallback(() => {
-    rememberDismissed();
+    setDismissed(true);
     setPromptState('hidden');
   }, []);
 
@@ -195,7 +178,7 @@ export function PwaOnboarding() {
       const choice = await installPrompt.userChoice;
       setInstallPrompt(undefined);
       if (choice.outcome === 'accepted') {
-        rememberDismissed();
+        setDismissed(true);
         setPromptState('hidden');
       }
     } catch {
