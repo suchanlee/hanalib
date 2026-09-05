@@ -130,7 +130,6 @@ export function CatalogView() {
     <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6 sm:pt-8" data-testid="catalog-view">
       <section className="mb-6 sm:mb-8">
         <h1 className="max-w-xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t.title}</h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">{t.subtitle}</p>
       </section>
 
       <section aria-label={state.locale === 'ko' ? '도서 검색과 필터' : 'Book search and filters'}>

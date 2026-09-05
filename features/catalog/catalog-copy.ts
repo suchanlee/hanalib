@@ -3,7 +3,6 @@ import type { AppLocale, CatalogItem, CatalogStatus } from '@/lib/domain/types';
 export const catalogCopy = {
   ko: {
     title: '다음 책을 발견해 보세요',
-    subtitle: '아끼는 책을 빌리고, 함께 읽는 즐거움을 나눠요.',
     results: (count: number) => `도서 ${count}권`,
     filter: '필터',
     filters: '도서 필터',
@@ -78,7 +77,6 @@ export const catalogCopy = {
   },
   en: {
     title: 'Find your next read',
-    subtitle: 'Borrow books your neighbors love and make reading a shared habit.',
     results: (count: number) => `${count} ${count === 1 ? 'book' : 'books'}`,
     filter: 'Filters',
     filters: 'Book filters',
