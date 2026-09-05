@@ -638,6 +638,51 @@ export class D1LibraryRepository implements LibraryRepository {
     return mapCatalogItem(item);
   }
 
+  async refreshCatalogItemCover(
+    context: RequestContext,
+    itemId: string,
+    coverUrl: string,
+    source: string,
+  ) {
+    await this.assertActiveMember(context);
+    let parsedCoverUrl: URL;
+    try {
+      parsedCoverUrl = new URL(coverUrl);
+    } catch {
+      throw libraryError('invalid-input', 'The provider cover URL is invalid.');
+    }
+    if (parsedCoverUrl.protocol !== 'https:') {
+      throw libraryError('invalid-input', 'The provider cover must use HTTPS.');
+    }
+
+    const now = this.now().getTime();
+    const results = await this.db.batch([
+      this.db.prepare(`
+        UPDATE book_editions
+        SET cover_source_url = ?,
+            field_provenance_json = json_set(COALESCE(field_provenance_json, '{}'), '$.coverUrl', ?),
+            resolved_at = ?
+        WHERE id = (
+          SELECT edition_id
+          FROM catalog_items
+          WHERE id = ? AND community_id = ? AND owner_id = ? AND archived_at IS NULL
+          LIMIT 1
+        )
+      `).bind(coverUrl, source, now, itemId, context.communityId, context.actorId),
+      this.db.prepare(`
+        UPDATE uploaded_assets
+        SET catalog_item_id = NULL
+        WHERE catalog_item_id = ? AND owner_id = ? AND kind = 'cover'
+      `).bind(itemId, context.actorId),
+    ]);
+    if (affected(results[0]) !== 1) {
+      throw libraryError('not-found', 'Only the owner can refresh an active listing cover.');
+    }
+    const item = await this.catalogItem(itemId, context.communityId);
+    if (!item) throw libraryError('not-found', 'Book not found.');
+    return mapCatalogItem(item);
+  }
+
   async archiveCatalogItem(context: RequestContext, itemId: string) {
     await this.assertActiveMember(context);
     const existing = await this.catalogItem(itemId, context.communityId);

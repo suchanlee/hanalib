@@ -197,6 +197,23 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
         throw error;
       }
     },
+    async refreshItemCover(itemId) {
+      try {
+        const item = await apiData<CatalogItem>(
+          `/api/catalog/${encodeURIComponent(itemId)}/cover/refresh`,
+          mutationInit('POST'),
+        );
+        setState((current) => ({
+          ...current,
+          items: current.items.map((candidate) => candidate.id === item.id ? item : candidate),
+          announcement: current.locale === 'ko' ? '더 선명한 온라인 표지를 찾았어요.' : 'Found a sharper online cover.',
+        }));
+        return item;
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
+    },
     archiveItem(itemId) {
       void apiData<{ id: string; archived: boolean }>(`/api/catalog/${encodeURIComponent(itemId)}`, mutationInit('DELETE'))
         .then(() => {

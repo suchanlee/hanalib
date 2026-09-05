@@ -103,6 +103,7 @@ export interface HanaAppActions {
   setFilters(filters: Partial<CatalogFilters>): void;
   addBook(input: AddBookInput): Promise<string>;
   updateItem(itemId: string, changes: UpdateCatalogItemInput): Promise<CatalogItem>;
+  refreshItemCover(itemId: string): Promise<CatalogItem>;
   archiveItem(itemId: string): void;
   requestBorrow(itemId: string): void;
   cancelRequest(requestId: string): void;

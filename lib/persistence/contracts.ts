@@ -19,6 +19,7 @@ export interface LibraryRepository {
   listCatalog(context: Pick<RequestContext, 'actorId' | 'communityId'>): Promise<CatalogItem[]>;
   createCatalogItem(context: RequestContext, input: AddBookInput): Promise<CatalogItem>;
   updateCatalogItem(context: RequestContext, itemId: string, changes: UpdateCatalogItemInput): Promise<CatalogItem>;
+  refreshCatalogItemCover(context: RequestContext, itemId: string, coverUrl: string, source: string): Promise<CatalogItem>;
   archiveCatalogItem(context: RequestContext, itemId: string): Promise<void>;
   createBorrowRequest(context: RequestContext, itemId: string): Promise<BorrowRequest>;
   cancelBorrowRequest(context: Pick<RequestContext, 'actorId' | 'communityId'>, requestId: string): Promise<BorrowRequest>;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ChangeEvent } from 'react';
-import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Hash, ImagePlus, Languages, Library, Pencil, Trash2, UserRound } from 'lucide-react';
+import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Hash, ImagePlus, Languages, Library, Pencil, RefreshCw, Trash2, UserRound } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +48,7 @@ export function BookDetailView() {
   const [coverPreviewUrl, setCoverPreviewUrl] = useState('');
   const [coverError, setCoverError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isRefreshingCover, setIsRefreshingCover] = useState(false);
 
   useEffect(() => () => {
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
@@ -120,6 +121,22 @@ export function BookDetailView() {
     setCoverFile(file);
     setCoverPreviewUrl(URL.createObjectURL(file));
     setCoverError('');
+  }
+
+  async function refreshCover() {
+    if (!isOwner) return;
+    setIsRefreshingCover(true);
+    setCoverError('');
+    try {
+      await actions.refreshItemCover(itemId);
+      setCoverFile(undefined);
+      setCoverPreviewUrl('');
+      setFeedback({ tone: 'success', text: t.coverRefreshed });
+    } catch {
+      setCoverError(t.coverRefreshFailed);
+    } finally {
+      setIsRefreshingCover(false);
+    }
   }
 
   function removeListing() {
@@ -289,6 +306,17 @@ export function BookDetailView() {
                             />
                           </Label>
                           <p className="mt-2 text-xs leading-5 text-muted-foreground">{t.coverHelp}</p>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="mt-2 h-10 px-2"
+                            disabled={isSaving || isRefreshingCover}
+                            onClick={() => { void refreshCover(); }}
+                            data-testid="refresh-cover"
+                          >
+                            <RefreshCw aria-hidden="true" className={`size-4 ${isRefreshingCover ? 'animate-spin' : ''}`} />
+                            {isRefreshingCover ? t.refreshingCover : t.refreshCover}
+                          </Button>
                         </div>
                       </div>
                       {coverError ? <p className="text-sm text-destructive" role="alert">{coverError}</p> : null}

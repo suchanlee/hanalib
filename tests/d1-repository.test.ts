@@ -259,6 +259,48 @@ void test('an owner cannot attach another member’s uploaded cover', async () =
   assert.equal(database.batches.length, 0);
 });
 
+void test('an owner can refresh a provider cover and clear their uploaded override', async () => {
+  const database = new RecordedD1((sql) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('INNER JOIN book_editions')) {
+      return {
+        itemId: 'item-1', ownerId: 'borrower', itemStatus: 'available', itemCondition: 'good',
+        ownerNotes: null, itemCreatedAt: fixedNow.getTime(), editionId: 'edition-1', isbn10: null,
+        isbn13: '9788936434267', title: '아몬드', titleEn: null, authorsJson: '["손원평"]', authorsEnJson: '[]',
+        publisher: '창비', publishedOn: '2017', language: 'ko', pageCount: 263, description: null,
+        coverOverrideAssetId: null, coverSourceUrl: 'https://t1.daumcdn.net/lbook/image/1467038', coverStoragePath: null,
+        coverTone: 'amber', provenanceJson: '{"coverUrl":"kakao-books"}',
+      };
+    }
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  const item = await repository.refreshCatalogItemCover(
+    context,
+    'item-1',
+    'https://t1.daumcdn.net/lbook/image/1467038',
+    'kakao-books',
+  );
+
+  assert.equal(item.edition.coverUrl, 'https://t1.daumcdn.net/lbook/image/1467038');
+  assert.equal(database.batches.length, 1);
+  assert.match(database.batches[0][0].sql, /owner_id = \?/);
+  assert.match(database.batches[0][0].sql, /json_set/);
+  assert.match(database.batches[0][1].sql, /SET catalog_item_id = NULL/);
+});
+
+void test('provider cover refresh rejects non-HTTPS URLs before writing', async () => {
+  const database = new RecordedD1((sql) => sql.includes('SELECT 1 AS active') ? { active: 1 } : null);
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  await assert.rejects(
+    repository.refreshCatalogItemCover(context, 'item-1', 'http://example.test/cover.jpg', 'test'),
+    (error: unknown) => error instanceof LibraryError && error.code === 'invalid-input',
+  );
+  assert.equal(database.batches.length, 0);
+});
+
 void test('all repository operations reject inactive community actors before preparing mutations', async () => {
   const database = new RecordedD1(() => null);
   const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
