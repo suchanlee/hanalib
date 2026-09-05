@@ -23,7 +23,7 @@ GOOGLE_BOOKS_API_KEY=
 # Local/test only. Production always rejects fixture fallback even if set.
 ISBN_FIXTURES_ENABLED=true
 
-# US SMS and transactional email.
+# Legacy rollback-only SMS/email providers. Not required by the Kakao-only UI.
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_FROM_NUMBER=

@@ -30,7 +30,7 @@ npm run build
 - `features/` contains the mobile product journeys: auth, catalog/detail, intake, circulation, and settings.
 - `lib/domain/` holds shared state contracts and timing/authorization rules.
 - `lib/isbn/` resolves and stitches NLK and Google Books metadata behind provider interfaces. Naver Book Search is deliberately excluded because the service retired on July 31, 2026.
-- `lib/notifications/` parses inbound `1`/`2` decisions and builds Korean/English email and SMS messages.
+- `lib/notifications/` encrypts Kakao credentials, refreshes access tokens, and sends Korean/English circulation cards to each member's private KakaoTalk My Chatroom.
 - `db/schema.ts` defines durable Cloudflare D1 data. Generated SQL migrations in `drizzle/` are immutable after application.
 - Cover uploads use the `FILES` R2 binding; structured state uses the `DB` D1 binding declared in `.openai/hosting.json`.
 
@@ -44,5 +44,5 @@ The application is deployed through OpenAI Sites on Cloudflare Workers with mana
 - Accepting one request atomically supersedes other pending requests for that copy.
 - A return can be recorded by the borrower or owner.
 - The first return check is seven days after loan start and repeats weekly without a due date.
-- SMS commands apply only when exactly one actionable request exists for the sender; `1` accepts and `2` declines.
-- The pilot and SMS numbers are US-scoped; strict data-residency placement is not required.
+- KakaoTalk alerts contain same-origin buttons back to the authenticated app; accept, decline, and return actions remain authorization-checked server mutations.
+- The pilot is US-scoped; strict data-residency placement is not required.

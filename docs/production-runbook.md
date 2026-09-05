@@ -4,7 +4,7 @@ The application runs on OpenAI Sites backed by Cloudflare Workers. Sites owns th
 
 ## 1. Identity and membership
 
-Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` consent item. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
+Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` and `talk_message` consent items. Configure `talk_message` as optional consent. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
 `https://hana-community-library.lee-suchan.chatgpt.site/api/auth/kakao/callback`
 
@@ -18,15 +18,13 @@ Sites applies the immutable `drizzle/*.sql` migrations to D1 and binds R2 as `FI
 
 Open Library is the credential-free baseline. Set `NLK_API_KEY` and `GOOGLE_BOOKS_API_KEY` for Korean and English enrichment; optionally set both `NAVER_CLIENT_ID` and `NAVER_CLIENT_SECRET` for Naver Books enrichment. The resolver queries configured providers plus Open Library in parallel, accepts partial provider failure, rejects non-exact ISBN editions, and stitches fields with per-field provenance. Production fixtures are disabled. Review each provider’s current attribution, caching, and cover-image terms before public launch; retain a provider URL only when permitted and use member-uploaded R2 covers otherwise.
 
-## 4. Notifications and inbound SMS
+## 4. Private KakaoTalk notifications
 
-Set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` for a US number. Configure Twilio’s incoming-message webhook as:
+Members who grant `talk_message` receive circulation cards in their private KakaoTalk My Chatroom. The OAuth callback stores the access and refresh tokens as an AES-GCM-encrypted credential in `notification_endpoints`; the server refreshes short-lived access tokens with the Kakao REST API key and client secret. Never expose either token to the browser or logs.
 
-`https://hana-community-library.lee-suchan.chatgpt.site/api/webhooks/twilio/inbound`
+Borrow requests include a same-origin **요청 확인 / View request** button. Decisions and weekly return checks include corresponding authenticated app buttons. A normal Kakao Channel chatbot cannot initiate these alerts; this implementation deliberately uses Kakao's **Send to me** API, which delivers to the authorized member's My Chatroom and does not expose a shared group conversation.
 
-Set `RESEND_API_KEY` and a verified `EMAIL_FROM`. Phone numbers stay encrypted at rest, SMS delivery activates only after six-digit ownership verification, and incoming Twilio requests require a valid provider signature. Only exact `1` or `2` replies from an owner with one actionable request can change state; provider message IDs are idempotent.
-
-Borrow and decision mutations attempt delivery immediately. Every message also uses the transactional outbox so a provider failure can be retried without losing the domain change. Logs must never include message bodies, phone numbers, OAuth tokens, book titles, member names, or contact addresses.
+Borrow and decision mutations attempt delivery immediately. Every message also uses the transactional outbox so a provider failure can be retried without losing the domain change. Logs must never include message bodies, OAuth tokens, book titles, member names, or encrypted notification payloads. Legacy Twilio and email adapters remain isolated in source for rollback, but they are not exposed by the Kakao-only production UI and their credentials are not required.
 
 ## 5. Return-check scheduler
 
@@ -47,8 +45,8 @@ Allowlisted analytics contain only an event name, optional anonymous session ID,
 
 - Validate real Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
 - Validate Korean and English ISBNs against live NLK and Google Books data.
-- Send and receive Twilio sandbox messages, including signed `1`, `2`, duplicate, expired, and ambiguous replies.
-- Verify the Resend sender and inspect delivery/bounce behavior without logging content.
+- Grant and deny optional `talk_message` consent, then verify the Settings connection state in both cases.
+- Trigger each circulation event and verify the private My Chatroom card and its in-app action button.
 - Connect the scheduler and observe a retry plus a due return check in staging.
 - Complete physical iOS Safari and Android Chrome camera tests; the automated browser cannot prove camera permission UX on real hardware.
 - Review keyboard/screen-reader behavior, backup/restore, retention/deletion, abuse response, and monitoring.
