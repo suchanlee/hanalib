@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const inUse = await db.prepare(`
       SELECT 1 AS found
       WHERE EXISTS (SELECT 1 FROM catalog_items WHERE owner_id = ?)
-         OR EXISTS (SELECT 1 FROM loan_requests WHERE owner_id = ? OR borrower_id = ?)
+         OR EXISTS (SELECT 1 FROM loan_requests WHERE requester_id = ? OR responded_by = ?)
          OR EXISTS (SELECT 1 FROM loans WHERE owner_id = ? OR borrower_id = ?)
     `).bind(demo.profileId, demo.profileId, demo.profileId, demo.profileId, demo.profileId)
       .first<{ found: number }>();
