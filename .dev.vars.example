@@ -38,3 +38,8 @@ INTERNAL_JOB_SECRET=
 # Member contact privacy. AES key is base64url-encoded 32 bytes; hash key is 32+ characters.
 CONTACT_ENCRYPTION_KEY=
 CONTACT_HASH_KEY=
+
+# Standards-based Web Push (VAPID). The subject must be an https: or mailto: URI.
+WEB_PUSH_PUBLIC_KEY=
+WEB_PUSH_PRIVATE_KEY=
+WEB_PUSH_SUBJECT=http://localhost:3000

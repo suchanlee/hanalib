@@ -3,8 +3,13 @@ import type { OutboxPayloadByType, LibraryOutboxEventType } from '../persistence
 import { operationalLog, safeErrorCode } from '../observability/log.ts';
 import { decryptContact, encryptContact } from './contact-crypto.ts';
 import { parseKakaoCredential, refreshKakaoCredential } from './kakao.ts';
-import { sendNotification, type NotificationSenderConfig } from './sender.ts';
+import { sendNotification, type DeliveryResult, type NotificationSenderConfig } from './sender.ts';
 import { borrowRequestTemplate, decisionTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
+import {
+  isWebPushConfigured,
+  sendWebPushToUser,
+  type WebPushConfig,
+} from './web-push.ts';
 
 interface OutboxRow {
   id: string;
@@ -31,7 +36,7 @@ interface KakaoRow {
   addressEncrypted: string;
 }
 
-export interface OutboxWorkerConfig extends NotificationSenderConfig {
+export interface OutboxWorkerConfig extends NotificationSenderConfig, WebPushConfig {
   contactEncryptionKey?: string;
 }
 
@@ -220,14 +225,24 @@ export async function processReadyOutbox(
     if (affected(claim) !== 1) continue;
     result.claimed += 1;
     try {
-      const target = await recipient(db, row, config, options.fetcher ?? fetch, now);
-      const deliveries = await sendNotification(
-        config,
-        target,
-        renderOutboxMessage(row),
-        options.fetcher ?? fetch,
-        `hana-${row.id}`,
-      );
+      const message = renderOutboxMessage(row);
+      let deliveries: DeliveryResult[] = [];
+      if (isWebPushConfigured(config)) {
+        const push = await sendWebPushToUser(db, row.recipientId, message, `hana-${row.id}`, config, { now });
+        if (push.delivered > 0) {
+          deliveries = [{ channel: 'push', providerMessageId: `web-push:${push.delivered}` }];
+        }
+      }
+      if (deliveries.length === 0) {
+        const target = await recipient(db, row, config, options.fetcher ?? fetch, now);
+        deliveries = await sendNotification(
+          config,
+          target,
+          message,
+          options.fetcher ?? fetch,
+          `hana-${row.id}`,
+        );
+      }
       const sentAt = Date.now();
       await db.batch([
         ...deliveries.map((delivery) => db.prepare(`

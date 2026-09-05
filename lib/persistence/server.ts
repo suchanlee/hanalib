@@ -66,6 +66,10 @@ export async function withLibraryApi<T>(
     if (options.dispatchNotifications) {
       await processReadyOutbox(getD1Database(), {
         contactEncryptionKey: process.env.CONTACT_ENCRYPTION_KEY,
+        contactHashKey: process.env.CONTACT_HASH_KEY,
+        vapidPublicKey: process.env.WEB_PUSH_PUBLIC_KEY,
+        vapidPrivateKey: process.env.WEB_PUSH_PRIVATE_KEY,
+        vapidSubject: process.env.WEB_PUSH_SUBJECT,
         publicAppUrl: process.env.PUBLIC_APP_URL,
         resendApiKey: process.env.RESEND_API_KEY,
         emailFrom: process.env.EMAIL_FROM,

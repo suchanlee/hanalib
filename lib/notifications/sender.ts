@@ -21,7 +21,7 @@ export interface DeliveryTarget {
 }
 
 export interface DeliveryResult {
-  channel: 'email' | 'sms' | 'kakao';
+  channel: 'email' | 'sms' | 'kakao' | 'push';
   providerMessageId: string;
 }
 
