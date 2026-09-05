@@ -62,6 +62,7 @@ function FilterFields({
         >
           <NativeSelectOption value="all">{t.allStatuses}</NativeSelectOption>
           <NativeSelectOption value="available">{copy[state.locale].available}</NativeSelectOption>
+          <NativeSelectOption value="held">{statusLabel(state.locale, 'held')}</NativeSelectOption>
           <NativeSelectOption value="borrowed">{copy[state.locale].borrowed}</NativeSelectOption>
         </NativeSelect>
       </label>

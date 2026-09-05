@@ -90,7 +90,7 @@ export interface ReturnCheck {
 
 export interface CatalogFilters {
   ownerId: string;
-  status: 'all' | 'available' | 'borrowed';
+  status: 'all' | 'available' | 'held' | 'borrowed';
   language: 'all' | 'ko' | 'en' | 'other';
 }
 
