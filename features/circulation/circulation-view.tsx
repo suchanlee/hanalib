@@ -147,8 +147,8 @@ function RequestCard({
             <span>
               {t(
                 locale,
-                '카카오톡 알림의 요청 확인 버튼이나 이 화면에서 수락 또는 거절할 수 있어요.',
-                'Use the KakaoTalk alert button or decide directly on this screen.',
+                '알림의 요청 확인 버튼이나 이 화면에서 수락 또는 거절할 수 있어요.',
+                'Use the notification’s request button or decide directly on this screen.',
               )}
             </span>
           </div>
