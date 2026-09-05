@@ -85,8 +85,8 @@ function LibraryShell() {
       </div>
 
       <nav aria-label={state.locale === 'ko' ? '주요 메뉴' : 'Main navigation'} className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 px-2 pt-2 shadow-[0_-10px_30px_rgba(20,50,42,0.08)] backdrop-blur-xl lg:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4">
-          {navItems.map(({ screen, icon: Icon, ko, en, testId }) => (
+        <div className="mx-auto grid max-w-md grid-cols-3">
+          {navItems.filter(({ screen }) => screen !== 'settings').map(({ screen, icon: Icon, ko, en, testId }) => (
             <button
               key={screen}
               data-testid={testId}
