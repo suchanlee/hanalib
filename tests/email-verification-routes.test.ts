@@ -18,7 +18,7 @@ test.after(() => {
   }
 });
 
-void test('stores a pending address and sends its signed verification link', async () => {
+void test('stores a notification email for immediate delivery without verification', async () => {
   Object.assign(process.env, {
     PUBLIC_APP_URL: 'https://library.example',
     AUTH_TRANSACTION_SECRET: 'transaction-secret',
@@ -29,7 +29,6 @@ void test('stores a pending address and sends its signed verification link', asy
   });
   let sql = '';
   let values: unknown[] = [];
-  let message: { subject: string; text: string } | undefined;
   const database = {
     prepare(candidate: string) {
       sql = candidate;
@@ -44,16 +43,10 @@ void test('stores a pending address and sends its signed verification link', asy
     '@/db': { getD1Database: () => database },
     '@/lib/auth/email-verification': {
       normalizeEmail: (email: string) => email.trim().toLowerCase(),
-      createEmailVerificationToken: async () => 'signed-token',
     },
     '@/lib/notifications/contact-crypto': {
       encryptContact: async () => 'encrypted-email',
       hashContact: async () => 'email-hash',
-    },
-    '@/lib/notifications/sender': {
-      sendResendEmail: async (_config: unknown, _to: string, candidate: typeof message) => {
-        message = candidate;
-      },
     },
     '@/lib/persistence/errors': {
       libraryError: (code: string, detail: string) => Object.assign(new Error(detail), { code }),
@@ -66,15 +59,15 @@ void test('stores a pending address and sends its signed verification link', asy
       },
     },
   });
-  const route = load<{ POST(request: Request): Promise<Response> }>('app/api/profile/email-verification/route.ts');
+  const route = load<{ POST(request: Request): Promise<Response> }>('app/api/profile/email/route.ts');
 
-  const response = await route.POST(new Request('https://library.example/api/profile/email-verification', { method: 'POST' }));
-  assert.deepEqual(await response.json(), { data: { sent: true } });
+  const response = await route.POST(new Request('https://library.example/api/profile/email', { method: 'POST' }));
+  assert.deepEqual(await response.json(), { data: { saved: true } });
   assert.match(sql, /kind, address_encrypted, address_hash, verified_at/);
   assert.equal(values[1], 'member-1');
   assert.equal(values[2], 'encrypted-email');
   assert.equal(values[3], 'email-hash');
-  assert.match(message?.text ?? '', /email-verification\/confirm\?token=signed-token/);
+  assert.equal(typeof values[4], 'number');
 });
 
 void test('confirmation verifies only the address bound into the signed token', async () => {

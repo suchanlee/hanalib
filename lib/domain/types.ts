@@ -145,7 +145,7 @@ export interface HanaAppActions {
   cancelHold(holdId: string): Promise<void>;
   claimHold(holdId: string): Promise<BorrowRequest>;
   respondToReturnCheck(checkId: string, returned: boolean): Promise<void>;
-  requestEmailVerification(email: string): Promise<void>;
+  saveNotificationEmail(email: string): Promise<void>;
   updateProfile(changes: Partial<Pick<Member, 'displayName' | 'displayNameKo' | 'locale' | 'notificationChannel' | 'phone'>>): Promise<Member>;
 }
 

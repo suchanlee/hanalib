@@ -1,6 +1,6 @@
 # Hana Seed Books — product, UX, and technical implementation plan
 
-> **Current implementation decision (September 2026):** Google and Kakao are the member-authentication providers. Google supplies a verified email; Kakao members without one are prompted to add and verify an address for notification delivery. Circulation delivery uses email plus standards-based Web Push so installed iPhone/Android web apps and supported desktop browsers can notify members even while the page is closed. Subscriptions are encrypted in D1, and notification clicks deep-link to the authorization-checked app. This supersedes the Apple authentication, Twilio reply-by-`1`/`2`, and Kakao **Send to me** sections retained below as historical planning context.
+> **Current implementation decision (September 2026):** Google and Kakao are the member-authentication providers. Google supplies a verified email; Kakao members without one are prompted to save an address directly for notification delivery. Circulation delivery uses email plus standards-based Web Push so installed iPhone/Android web apps and supported desktop browsers can notify members even while the page is closed. Subscriptions are encrypted in D1, and notification clicks deep-link to the authorization-checked app. This supersedes the Apple authentication, Twilio reply-by-`1`/`2`, and Kakao **Send to me** sections retained below as historical planning context.
 
 Status: planning only  
 Primary locale: Korean (`ko`)  
@@ -326,7 +326,7 @@ If another action already changed the copy, the command does nothing and sends a
 - Display name: required, 2–40 characters.
 - Profile image: optional; use identity-provider image initially.
 - UI language: Korean / English; applies immediately and persists.
-- Notification channel: verified email, verified SMS, or both.
+- Notification channel: Google or member-supplied email, verified SMS, or both.
 - Phone verification and replacement.
 - Community memberships and leave action. Leaving is blocked while the user owns or borrows an active loan.
 - Privacy explanation: what other members can see.

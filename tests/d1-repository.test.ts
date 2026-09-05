@@ -556,7 +556,7 @@ void test('bootstrap exposes requests and loans only to their participants', asy
   assert.deepEqual(loanQuery.values, ['hana', 'borrower', 'borrower']);
 });
 
-void test('bootstrap hydrates a verified manual email when sign-in supplied none', async () => {
+void test('bootstrap hydrates a saved notification email when sign-in supplied none', async () => {
   const encryptionKey = 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8';
   const encryptedEmail = await encryptContact('reader@example.com', encryptionKey);
   const database = new RecordedD1(

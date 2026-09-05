@@ -26,7 +26,7 @@ const member = {
 const state = {
   locale: 'en', currentUserId: member.id, members: [member], isMutating: false,
 };
-const actions = { requestEmailVerification: async () => {} };
+const actions = { saveNotificationEmail: async () => {} };
 
 function element(tag: string) {
   return ({ children, loading: _loading, showCloseButton: _showCloseButton, ...props }: Record<string, unknown> & { children?: ReactNode }) =>
@@ -46,7 +46,7 @@ const load = sourceLoader({
     DialogHeader: element('div'),
     DialogTitle: element('h2'),
   },
-  'lucide-react': { MailCheck: () => null },
+  'lucide-react': { Mail: () => null },
 });
 const { EmailCompletionDialog } = load<{ EmailCompletionDialog(this: void): ReactNode }>('features/settings/email-completion-dialog.tsx');
 
@@ -76,7 +76,7 @@ void test('prompts a member without email again on a fresh app mount', async () 
   await nextVisit.close();
 });
 
-void test('does not prompt a member whose verified email is already loaded', async () => {
+void test('does not prompt a member whose email is already loaded', async () => {
   member.email = 'member@example.com';
   const view = await mount();
   assert.equal(view.container.querySelector('[data-testid="email-completion-dialog"]'), null);

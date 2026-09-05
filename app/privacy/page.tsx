@@ -11,7 +11,7 @@ const sections = [
     title: '1. What we collect · 수집하는 정보',
     paragraphs: [
       'Google sign-in provides your account identifier, name, and verified email. Kakao sign-in provides your service-specific account identifier and nickname; we do not require a Kakao Account email. Google 로그인에서는 계정 식별자, 이름과 인증된 이메일을 받고, 카카오 로그인에서는 서비스별 계정 식별자와 닉네임만 받으며 카카오계정 이메일은 요구하지 않습니다.',
-      'We also store the profile details you choose to provide, an email you add and its verification status, optional phone and verification status, book listings and cover images, borrow requests, loan and return history, notification delivery status, and minimal security and operational records. 선택한 프로필 정보, 직접 추가한 이메일과 인증 상태, 선택적 전화번호와 인증 상태, 도서와 표지, 대여 요청·대여·반납 기록, 알림 전송 상태 및 최소한의 보안·운영 기록도 저장합니다.',
+      'We also store the profile details you choose to provide, an email you add for notifications, optional phone and verification status, book listings and cover images, borrow requests, loan and return history, notification delivery status, and minimal security and operational records. 선택한 프로필 정보, 알림용으로 직접 추가한 이메일, 선택적 전화번호와 인증 상태, 도서와 표지, 대여 요청·대여·반납 기록, 알림 전송 상태 및 최소한의 보안·운영 기록도 저장합니다.',
     ],
   },
   {

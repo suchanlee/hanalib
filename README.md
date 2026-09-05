@@ -30,7 +30,7 @@ npm run build
 - `features/` contains the mobile product journeys: auth, catalog/detail, intake, circulation, and settings.
 - `lib/domain/` holds shared state contracts and timing/authorization rules.
 - `lib/isbn/` resolves and stitches NLK and Google Books metadata behind provider interfaces. Naver Book Search is deliberately excluded because the service retired on July 31, 2026.
-- `lib/notifications/` sends Korean/English circulation alerts through Resend email for every recipient with a verified Google or member-supplied email, independently of encrypted per-device Web Push delivery. Kakao and SMS remain fallback adapters when no push succeeds; successful channels are recorded separately to avoid resending them on retries.
+- `lib/notifications/` sends Korean/English circulation alerts through Resend email for every recipient with a Google or member-supplied email, independently of encrypted per-device Web Push delivery. Kakao and SMS remain fallback adapters when no push succeeds; successful channels are recorded separately to avoid resending them on retries.
 - `db/schema.ts` defines durable Cloudflare D1 data. Generated SQL migrations in `drizzle/` are immutable after application.
 - Cover uploads use the `FILES` R2 binding; structured state uses the `DB` D1 binding declared in `.openai/hosting.json`.
 

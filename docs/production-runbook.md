@@ -24,7 +24,7 @@ Open Library is the credential-free baseline. Set `NLK_API_KEY` and `GOOGLE_BOOK
 
 ## 4. Email and Web Push notifications
 
-Verify `library.hanaseed.org` as a sending domain in Resend, then set `RESEND_API_KEY` as a Sites secret. The sender is `EMAIL_FROM="Hana Seed Library <notifications@library.hanaseed.org>"`. Every circulation event sends email when the recipient has a verified Google email or a manually supplied address verified through the one-hour signed link. Members without a verified address are prompted on each fresh app visit and can postpone for that visit. Missing Resend configuration prevents both verification and notification mail; queued circulation email remains pending for retry even if push succeeds.
+Verify `library.hanaseed.org` as a sending domain in Resend, then set `RESEND_API_KEY` as a Sites secret. The sender is `EMAIL_FROM="Hana Seed Library <notifications@library.hanaseed.org>"`. Every circulation event sends email when the recipient has a Google email or a manually supplied address. Members without an address are prompted on each fresh app visit and can postpone for that visit. A manually supplied address is saved immediately without a verification round trip. Missing Resend configuration prevents notification mail; queued circulation email remains pending for retry even if push succeeds.
 
 Generate one VAPID P-256 key pair and set `WEB_PUSH_PUBLIC_KEY`, `WEB_PUSH_PRIVATE_KEY`, and an HTTPS `WEB_PUSH_SUBJECT`. Keep the private key server-only. The browser registers `/sw.js`, requests notification permission only after a member presses the enable button, and stores each subscription as AES-GCM-encrypted JSON plus a keyed endpoint hash in `web_push_subscriptions`. The endpoint is a bearer capability and must never appear in logs.
 
@@ -62,7 +62,7 @@ The copied `Report` field distinguishes a server acknowledgment from a report th
 ## 8. Public-launch gates
 
 - Validate real Google and Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
-- For a Kakao member without email, submit an address, open the verification link, reload the app, and confirm both that the prompt disappears and a test circulation email arrives.
+- For a Kakao member without email, save an address, reload the app, and confirm both that the prompt stays dismissed and a test circulation email arrives.
 - Validate Korean and English ISBNs against live NLK and Google Books data.
 - Install the app on a physical iPhone and Android phone, enable notifications, and verify the Settings test alert while the app is closed.
 - Trigger each circulation event and verify its device notification and authenticated deep link.

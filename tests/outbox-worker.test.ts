@@ -152,7 +152,7 @@ void test('members without email can still receive push', async () => {
   assert.deepEqual([...fixture.deliveries.keys()], ['push']);
 });
 
-void test('sends notification email to a verified manually supplied address', async () => {
+void test('sends notification email to a saved manually supplied address', async () => {
   const fixture = await deliveryFixture(null, 'manual@example.com');
   let recipient = '';
   const result = await processReadyOutbox(fixture.db, { ...emailConfig, ...pushConfig }, {
