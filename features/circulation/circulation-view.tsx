@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHanaApp } from '@/features/app/app-context';
+import { ReturnConfirmationDialog } from './return-confirmation-dialog';
 import type {
   AppLocale,
   BorrowRequest,
@@ -299,15 +300,21 @@ function LoanCard({
         </div>
       </CardContent>
       <CardFooter className="gap-2">
-        <Button
-          className="h-10 flex-1"
-          data-testid={`loan-return-${loan.id}`}
-          onClick={onReturn}
-          variant={borrowed ? 'default' : 'outline'}
-        >
-          {borrowed ? <BookCheck aria-hidden="true" /> : <RotateCcw aria-hidden="true" />}
-          {t(locale, '반납 완료', 'Returned')}
-        </Button>
+        <ReturnConfirmationDialog
+          bookTitle={item.edition.title}
+          locale={locale}
+          onConfirm={onReturn}
+          trigger={(
+            <Button
+              className="h-10 flex-1"
+              data-testid={`loan-return-${loan.id}`}
+              variant={borrowed ? 'default' : 'outline'}
+            >
+              {borrowed ? <BookCheck aria-hidden="true" /> : <RotateCcw aria-hidden="true" />}
+              {t(locale, '반납 완료', 'Returned')}
+            </Button>
+          )}
+        />
         {returnCheck ? (
           <Button className="h-10 flex-1" variant="outline" onClick={onStillBorrowing} data-testid={`loan-still-borrowing-${loan.id}`}>
             {t(locale, '아직 대여 중', 'Still borrowing')}

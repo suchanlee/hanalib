@@ -30,6 +30,7 @@ import { Label } from '@/components/ui/label';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 import { useHanaApp } from '@/features/app/app-context';
+import { ReturnConfirmationDialog } from '@/features/circulation/return-confirmation-dialog';
 import type { BookEdition, CatalogItem } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
 import { uploadMemberCover, validCoverFile } from '@/lib/storage/client-cover';
@@ -444,10 +445,17 @@ export function BookDetailView() {
             ) : null}
 
             {canReturn ? (
-              <Button type="button" className="h-12 sm:col-span-2" onClick={returnBook} data-testid="mark-returned">
-                <Check className="size-5" />
-                {t.returnBook}
-              </Button>
+              <ReturnConfirmationDialog
+                bookTitle={item.edition.title}
+                locale={state.locale}
+                onConfirm={returnBook}
+                trigger={(
+                  <Button type="button" className="h-12 sm:col-span-2" data-testid="mark-returned">
+                    <Check className="size-5" />
+                    {t.returnBook}
+                  </Button>
+                )}
+              />
             ) : null}
 
             {isOwner ? (
