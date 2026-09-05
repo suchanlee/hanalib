@@ -32,6 +32,7 @@ import { parseIsbn } from '@/lib/isbn/isbn';
 import { ResolvedBookProvider, type StitchedBookMetadata } from '@/lib/isbn/providers';
 import { uploadMemberCover, validCoverFile } from '@/lib/storage/client-cover';
 import type { IScannerControls } from '@zxing/browser';
+import { settleCameraAction } from './camera-lifecycle';
 
 type IntakeStage = 'idle' | 'permission' | 'scanning' | 'lookup' | 'confirm' | 'error' | 'success';
 
@@ -228,6 +229,10 @@ function barcodeDetectorConstructor() {
   return (globalThis as typeof globalThis & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
 }
 
+function stopScannerControls(controls: IScannerControls | null) {
+  if (controls) void settleCameraAction(() => controls.stop());
+}
+
 function ManualIsbnForm({
   locale,
   value,
@@ -309,8 +314,9 @@ export function IntakeView() {
   const cameraAttemptRef = useRef(0);
 
   const stopCamera = useCallback(() => {
-    zxingControlsRef.current?.stop();
+    const controls = zxingControlsRef.current;
     zxingControlsRef.current = null;
+    stopScannerControls(controls);
     if (detectionTimerRef.current !== undefined) {
       window.clearTimeout(detectionTimerRef.current);
       detectionTimerRef.current = undefined;
@@ -373,10 +379,12 @@ export function IntakeView() {
     if (stage !== 'scanning' || !streamRef.current || !videoRef.current) return;
     const video = videoRef.current;
     video.srcObject = streamRef.current;
-    void video.play();
+    let canceled = false;
+    void settleCameraAction(() => video.play()).then((played) => {
+      if (!played && !canceled) setAutoDetectionAvailable(false);
+    });
 
     const Detector = barcodeDetectorConstructor();
-    let canceled = false;
 
     if (!Detector) {
       const startZxing = async () => {
@@ -389,13 +397,18 @@ export function IntakeView() {
           const hints = new Map();
           hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E]);
           const reader = new BrowserMultiFormatOneDReader(hints, { delayBetweenScanAttempts: 250, delayBetweenScanSuccess: 500 });
-          zxingControlsRef.current = await reader.decodeFromStream(streamRef.current, video, (result, _error, controls) => {
+          const controls = await reader.decodeFromStream(streamRef.current, video, (result, _error, scanControls) => {
             const value = result?.getText();
             if (value && parseIsbn(value)) {
-              controls.stop();
+              stopScannerControls(scanControls);
               void performLookup(value);
             }
           });
+          if (canceled || !streamRef.current) {
+            stopScannerControls(controls);
+            return;
+          }
+          zxingControlsRef.current = controls;
         } catch {
           if (!canceled) setAutoDetectionAvailable(false);
         }
@@ -403,8 +416,9 @@ export function IntakeView() {
       void startZxing();
       return () => {
         canceled = true;
-        zxingControlsRef.current?.stop();
+        const controls = zxingControlsRef.current;
         zxingControlsRef.current = null;
+        stopScannerControls(controls);
       };
     }
 
