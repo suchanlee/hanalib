@@ -3,6 +3,21 @@ const GOOGLE_BOOKS_COVER_HOSTS = new Set([
   'books.googleusercontent.com',
 ]);
 
+function kakaoOriginalBookCover(url: URL) {
+  if (!url.hostname.endsWith('.kakaocdn.net') || !url.pathname.startsWith('/thumb/')) return undefined;
+  const encodedSource = url.searchParams.get('fname');
+  if (!encodedSource) return undefined;
+
+  try {
+    const source = new URL(encodedSource);
+    if (source.hostname !== 'daumcdn.net' && !source.hostname.endsWith('.daumcdn.net')) return undefined;
+    source.protocol = 'https:';
+    return source.toString();
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Requests the largest version Google can derive from a thumbnail-only cover.
  * Google ignores the requested width when the source image is smaller, so this
@@ -13,6 +28,9 @@ export function highResolutionCoverUrl(rawUrl: string) {
   try {
     const url = new URL(rawUrl);
     if (url.protocol === 'http:') url.protocol = 'https:';
+
+    const kakaoOriginal = kakaoOriginalBookCover(url);
+    if (kakaoOriginal) return kakaoOriginal;
 
     if (
       GOOGLE_BOOKS_COVER_HOSTS.has(url.hostname)

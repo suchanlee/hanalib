@@ -1,6 +1,6 @@
 import type { AddBookInput, AppLocale } from '@/lib/domain/types';
 
-export type MetadataSource = 'nlk' | 'naver' | 'google-books' | 'open-library' | 'member' | 'fixture';
+export type MetadataSource = 'nlk' | 'naver' | 'kakao-books' | 'google-books' | 'open-library' | 'member' | 'fixture';
 
 export interface MetadataCandidate {
   source: MetadataSource;
@@ -115,7 +115,7 @@ function firstValue<T>(candidates: MetadataCandidate[], sourceOrder: MetadataSou
 
 function bestEditionTitle(candidates: MetadataCandidate[], locale: AppLocale, sourceOrder: MetadataSource[]) {
   if (locale === 'ko') {
-    const authoritative = firstValue(candidates, ['nlk', 'naver'], (candidate) => candidate.title);
+    const authoritative = firstValue(candidates, ['nlk', 'naver', 'kakao-books'], (candidate) => candidate.title);
     if (authoritative) return authoritative;
   }
 
@@ -140,11 +140,13 @@ function bestEditionTitle(candidates: MetadataCandidate[], locale: AppLocale, so
 
 export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: MetadataCandidate[]): StitchedBookMetadata {
   const bibliographicOrder: MetadataSource[] = locale === 'ko'
-    ? ['nlk', 'naver', 'google-books', 'open-library', 'fixture', 'member']
-    : ['google-books', 'open-library', 'naver', 'nlk', 'fixture', 'member'];
-  const coverOrder: MetadataSource[] = ['naver', 'google-books', 'nlk', 'open-library', 'fixture', 'member'];
+    ? ['nlk', 'naver', 'kakao-books', 'google-books', 'open-library', 'fixture', 'member']
+    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture', 'member'];
+  const coverOrder: MetadataSource[] = locale === 'ko'
+    ? ['kakao-books', 'naver', 'google-books', 'nlk', 'open-library', 'fixture', 'member']
+    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture', 'member'];
   const title = bestEditionTitle(candidates, locale, bibliographicOrder);
-  const titleEn = firstValue(candidates, ['google-books', 'open-library', 'naver', 'nlk', 'fixture'], (candidate) => candidate.titleEn);
+  const titleEn = firstValue(candidates, ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture'], (candidate) => candidate.titleEn);
   const authors = firstValue(candidates, bibliographicOrder, (candidate) => candidate.authors);
   const publisher = firstValue(candidates, bibliographicOrder, (candidate) => candidate.publisher);
   const publishedYear = firstValue(candidates, bibliographicOrder, (candidate) => candidate.publishedYear);
@@ -152,10 +154,10 @@ export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: Me
   const language = titleCandidate?.language
     ? { value: titleCandidate.language, source: titleCandidate.source }
     : firstValue(candidates, bibliographicOrder, (candidate) => candidate.language);
-  const pageCount = firstValue(candidates, ['google-books', 'open-library', 'nlk', 'naver', 'fixture'], (candidate) => candidate.pageCount);
+  const pageCount = firstValue(candidates, ['google-books', 'open-library', 'nlk', 'naver', 'kakao-books', 'fixture'], (candidate) => candidate.pageCount);
   const description = firstValue(candidates, locale === 'ko'
-    ? ['naver', 'google-books', 'nlk', 'open-library', 'fixture']
-    : ['google-books', 'open-library', 'naver', 'nlk', 'fixture'], (candidate) => candidate.description);
+    ? ['kakao-books', 'naver', 'google-books', 'nlk', 'open-library', 'fixture']
+    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture'], (candidate) => candidate.description);
   const coverUrl = firstValue(candidates, coverOrder, (candidate) => candidate.coverUrl);
 
   const selections = { title, titleEn, authors, publisher, publishedYear, language, pageCount, description, coverUrl };

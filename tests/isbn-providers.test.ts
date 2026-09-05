@@ -3,6 +3,7 @@ import test from 'node:test';
 import { ResolvedBookProvider } from '../lib/isbn/providers.ts';
 import {
   normalizeGoogleBooksResponse,
+  normalizeKakaoBooksResponse,
   normalizeNaverBooksResponse,
   normalizeNlkResponse,
   normalizeOpenLibraryEditionResponse,
@@ -94,6 +95,32 @@ void test('normalizes an exact Korean Naver Books result and strips search marku
   assert.equal(result?.publishedYear, 2021);
   assert.equal(result?.coverUrl, 'https://bookthumb.phinf.naver.net/cover.jpg');
   assert.equal(result?.description, '제주 4·3의 기억과 사랑.');
+});
+
+void test('normalizes an exact Kakao book and unwraps its higher-resolution cover asset', () => {
+  const result = normalizeKakaoBooksResponse('9788996991342', {
+    documents: [{
+      title: '미움받을 용기',
+      authors: ['기시미 이치로', '고가 후미타케'],
+      publisher: '인플루엔셜',
+      datetime: '2014-11-17T00:00:00.000+09:00',
+      isbn: '8996991341 9788996991342',
+      contents: '아들러 심리학을 대화체로 정리한 책.',
+      thumbnail: 'https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1467038',
+    }],
+  });
+  assert.equal(result?.title, '미움받을 용기');
+  assert.deepEqual(result?.authors, ['기시미 이치로', '고가 후미타케']);
+  assert.equal(result?.publishedYear, 2014);
+  assert.equal(result?.language, 'ko');
+  assert.equal(result?.coverUrl, 'https://t1.daumcdn.net/lbook/image/1467038');
+});
+
+void test('rejects a mismatched Kakao book edition', () => {
+  const result = normalizeKakaoBooksResponse('9788996991342', {
+    documents: [{ title: 'Wrong edition', isbn: '9788996991343' }],
+  });
+  assert.equal(result, null);
 });
 
 void test('rejects a near-match Naver edition', () => {

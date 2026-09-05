@@ -27,3 +27,15 @@ void test('leaves non-Google cover providers unchanged except for HTTPS', () => 
 void test('leaves relative member-upload URLs unchanged', () => {
   assert.equal(highResolutionCoverUrl('/api/covers/asset-id'), '/api/covers/asset-id');
 });
+
+void test('uses the full Kakao-hosted book image embedded in a trusted thumbnail URL', () => {
+  assert.equal(
+    highResolutionCoverUrl('https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1467038'),
+    'https://t1.daumcdn.net/lbook/image/1467038',
+  );
+});
+
+void test('does not follow an untrusted image embedded in a Kakao thumbnail URL', () => {
+  const thumbnail = 'https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=https%3A%2F%2Fevil.example%2Fcover.jpg';
+  assert.equal(highResolutionCoverUrl(thumbnail), thumbnail);
+});

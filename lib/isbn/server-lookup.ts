@@ -3,23 +3,26 @@ import { lookupFixtureMetadata, stitchMetadata, type MetadataCandidate, type Sti
 import { isbn13To10 } from './isbn.ts';
 import {
   normalizeGoogleBooksResponse,
+  normalizeKakaoBooksResponse,
   normalizeNaverBooksResponse,
   normalizeNlkResponse,
   normalizeOpenLibraryEditionResponse,
   normalizeOpenLibrarySearchResponse,
   type GoogleVolumesResponse,
+  type KakaoBooksResponse,
   type NaverBooksResponse,
   type OpenLibraryEditionResponse,
   type OpenLibrarySearchResponse,
 } from './server-normalizers.ts';
 
 export type ProviderStatus = 'ok' | 'not-found' | 'failed' | 'not-configured';
-export type ProviderId = 'nlk' | 'naver' | 'google-books' | 'open-library';
+export type ProviderId = 'nlk' | 'naver' | 'kakao-books' | 'google-books' | 'open-library';
 
 export interface LookupProviderConfig {
   nlkApiKey?: string;
   naverClientId?: string;
   naverClientSecret?: string;
+  kakaoRestApiKey?: string;
   googleBooksApiKey?: string;
   timeoutMs?: number;
 }
@@ -112,6 +115,27 @@ export async function fetchNaverBooksMetadata(
   return normalized ? { ...normalized, source: 'naver' as const } : null;
 }
 
+export async function fetchKakaoBooksMetadata(
+  isbn13: string,
+  restApiKey: string,
+  options: { fetchImpl?: FetchLike; timeoutMs?: number } = {},
+) {
+  const url = new URL('https://dapi.kakao.com/v3/search/book');
+  url.searchParams.set('query', isbn13);
+  url.searchParams.set('target', 'isbn');
+  url.searchParams.set('size', '10');
+  const response = await (options.fetchImpl ?? fetch)(url, {
+    headers: {
+      accept: 'application/json',
+      authorization: `KakaoAK ${restApiKey}`,
+    },
+    signal: providerSignal(options.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+  });
+  if (!response.ok) throw new Error(`Kakao Books responded with ${response.status}.`);
+  const normalized = normalizeKakaoBooksResponse(isbn13, await response.json() as KakaoBooksResponse);
+  return normalized ? { ...normalized, source: 'kakao-books' as const } : null;
+}
+
 export async function fetchOpenLibraryMetadata(
   isbn13: string,
   options: { fetchImpl?: FetchLike; timeoutMs?: number } = {},
@@ -183,6 +207,7 @@ export async function resolveBookMetadata(
   const providerStatus: Record<ProviderId, ProviderStatus> = {
     nlk: config.nlkApiKey ? 'failed' : 'not-configured',
     naver: config.naverClientId && config.naverClientSecret ? 'failed' : 'not-configured',
+    'kakao-books': config.kakaoRestApiKey ? 'failed' : 'not-configured',
     'google-books': config.googleBooksApiKey ? 'failed' : 'not-configured',
     'open-library': 'failed',
   };
@@ -192,6 +217,10 @@ export async function resolveBookMetadata(
   if (config.naverClientId && config.naverClientSecret) tasks.push({
     id: 'naver',
     run: () => fetchNaverBooksMetadata(isbn13, config.naverClientId!, config.naverClientSecret!, providerOptions),
+  });
+  if (config.kakaoRestApiKey) tasks.push({
+    id: 'kakao-books',
+    run: () => fetchKakaoBooksMetadata(isbn13, config.kakaoRestApiKey!, providerOptions),
   });
   if (config.googleBooksApiKey) tasks.push({
     id: 'google-books',

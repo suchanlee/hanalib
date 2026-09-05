@@ -7,6 +7,7 @@ export interface ServerConfig {
     nlkApiKey?: string;
     naverClientId?: string;
     naverClientSecret?: string;
+    kakaoBooksRestApiKey?: string;
     googleBooksApiKey?: string;
   };
   messaging: {
@@ -33,6 +34,7 @@ export function readServerConfig(source: EnvSource = process.env): ServerConfig 
       nlkApiKey: source.NLK_API_KEY,
       naverClientId: source.NAVER_CLIENT_ID,
       naverClientSecret: source.NAVER_CLIENT_SECRET,
+      kakaoBooksRestApiKey: source.KAKAO_REST_API_KEY,
       googleBooksApiKey: source.GOOGLE_BOOKS_API_KEY,
     },
     messaging: {

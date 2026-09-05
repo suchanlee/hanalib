@@ -90,7 +90,7 @@ void test('returns useful metadata when one provider fails', async () => {
   );
   assert.equal(result.metadata?.title, 'Almond');
   assert.deepEqual(result.providerStatus, {
-    nlk: 'failed', naver: 'not-configured', 'google-books': 'ok', 'open-library': 'ok',
+    nlk: 'failed', naver: 'not-configured', 'kakao-books': 'not-configured', 'google-books': 'ok', 'open-library': 'ok',
   });
   assert.equal(result.usedFixture, false);
 });
@@ -114,7 +114,7 @@ void test('uses the credential-free exact-edition provider when configured provi
   assert.deepEqual(result.metadata?.authors, ['Won-pyung Sohn']);
   assert.equal(result.metadata?.provenance.title, 'open-library');
   assert.deepEqual(result.providerStatus, {
-    nlk: 'not-configured', naver: 'not-configured', 'google-books': 'not-configured', 'open-library': 'ok',
+    nlk: 'not-configured', naver: 'not-configured', 'kakao-books': 'not-configured', 'google-books': 'not-configured', 'open-library': 'ok',
   });
 });
 
@@ -240,6 +240,31 @@ void test('prefers Korean bibliographic fields and Naver covers while stitching 
   assert.equal(result.metadata?.provenance.title, 'nlk');
   assert.equal(result.metadata?.coverUrl, 'https://naver.test/cover.jpg');
   assert.equal(result.metadata?.description, '한국어 소개');
+});
+
+void test('uses the existing Kakao app credential for exact Korean book covers', async () => {
+  const fetchImpl: FetchLike = async (input, init) => {
+    const url = new URL(input instanceof Request ? input.url : String(input));
+    if (url.hostname === 'dapi.kakao.com') {
+      assert.equal(url.searchParams.get('query'), '9788996991342');
+      assert.equal(url.searchParams.get('target'), 'isbn');
+      assert.equal(new Headers(init?.headers).get('authorization'), 'KakaoAK kakao-key');
+      return Response.json({ documents: [{
+        title: '미움받을 용기', authors: ['기시미 이치로'], publisher: '인플루엔셜',
+        datetime: '2014-11-17T00:00:00.000+09:00', isbn: '8996991341 9788996991342',
+        thumbnail: 'https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F1467038',
+      }] });
+    }
+    if (url.hostname === 'openlibrary.org') return Response.json({}, { status: 404 });
+    throw new Error(`Unexpected provider URL: ${url}`);
+  };
+  const result = await resolveBookMetadata(
+    '9788996991342', 'ko', { kakaoRestApiKey: 'kakao-key' }, { fetchImpl },
+  );
+  assert.equal(result.metadata?.title, '미움받을 용기');
+  assert.equal(result.metadata?.coverUrl, 'https://t1.daumcdn.net/lbook/image/1467038');
+  assert.equal(result.metadata?.provenance.coverUrl, 'kakao-books');
+  assert.equal(result.providerStatus['kakao-books'], 'ok');
 });
 
 void test('allows fixtures only when explicitly enabled outside production', () => {

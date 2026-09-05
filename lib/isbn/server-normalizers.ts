@@ -37,6 +37,18 @@ export interface NaverBooksResponse {
   }>;
 }
 
+export interface KakaoBooksResponse {
+  documents?: Array<{
+    title?: string;
+    contents?: string;
+    isbn?: string;
+    datetime?: string;
+    authors?: string[];
+    publisher?: string;
+    thumbnail?: string;
+  }>;
+}
+
 export interface OpenLibraryEditionResponse {
   title?: string;
   subtitle?: string;
@@ -190,6 +202,24 @@ export function normalizeNaverBooksResponse(isbn13: string, response: NaverBooks
     language: /[\uac00-\ud7a3]/.test(`${title} ${authors?.join(' ') ?? ''}`) ? 'ko' : undefined,
     description: cleanMarkup(exact.description),
     coverUrl: exact.image?.replace(/^http:/, 'https:'),
+  };
+}
+
+export function normalizeKakaoBooksResponse(isbn13: string, response: KakaoBooksResponse): Omit<MetadataCandidate, 'source'> | null {
+  const exact = response.documents?.find((item) => includesIsbn13(item.isbn?.split(/\s+/) ?? [], isbn13));
+  const title = cleanMarkup(exact?.title);
+  if (!exact || !title) return null;
+  const authors = exact.authors?.map((author) => author.trim()).filter(Boolean);
+
+  return {
+    isbn13,
+    title,
+    authors,
+    publisher: cleanMarkup(exact.publisher),
+    publishedYear: year(exact.datetime),
+    language: /[\uac00-\ud7a3]/.test(`${title} ${authors?.join(' ') ?? ''}`) ? 'ko' : undefined,
+    description: cleanMarkup(exact.contents),
+    coverUrl: exact.thumbnail ? highResolutionCoverUrl(exact.thumbnail) : undefined,
   };
 }
 
