@@ -10,7 +10,7 @@ const sections = [
   {
     title: '1. What we collect · 수집하는 정보',
     paragraphs: [
-      'Kakao sign-in provides your service-specific account identifier, nickname, and profile image when available. We request only basic sign-in scopes and do not require your Kakao Account email. 카카오 로그인에서 서비스별 계정 식별자, 닉네임, 가능한 경우 프로필 이미지를 받으며 기본 로그인 권한만 요청하고 카카오계정 이메일은 요구하지 않습니다.',
+      'Kakao sign-in provides your service-specific account identifier and nickname. We request only these basic sign-in details and do not require your Kakao Account email. 카카오 로그인에서 서비스별 계정 식별자와 닉네임만 받으며 카카오계정 이메일은 요구하지 않습니다.',
       'We also store the profile details you choose to provide, optional phone and verification status, book listings and cover images, borrow requests, loan and return history, notification delivery status, and minimal security and operational records. 선택한 프로필 정보, 선택적 전화번호와 인증 상태, 도서와 표지, 대여 요청·대여·반납 기록, 알림 전송 상태 및 최소한의 보안·운영 기록도 저장합니다.',
     ],
   },

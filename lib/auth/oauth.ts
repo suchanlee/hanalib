@@ -122,7 +122,7 @@ export async function authorizationUrl(
   url.searchParams.set('client_id', config.credentials.clientId);
   url.searchParams.set('redirect_uri', redirectUri);
   url.searchParams.set('response_type', 'code');
-  url.searchParams.set('scope', 'openid,profile_nickname,profile_image');
+  url.searchParams.set('scope', 'openid,profile_nickname');
   url.searchParams.set('state', transaction.state);
   url.searchParams.set('nonce', transaction.nonce);
   url.searchParams.set('code_challenge', await pkceChallenge(transaction.verifier));

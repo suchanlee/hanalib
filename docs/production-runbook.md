@@ -4,7 +4,7 @@ The application runs on OpenAI Sites backed by Cloudflare Workers. Sites owns th
 
 ## 1. Identity and membership
 
-Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` and `profile_image` consent items. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
+Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` consent item. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
 `https://hana-community-library.lee-suchan.chatgpt.site/api/auth/kakao/callback`
 

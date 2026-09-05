@@ -61,7 +61,7 @@ void test('builds Kakao OIDC authorization with nonce and PKCE', async () => {
   assert.equal(url.origin, 'https://kauth.kakao.com');
   assert.equal(url.pathname, '/oauth/authorize');
   assert.equal(url.searchParams.get('response_type'), 'code');
-  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname,profile_image');
+  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname');
   assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
   assert.equal(url.searchParams.get('state'), transaction.state);
   assert.equal(url.searchParams.get('nonce'), transaction.nonce);
