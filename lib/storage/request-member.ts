@@ -6,12 +6,8 @@ export interface ActiveMember {
 }
 
 export async function requireActiveMember(request: Request): Promise<ActiveMember | undefined> {
-  try {
-    const member = await getAuthenticatedMember(request);
-    return member ? { memberId: member.id, communityId: member.communityId } : undefined;
-  } catch {
-    return undefined;
-  }
+  const member = await getAuthenticatedMember(request);
+  return member ? { memberId: member.id, communityId: member.communityId } : undefined;
 }
 
 export function unauthorizedResponse() {

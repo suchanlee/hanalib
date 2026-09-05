@@ -1,6 +1,7 @@
+import { observedRoute } from '@/lib/http/observed-route';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '@/lib/auth/member';
 
-export async function GET(request: Request) {
+async function get(request: Request) {
   try {
     await requireAuthenticatedMember(request);
     const publicKey = process.env.WEB_PUSH_PUBLIC_KEY;
@@ -26,4 +27,8 @@ export async function GET(request: Request) {
       { status: 401, headers: { 'Cache-Control': 'private, no-store' } },
     );
   }
+}
+
+export async function GET(request: Request) {
+  return observedRoute(request, 'push-config', () => get(request));
 }

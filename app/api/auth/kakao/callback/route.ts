@@ -1,4 +1,4 @@
-import { handleOAuthCallback } from '@/lib/auth/handlers';
+import { errorRedirect, handleOAuthCallback } from '@/lib/auth/handlers';
 import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '@/lib/observability/log';
 
 export async function GET(request: Request) {
@@ -16,9 +16,6 @@ export async function GET(request: Request) {
       provider: 'kakao',
       errorCode: safeErrorCode(error, 'sign-in-failed'),
     }));
-    return withRequestId(Response.json({ error: 'kakao-sign-in-failed' }, {
-      status: 503,
-      headers: { 'cache-control': 'no-store' },
-    }), logContext);
+    return withRequestId(errorRedirect(new URL(request.url).origin, 'sign_in_failed', new URL(request.url).protocol === 'https:', logContext.requestId), logContext);
   }
 }

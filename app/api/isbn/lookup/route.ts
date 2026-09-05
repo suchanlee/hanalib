@@ -28,7 +28,10 @@ export async function GET(request: Request) {
     if (error instanceof LibraryError) {
       return respond(Response.json({ error: error.code }, { status: error.status, headers: { 'cache-control': 'no-store' } }));
     }
-    throw error;
+    operationalLog('error', 'book-metadata-lookup-failed', requestLogFields(logContext, 503, {
+      operation: 'rate-limit', errorCode: safeErrorCode(error, 'database-read-failed'),
+    }));
+    return respond(Response.json({ error: 'service-unavailable' }, { status: 503, headers: { 'cache-control': 'no-store' } }));
   }
   const search = new URL(request.url).searchParams;
   const parsed = parseIsbn(search.get('isbn') ?? '');

@@ -1,4 +1,4 @@
-import { handleOAuthStart } from '@/lib/auth/handlers';
+import { errorRedirect, handleOAuthStart } from '@/lib/auth/handlers';
 import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '@/lib/observability/log';
 
 export async function GET(request: Request) {
@@ -11,9 +11,6 @@ export async function GET(request: Request) {
       provider: 'kakao',
       errorCode: safeErrorCode(error, 'auth-not-configured'),
     }));
-    return withRequestId(Response.json({ error: 'kakao-auth-not-configured' }, {
-      status: 503,
-      headers: { 'cache-control': 'no-store' },
-    }), logContext);
+    return withRequestId(errorRedirect(new URL(request.url).origin, 'sign_in_failed', new URL(request.url).protocol === 'https:', logContext.requestId), logContext);
   }
 }

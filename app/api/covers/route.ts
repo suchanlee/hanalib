@@ -46,7 +46,10 @@ export async function POST(request: Request) {
     if (error instanceof LibraryError) {
       return respond(Response.json({ error: error.code }, { status: error.status, headers: { 'cache-control': 'no-store' } }));
     }
-    throw error;
+    operationalLog('error', 'cover-storage-failed', requestLogFields(logContext, 503, {
+      operation: 'rate-limit', errorCode: safeErrorCode(error, 'database-read-failed'),
+    }));
+    return respond(Response.json({ error: 'service-unavailable' }, { status: 503, headers: { 'cache-control': 'no-store' } }));
   }
 
   const declaredType = request.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase() ?? '';
@@ -64,7 +67,12 @@ export async function POST(request: Request) {
     bytes = await readBytesWithLimit(request.body);
     validated = validateCoverUpload(declaredType, bytes);
   } catch (error) {
-    if (!(error instanceof CoverValidationError)) throw error;
+    if (!(error instanceof CoverValidationError)) {
+      operationalLog('error', 'cover-storage-failed', requestLogFields(logContext, 503, {
+        operation: 'read-upload', errorCode: safeErrorCode(error, 'upload-read-failed'),
+      }));
+      return respond(Response.json({ error: 'upload-read-failed' }, { status: 503, headers: { 'cache-control': 'no-store' } }));
+    }
     const status = error.code === 'file-too-large' ? 413 : error.code === 'unsupported-type' ? 415 : 400;
     return respond(Response.json({ error: error.code, maxBytes: MAX_COVER_BYTES }, { status, headers: { 'cache-control': 'no-store' } }));
   }

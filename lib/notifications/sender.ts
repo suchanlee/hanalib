@@ -49,6 +49,7 @@ export async function sendResendEmail(
 
   const response = await fetcher('https://api.resend.com/emails', {
     method: 'POST',
+    signal: AbortSignal.timeout(10_000),
     headers: {
       Authorization: `Bearer ${config.resendApiKey}`,
       'Content-Type': 'application/json',
@@ -87,6 +88,7 @@ export async function sendTwilioSms(
     `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(config.twilioAccountSid)}/Messages.json`,
     {
       method: 'POST',
+    signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Basic ${credentials}`,
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',

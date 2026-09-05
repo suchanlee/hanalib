@@ -101,13 +101,13 @@ export function WebMcpBridge() {
       description: 'Record that an active loan has been returned. Only its borrower or owner may do this.',
       inputSchema: { type: 'object', properties: { loanId: { type: 'string' } }, required: ['loanId'], additionalProperties: false },
       annotations: { readOnlyHint: false, untrustedContentHint: false },
-      execute(input) {
+      async execute(input) {
         if (!state.isAuthenticated) throw new Error('Sign in before recording a return.');
         const loanId = objectInput(input).loanId;
         if (typeof loanId !== 'string') throw new Error('loanId must be a string.');
         const loan = state.loans.find((candidate) => candidate.id === loanId);
         if (!loan || loan.status !== 'active' || (loan.ownerId !== state.currentUserId && loan.borrowerId !== state.currentUserId)) throw new Error('This loan cannot be returned by the current member.');
-        actions.markReturned(loanId);
+        await actions.markReturned(loanId);
         return { loanId, status: 'returned' };
       },
     });

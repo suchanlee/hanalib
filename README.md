@@ -38,7 +38,7 @@ The application is deployed through OpenAI Sites on Cloudflare Workers with mana
 
 ## Notifications
 
-Immediate events are queued transactionally and delivery is attempted before the triggering API request completes. Scheduled events are stored in the same outbox but require the protected notification job to be invoked regularly.
+Immediate events are queued transactionally and delivery is attempted in a background task after the triggering mutation commits. Scheduled events are stored in the same outbox but require the protected notification job to be invoked regularly.
 
 | Kind | Event | Recipient | Timing and cadence |
 | --- | --- | --- | --- |

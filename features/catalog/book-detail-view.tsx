@@ -29,6 +29,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
+import { issueMessage, userIssue } from '@/features/app/user-issue';
 import { useHanaApp } from '@/features/app/app-context';
 import { ReturnConfirmationDialog } from '@/features/circulation/return-confirmation-dialog';
 import type { BookEdition, CatalogItem } from '@/lib/domain/types';
@@ -142,7 +143,8 @@ export function BookDetailView() {
     if (coverFile) {
       try {
         coverAssetId = (await uploadMemberCover(coverFile, state.currentUserId)).assetId;
-      } catch {
+      } catch (error) {
+        actions.reportError(error, 'upload-cover');
         setCoverError(t.coverUploadFailed);
         setIsSaving(false);
         return;
@@ -212,7 +214,7 @@ export function BookDetailView() {
       setFeedback({ tone: 'error', text: t.removeBlocked });
       return;
     }
-    actions.archiveItem(itemId);
+    void actions.archiveItem(itemId).catch(() => {});
   }
 
   async function requestBook() {
@@ -229,26 +231,32 @@ export function BookDetailView() {
       await actions.requestBorrow(itemId);
       setRequestDialogOpen(false);
       setFeedback({ tone: 'success', text: t.requested });
-    } catch {
-      setFeedback({ tone: 'error', text: t.requestFailed });
+    } catch (error) {
+      setFeedback({ tone: 'error', text: issueMessage(userIssue(error), state.locale) });
     } finally {
       setIsRequesting(false);
     }
   }
 
-  function cancelRequest() {
+  async function cancelRequest() {
     if (!pendingRequest) return;
-    actions.cancelRequest(pendingRequest.id);
-    setFeedback({ tone: 'success', text: t.requestCanceled });
+    setFeedback(null);
+    try {
+      await actions.cancelRequest(pendingRequest.id);
+      setFeedback({ tone: 'success', text: t.requestCanceled });
+    } catch { /* The app displays the error and recovery instructions. */ }
   }
 
-  function returnBook() {
+  async function returnBook() {
     if (!activeLoan || !canReturn) {
       setFeedback({ tone: 'error', text: state.locale === 'ko' ? '대여자나 소유자만 반납을 기록할 수 있어요.' : 'Only the borrower or owner can record a return.' });
       return;
     }
-    actions.markReturned(activeLoan.id);
-    setFeedback({ tone: 'success', text: t.returned });
+    setFeedback(null);
+    try {
+      await actions.markReturned(activeLoan.id);
+      setFeedback({ tone: 'success', text: t.returned });
+    } catch { /* The app displays the error and recovery instructions. */ }
   }
 
   async function joinWaitlist() {
@@ -256,8 +264,8 @@ export function BookDetailView() {
     try {
       await actions.joinHold(itemId);
       setFeedback({ tone: 'success', text: t.joinedWaitlist });
-    } catch {
-      setFeedback({ tone: 'error', text: t.requestFailed });
+    } catch (error) {
+      setFeedback({ tone: 'error', text: issueMessage(userIssue(error), state.locale) });
     } finally {
       setIsHolding(false);
     }
@@ -269,8 +277,8 @@ export function BookDetailView() {
     try {
       await actions.cancelHold(ownHold.id);
       setFeedback({ tone: 'success', text: state.locale === 'ko' ? '대기 목록에서 나왔어요.' : 'You left the waitlist.' });
-    } catch {
-      setFeedback({ tone: 'error', text: t.requestFailed });
+    } catch (error) {
+      setFeedback({ tone: 'error', text: issueMessage(userIssue(error), state.locale) });
     } finally {
       setIsHolding(false);
     }
@@ -283,8 +291,8 @@ export function BookDetailView() {
       await actions.claimHold(ownHold.id);
       setHoldClaimDialogOpen(false);
       setFeedback({ tone: 'success', text: t.requested });
-    } catch {
-      setFeedback({ tone: 'error', text: t.requestFailed });
+    } catch (error) {
+      setFeedback({ tone: 'error', text: issueMessage(userIssue(error), state.locale) });
     } finally {
       setIsHolding(false);
     }

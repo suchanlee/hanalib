@@ -64,14 +64,8 @@ export function SettingsView() {
 
   async function signOut() {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { accept: 'application/json' },
-      });
-    } finally {
-      actions.signOut();
-    }
+      await actions.signOut();
+    } catch { /* The app displays recovery instructions and keeps the session visible. */ }
   }
 
   return (

@@ -1,9 +1,10 @@
+import { observedRoute } from '@/lib/http/observed-route';
 import { getD1Database } from '@/db';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '@/lib/auth/member';
 import { isSameOriginMutation } from '@/lib/auth/session';
 import { sendWebPushToUser, webPushConfig } from '@/lib/notifications/web-push';
 
-export async function POST(request: Request) {
+async function post(request: Request) {
   try {
     const configured = process.env.PUBLIC_APP_URL;
     if (!configured || !isSameOriginMutation(request, configured)) {
@@ -37,4 +38,8 @@ export async function POST(request: Request) {
       { status: error instanceof AuthenticationRequiredError ? 401 : 503, headers: { 'Cache-Control': 'private, no-store' } },
     );
   }
+}
+
+export async function POST(request: Request) {
+  return observedRoute(request, 'push-test', () => post(request));
 }

@@ -388,7 +388,7 @@ export function CirculationView() {
                     count={state.holdCounts[item.id] ?? 0}
                     locale={locale}
                     onOpen={() => actions.selectItem(item.id)}
-                    onCancel={() => { void actions.cancelHold(hold.id); }}
+                    onCancel={() => { void actions.cancelHold(hold.id).catch(() => {}); }}
                   />
                 );
               })}
@@ -407,9 +407,9 @@ export function CirculationView() {
                 item={item}
                 key={request.id}
                 locale={locale}
-                onAccept={() => actions.respondToRequest(request.id, 'accepted')}
-                onCancel={() => actions.cancelRequest(request.id)}
-                onDecline={() => actions.respondToRequest(request.id, 'declined')}
+                onAccept={() => actions.respondToRequest(request.id, 'accepted').catch(() => {})}
+                onCancel={() => actions.cancelRequest(request.id).catch(() => {})}
+                onDecline={() => actions.respondToRequest(request.id, 'declined').catch(() => {})}
                 request={request}
                 requester={other}
               />
@@ -430,9 +430,9 @@ export function CirculationView() {
                 key={loan.id}
                 loan={loan}
                 locale={locale}
-                onReturn={() => actions.markReturned(loan.id)}
+                onReturn={() => actions.markReturned(loan.id).catch(() => {})}
                 returnCheck={returnCheck}
-                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false); }}
+                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false).catch(() => {}); }}
                 otherMember={owner}
                 view="borrowed"
               />
@@ -453,9 +453,9 @@ export function CirculationView() {
                 key={loan.id}
                 loan={loan}
                 locale={locale}
-                onReturn={() => actions.markReturned(loan.id)}
+                onReturn={() => actions.markReturned(loan.id).catch(() => {})}
                 returnCheck={returnCheck}
-                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false); }}
+                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false).catch(() => {}); }}
                 otherMember={borrower}
                 view="lent"
               />

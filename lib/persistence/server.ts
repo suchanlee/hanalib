@@ -1,3 +1,4 @@
+import { waitUntil } from 'cloudflare:workers';
 import { getD1Database } from '../../db/index';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '../auth/member.ts';
 import { isSameOriginMutation } from '../auth/session.ts';
@@ -64,7 +65,7 @@ export async function withLibraryApi<T>(
     });
     const data = await handler(repository, context);
     if (options.dispatchNotifications) {
-      await processReadyOutbox(database, {
+      waitUntil(processReadyOutbox(database, {
         contactEncryptionKey: process.env.CONTACT_ENCRYPTION_KEY,
         contactHashKey: process.env.CONTACT_HASH_KEY,
         vapidPublicKey: process.env.WEB_PUSH_PUBLIC_KEY,
@@ -78,7 +79,12 @@ export async function withLibraryApi<T>(
         twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
         kakaoRestApiKey: process.env.KAKAO_REST_API_KEY,
         kakaoClientSecret: process.env.KAKAO_CLIENT_SECRET,
-      }, { requestId: logContext.requestId });
+      }, { requestId: logContext.requestId }).catch((error: unknown) => {
+        operationalLog('error', 'notification-dispatch-failed', requestLogFields(logContext, 200, {
+          operation: 'notification-dispatch',
+          errorCode: safeErrorCode(error, 'dispatch-failed'),
+        }));
+      }));
     }
     return withRequestId(Response.json({ data }, {
       status: options.status ?? 200,

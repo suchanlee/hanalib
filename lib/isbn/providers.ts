@@ -1,3 +1,4 @@
+import { ApiError, requestJson } from '../http/client.ts';
 import type { AddBookInput, AppLocale } from '@/lib/domain/types';
 
 export type MetadataSource = 'nlk' | 'naver' | 'kakao-books' | 'google-books' | 'open-library' | 'member' | 'fixture';
@@ -34,14 +35,17 @@ abstract class ServerProxyProvider implements BookMetadataProvider {
   }
 
   async lookup(isbn13: string, locale: AppLocale, signal?: AbortSignal) {
-    const response = await fetch(`${this.endpoint}?isbn=${encodeURIComponent(isbn13)}&locale=${locale}`, {
+    try {
+    const payload = await requestJson<Omit<MetadataCandidate, 'source'>>(`${this.endpoint}?isbn=${encodeURIComponent(isbn13)}&locale=${locale}`, {
       cache: 'no-store',
       headers: { accept: 'application/json' },
       signal,
     });
-    if (response.status === 404) return null;
-    if (!response.ok) throw new Error(`${this.id} lookup failed (${response.status})`);
-    return { ...(await response.json() as Omit<MetadataCandidate, 'source'>), source: this.id };
+    return { ...payload, source: this.id };
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   }
 }
 
@@ -86,15 +90,17 @@ export class ResolvedBookProvider {
     if (process.env.NODE_ENV !== 'production' && this.developmentMemberId) {
       headers.set('x-hana-demo-member-id', this.developmentMemberId);
     }
-    const response = await fetch(`${this.endpoint}?${search}`, {
+    try {
+    return await requestJson<StitchedBookMetadata>(`${this.endpoint}?${search}`, {
       cache: 'no-store',
       credentials: 'same-origin',
       headers,
       signal,
     });
-    if (response.status === 404) return null;
-    if (!response.ok) throw new Error(`Book metadata lookup failed (${response.status})`);
-    return await response.json() as StitchedBookMetadata;
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   }
 }
 

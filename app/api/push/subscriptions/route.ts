@@ -1,3 +1,4 @@
+import { observedRoute } from '@/lib/http/observed-route';
 import { getD1Database } from '@/db';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '@/lib/auth/member';
 import { isSameOriginMutation } from '@/lib/auth/session';
@@ -24,7 +25,7 @@ function status(error: unknown) {
   return 500;
 }
 
-export async function POST(request: Request) {
+async function post(request: Request) {
   try {
     if (!sameOrigin(request)) return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
     const member = await requireAuthenticatedMember(request);
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+async function remove(request: Request) {
   try {
     if (!sameOrigin(request)) return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
     const member = await requireAuthenticatedMember(request);
@@ -64,4 +65,12 @@ export async function DELETE(request: Request) {
       { status: responseStatus, headers: { 'Cache-Control': 'private, no-store' } },
     );
   }
+}
+
+export async function POST(request: Request) {
+  return observedRoute(request, 'push-subscription', () => post(request));
+}
+
+export async function DELETE(request: Request) {
+  return observedRoute(request, 'push-subscription', () => remove(request));
 }

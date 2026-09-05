@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { AppScreen } from '@/lib/domain/types';
 import { HanaAppProvider, useHanaApp } from './app-context';
+import { ErrorNotice } from './error-notice';
 import { WebMcpBridge } from './webmcp-bridge';
 
 const navItems: Array<{ screen: Exclude<AppScreen, 'detail'>; icon: typeof BookOpen; ko: string; en: string; testId: string }> = [
@@ -31,6 +32,15 @@ function LibraryShell() {
     + state.holds.filter((hold) => hold.status === 'offered').length
     + state.returnChecks.length;
   const actionableLabel = actionableCount > 9 ? '9+' : String(actionableCount);
+
+  if (!state.isAuthenticated && state.loadStatus !== 'ready') {
+    return <main className="mx-auto grid min-h-dvh max-w-md content-center gap-4 p-6" data-testid="bootstrap-status">
+      <h1 className="text-2xl font-semibold">{state.loadStatus === 'loading'
+        ? state.locale === 'ko' ? '도서관을 불러오는 중…' : 'Loading your library…'
+        : state.locale === 'ko' ? '도서관에 연결하지 못했어요' : 'Unable to load the library'}</h1>
+      {state.loadStatus === 'error' && <Button onClick={() => { void actions.refresh().catch(() => {}); }}>{state.locale === 'ko' ? '다시 불러오기' : 'Try loading again'}</Button>}
+    </main>;
+  }
 
   if (!state.isAuthenticated) {
     return (
@@ -86,11 +96,13 @@ function LibraryShell() {
           </header>
 
           <main className="mx-auto w-full max-w-5xl pb-28 lg:pb-10">
+            <fieldset disabled={state.isMutating} aria-busy={state.isMutating} className="min-w-0">
             {state.screen === 'catalog' && <CatalogView />}
             {state.screen === 'detail' && <BookDetailView />}
             {state.screen === 'intake' && <IntakeView />}
             {state.screen === 'borrowing' && <CirculationView />}
             {state.screen === 'settings' && <SettingsView />}
+            </fieldset>
           </main>
         </div>
       </div>
@@ -122,6 +134,16 @@ function LibraryShell() {
   );
 }
 
+function GlobalFeedback() {
+  const { state, actions } = useHanaApp();
+  if (!state.issue) return null;
+  return <div className="fixed inset-x-3 bottom-24 z-[60] mx-auto max-h-[60dvh] max-w-xl overflow-y-auto lg:bottom-6">
+    <ErrorNotice key={state.issue.occurredAt} issue={state.issue} locale={state.locale}
+      onDismiss={() => actions.dismissIssue()}
+      onRetry={state.issue.operation === 'sign-out' || state.issue.operation === 'sign-in' || state.issue.operation === 'sign-in-options' ? undefined : () => actions.refresh()} />
+  </div>;
+}
+
 export function HanaApp({ initialScreen = 'catalog' }: { initialScreen?: AppScreen }) {
-  return <HanaAppProvider initialScreen={initialScreen}><LibraryShell /></HanaAppProvider>;
+  return <HanaAppProvider initialScreen={initialScreen}><LibraryShell /><GlobalFeedback /></HanaAppProvider>;
 }

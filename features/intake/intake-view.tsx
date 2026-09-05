@@ -351,7 +351,7 @@ export function IntakeView() {
       );
     } catch (error) {
       if (controller.signal.aborted || sequence !== lookupSequenceRef.current) return;
-      console.error('book-metadata-lookup-failed', error);
+      actions.reportError(error, 'book-lookup');
       setDraft(blankDraft(parsed.isbn13, locale));
       setErrorKind('lookup');
       setStage('error');
@@ -367,7 +367,7 @@ export function IntakeView() {
     setDraft(createDraft(metadata));
     setFormError('');
     setStage('confirm');
-  }, [locale, state.currentUserId, stopCamera]);
+  }, [actions, locale, state.currentUserId, stopCamera]);
 
   useEffect(() => {
     if (stage !== 'scanning' || !streamRef.current || !videoRef.current) return;
@@ -540,7 +540,8 @@ export function IntakeView() {
       try {
         const upload = await uploadMemberCover(coverFile, state.currentUserId);
         persistedCoverUrl = upload.coverUrl;
-      } catch {
+      } catch (error) {
+        actions.reportError(error, 'upload-cover');
         setFormError(c.uploadFailed);
         setIsSaving(false);
         return;

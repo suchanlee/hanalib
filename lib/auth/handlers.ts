@@ -32,9 +32,10 @@ function redirect(location: string, status = 302) {
   return new Response(null, { status, headers: { ...noStoreHeaders, location } });
 }
 
-function errorRedirect(publicAppUrl: string, code: string, secure: boolean) {
+export function errorRedirect(publicAppUrl: string, code: string, secure: boolean, requestId: string) {
   const url = new URL('/', publicAppUrl);
   url.searchParams.set('authError', code);
+  url.searchParams.set('authRequestId', requestId);
   const response = redirect(url.toString(), 303);
   response.headers.append('set-cookie', clearOAuthTransactionCookie(secure));
   return response;
@@ -83,9 +84,9 @@ export async function handleOAuthCallback(
     transaction.provider !== provider ||
     !input.state ||
     input.state !== transaction.state
-  ) return withRequestId(errorRedirect(config.publicAppUrl, 'invalid_state', secure), logContext);
-  if (input.error) return withRequestId(errorRedirect(config.publicAppUrl, 'access_denied', secure), logContext);
-  if (!input.code) return withRequestId(errorRedirect(config.publicAppUrl, 'missing_code', secure), logContext);
+  ) return withRequestId(errorRedirect(config.publicAppUrl, 'invalid_state', secure, logContext.requestId), logContext);
+  if (input.error) return withRequestId(errorRedirect(config.publicAppUrl, 'access_denied', secure, logContext.requestId), logContext);
+  if (!input.code) return withRequestId(errorRedirect(config.publicAppUrl, 'missing_code', secure, logContext.requestId), logContext);
   try {
     const { claims, tokenSet } = await exchangeAuthorizationCode(config, input.code, transaction, fetcher);
     const identity = identityFromClaims(provider, claims);
@@ -112,7 +113,7 @@ export async function handleOAuthCallback(
       provider,
       errorCode: safeErrorCode(error, 'sign-in-failed'),
     }));
-    return withRequestId(errorRedirect(config.publicAppUrl, 'sign_in_failed', secure), logContext);
+    return withRequestId(errorRedirect(config.publicAppUrl, 'sign_in_failed', secure, logContext.requestId), logContext);
   }
 }
 

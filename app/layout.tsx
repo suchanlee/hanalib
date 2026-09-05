@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
 import { ThemeProvider } from '@/features/app/theme-context';
 import './globals.css';
+import { AppErrorBoundary } from '@/features/app/app-error-boundary';
 
 const themeInitializer = `
   (() => {
@@ -53,7 +54,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitializer }} />
       </head>
       <body className={`${geistSans.variable} antialiased`}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <AppErrorBoundary><ThemeProvider>{children}</ThemeProvider></AppErrorBoundary>
       </body>
     </html>
   );

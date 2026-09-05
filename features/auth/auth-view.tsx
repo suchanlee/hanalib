@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
+import { ApiError, requestJson } from '@/lib/http/client';
 import { oauthStartUrl } from './provider-config';
 
 interface AuthProviders {
@@ -16,39 +17,47 @@ export function AuthView() {
   const { state, actions } = useHanaApp();
   const ko = state.locale === 'ko';
   const [providers, setProviders] = useState<AuthProviders>();
+  const [providerFailed, setProviderFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [signingIn, setSigningIn] = useState(false);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const error = url.searchParams.get('authError');
+    if (!error) return;
+    actions.reportError(new ApiError(0, error, url.searchParams.get('authRequestId') ?? undefined), 'sign-in');
+    url.searchParams.delete('authError');
+    url.searchParams.delete('authRequestId');
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  }, [actions]);
 
   useEffect(() => {
     const controller = new AbortController();
-    void fetch('/api/auth/providers', {
-      credentials: 'same-origin',
-      headers: { accept: 'application/json' },
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('provider-status-unavailable');
-        return response.json() as Promise<AuthProviders>;
-      })
+    void requestJson<AuthProviders>('/api/auth/providers', { signal: controller.signal }, (value) => typeof value.kakao === 'boolean' && typeof value.demo === 'boolean')
       .then(setProviders)
       .catch((error: unknown) => {
-        if (!(error instanceof DOMException && error.name === 'AbortError')) {
-          setProviders({ demo: false, kakao: false });
+        if (!controller.signal.aborted) {
+          setProviderFailed(true);
+          actions.reportError(error, 'sign-in-options');
         }
       });
     return () => controller.abort();
-  }, []);
+  }, [actions, attempt]);
 
   function beginSignIn() {
     window.location.assign(oauthStartUrl('kakao', `${window.location.pathname}${window.location.search}${window.location.hash}`));
   }
 
   async function demoSignIn(persona: 'owner' | 'borrower' | 'holder' | 'holder-2') {
-    const response = await fetch('/api/auth/demo', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { accept: 'application/json', 'content-type': 'application/json' },
-      body: JSON.stringify({ persona }),
-    });
-    if (response.ok) await actions.refresh();
+    setSigningIn(true);
+    try {
+      await requestJson('/api/auth/demo', {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ persona }),
+      });
+      await actions.refresh();
+    } catch (error) {
+      actions.reportError(error, 'sign-in');
+    } finally { setSigningIn(false); }
   }
 
   return (
@@ -94,12 +103,13 @@ export function AuthView() {
             <Button
               className="h-12 w-full rounded-xl bg-[#FEE500] text-base font-semibold text-[#191919] hover:bg-[#F5DC00]"
               data-testid="auth-kakao"
-              disabled={providers?.kakao !== true}
+              disabled={providers?.kakao !== true || signingIn}
               onClick={beginSignIn}
             >
               <MessageCircle aria-hidden="true" className="size-5 fill-current" />
               {ko ? '카카오로 계속' : 'Continue with Kakao'}
             </Button>
+            {providerFailed && <Button variant="outline" className="w-full" onClick={() => { actions.dismissIssue(); setProviderFailed(false); setAttempt((value) => value + 1); }}>{ko ? '로그인 옵션 다시 불러오기' : 'Reload sign-in options'}</Button>}
             {providers && !providers.kakao && (
               <output className="block px-2 text-center text-xs leading-5 text-muted-foreground" data-testid="auth-provider-status">
                 {ko
@@ -115,16 +125,16 @@ export function AuthView() {
                     : 'Development mode is enabled. This account is available only in local preview.'}
                 </p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
-                  <Button data-testid="auth-demo-owner" onClick={() => void demoSignIn('owner')} size="sm" variant="secondary">
+                  <Button disabled={signingIn} data-testid="auth-demo-owner" onClick={() => void demoSignIn('owner')} size="sm" variant="secondary">
                     {ko ? '소유자로 계속' : 'Continue as owner'}
                   </Button>
-                  <Button data-testid="auth-demo-borrower" onClick={() => void demoSignIn('borrower')} size="sm" variant="outline">
+                  <Button disabled={signingIn} data-testid="auth-demo-borrower" onClick={() => void demoSignIn('borrower')} size="sm" variant="outline">
                     {ko ? '대여자로 계속' : 'Continue as borrower'}
                   </Button>
-                  <Button data-testid="auth-demo-holder" onClick={() => void demoSignIn('holder')} size="sm" variant="outline">
+                  <Button disabled={signingIn} data-testid="auth-demo-holder" onClick={() => void demoSignIn('holder')} size="sm" variant="outline">
                     {ko ? '대기자로 계속' : 'Continue as waitlist member'}
                   </Button>
-                  <Button data-testid="auth-demo-holder-2" onClick={() => void demoSignIn('holder-2')} size="sm" variant="outline">
+                  <Button disabled={signingIn} data-testid="auth-demo-holder-2" onClick={() => void demoSignIn('holder-2')} size="sm" variant="outline">
                     {ko ? '두 번째 대기자로 계속' : 'Continue as second waitlist member'}
                   </Button>
                 </div>

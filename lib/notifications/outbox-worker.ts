@@ -158,33 +158,41 @@ function channel(value: string, hasPhone: boolean, hasEmail: boolean): Notificat
   return 'email';
 }
 
-async function scheduleNextReturnCheck(db: D1Database, row: OutboxRow, now: number) {
-  if (row.eventType !== 'return_check_due') return;
-  const loan = await db.prepare("SELECT status FROM loans WHERE id = ? LIMIT 1")
+async function completeDelivery(db: D1Database, row: OutboxRow, now: number) {
+  const complete = db.prepare('UPDATE outbox_events SET processed_at = ? WHERE id = ? AND processed_at IS NULL')
+    .bind(now, row.id);
+  if (row.eventType !== 'return_check_due') {
+    await complete.run();
+    return;
+  }
+  const loan = await db.prepare("SELECT status, next_check_at AS scheduledFor FROM loans WHERE id = ? LIMIT 1")
     .bind(row.aggregateId)
-    .first<{ status: string }>();
-  if (loan?.status !== 'active') return;
-  const next = nextReturnCheckAt(new Date(row.availableAt), new Date(now)).getTime();
+    .first<{ status: string; scheduledFor: number }>();
+  if (loan?.status !== 'active') {
+    await complete.run();
+    return;
+  }
+  // available_at is a retry/lease timestamp; the loan retains the original cadence.
+  const scheduledFor = loan.scheduledFor;
+  const next = nextReturnCheckAt(new Date(scheduledFor), new Date(now)).getTime();
+  // D1 batches are transactional: a scheduling failure must leave this event retryable.
+  // Guard inserts too, in case the book was returned after the read above.
   await db.batch([
     db.prepare("UPDATE loans SET last_check_at = ?, next_check_at = ? WHERE id = ? AND status = 'active'")
       .bind(now, next, row.aggregateId),
     db.prepare('UPDATE return_checkins SET sent_at = ?, next_scheduled_for = ? WHERE loan_id = ? AND scheduled_for = ?')
-      .bind(now, next, row.aggregateId, row.availableAt),
-    db.prepare('INSERT OR IGNORE INTO return_checkins (id, loan_id, scheduled_for) VALUES (?, ?, ?)')
-      .bind(`checkin-${crypto.randomUUID()}`, row.aggregateId, next),
+      .bind(now, next, row.aggregateId, scheduledFor),
+    db.prepare(`INSERT OR IGNORE INTO return_checkins (id, loan_id, scheduled_for)
+      SELECT ?, id, ? FROM loans WHERE id = ? AND status = 'active'`)
+      .bind(`checkin-${crypto.randomUUID()}`, next, row.aggregateId),
     db.prepare(`
       INSERT INTO outbox_events (
         id, event_type, aggregate_type, aggregate_id, recipient_id, locale,
         payload_json, available_at, attempt_count
-      ) VALUES (?, 'return_check_due', 'loan', ?, ?, ?, ?, ?, 0)
-    `).bind(
-      `event-${crypto.randomUUID()}`,
-      row.aggregateId,
-      row.recipientId,
-      row.locale,
-      row.payloadJson,
-      next,
-    ),
+      ) SELECT ?, 'return_check_due', 'loan', id, ?, ?, ?, ?, 0
+        FROM loans WHERE id = ? AND status = 'active'
+    `).bind(`event-${crypto.randomUUID()}`, row.recipientId, row.locale, row.payloadJson, next, row.aggregateId),
+    complete,
   ]);
 }
 
@@ -271,16 +279,17 @@ export async function processReadyOutbox(
   const result: OutboxWorkerResult = { claimed: 0, sent: 0, failed: 0, skipped: 0 };
 
   for (const row of rows.results) {
-    const leaseUntil = now + 5 * 60_000;
+    const claimAt = options.now ?? Date.now();
+    const leaseUntil = claimAt + 5 * 60_000;
     const claim = await db.prepare(`
       UPDATE outbox_events
       SET attempt_count = attempt_count + 1, available_at = ?
       WHERE id = ? AND processed_at IS NULL AND available_at <= ?
-    `).bind(leaseUntil, row.id, now).run();
+    `).bind(leaseUntil, row.id, claimAt).run();
     if (affected(claim) !== 1) continue;
     result.claimed += 1;
     try {
-      if (!await eventIsActionable(db, row, now)) {
+      if (!await eventIsActionable(db, row, claimAt)) {
         await db.prepare('UPDATE outbox_events SET processed_at = ? WHERE id = ? AND processed_at IS NULL')
           .bind(now, row.id)
           .run();
@@ -350,12 +359,10 @@ export async function processReadyOutbox(
       if (failure?.status === 'rejected') throw failure.reason;
       if (sentChannels.size === 0) throw new Error('recipient-has-no-verified-contact');
       const sentAt = Date.now();
-      await db.prepare('UPDATE outbox_events SET processed_at = ?, available_at = ? WHERE id = ? AND processed_at IS NULL')
-        .bind(sentAt, row.availableAt, row.id).run();
-      await scheduleNextReturnCheck(db, row, sentAt);
+      await completeDelivery(db, row, sentAt);
       result.sent += 1;
     } catch (error) {
-      const retryAt = now + Math.min(6 * 3_600_000, 60_000 * 2 ** Math.min(row.attemptCount, 8));
+      const retryAt = (options.now ?? Date.now()) + Math.min(6 * 3_600_000, 60_000 * 2 ** Math.min(row.attemptCount, 8));
       await db.prepare('UPDATE outbox_events SET available_at = ? WHERE id = ? AND processed_at IS NULL')
         .bind(retryAt, row.id)
         .run();

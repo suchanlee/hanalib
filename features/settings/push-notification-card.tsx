@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useHanaApp } from '@/features/app/app-context';
+import { ApiError, apiData, requestJson } from '@/lib/http/client';
 import type { AppLocale } from '@/lib/domain/types';
 
 type PushState = 'loading' | 'install-ios' | 'available' | 'subscribed' | 'denied' | 'unsupported' | 'error';
@@ -45,26 +47,25 @@ function isStandalone() {
 }
 
 async function publicKey() {
-  const response = await fetch('/api/push/config', { credentials: 'same-origin' });
-  if (!response.ok) throw new Error('push-config-unavailable');
-  const payload = await response.json() as { data?: { publicKey?: string } };
-  if (!payload.data?.publicKey) throw new Error('push-config-unavailable');
-  return payload.data.publicKey;
+  const data = await apiData<{ publicKey?: string }>('/api/push/config');
+  if (!data.publicKey) throw new ApiError(503, 'push-config-unavailable');
+  return data.publicKey;
 }
 
 async function persist(subscription: PushSubscription) {
-  const response = await fetch('/api/push/subscriptions', {
+  await requestJson('/api/push/subscriptions', {
     method: 'POST',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(serializeSubscription(subscription)),
   });
-  if (!response.ok) throw new Error('push-subscription-save-failed');
 }
 
 export function PushNotificationCard({ locale }: { locale: AppLocale }) {
+  const { actions } = useHanaApp();
   const [state, setState] = useState<PushState>('loading');
   const [busy, setBusy] = useState(false);
+  const [statusAttempt, setStatusAttempt] = useState(0);
   const [testSent, setTestSent] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent>();
 
@@ -97,15 +98,15 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
         } else if (active) {
           setState('available');
         }
-      } catch {
-        if (active) setState('error');
+      } catch (error) {
+        if (active) { setState('error'); actions.reportError(error, 'notification-settings'); }
       }
     })();
     return () => {
       active = false;
       window.removeEventListener('beforeinstallprompt', captureInstallPrompt);
     };
-  }, []);
+  }, [actions, statusAttempt]);
 
   async function install() {
     if (!installPrompt) return;
@@ -114,6 +115,8 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
       await installPrompt.prompt();
       await installPrompt.userChoice;
       setInstallPrompt(undefined);
+    } catch (error) {
+      actions.reportError(error, 'install-app');
     } finally {
       setBusy(false);
     }
@@ -133,7 +136,8 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
         await persist(result.subscription);
         setState('subscribed');
       }
-    } catch {
+    } catch (error) {
+      actions.reportError(error, 'notification-settings');
       setState('error');
     } finally {
       setBusy(false);
@@ -146,16 +150,16 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
     try {
       const endpoint = await unsubscribe();
       if (endpoint) {
-        const response = await fetch('/api/push/subscriptions', {
+        await requestJson('/api/push/subscriptions', {
           method: 'DELETE',
           credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint }),
         });
-        if (!response.ok) throw new Error('push-unsubscribe-failed');
       }
       setState('available');
-    } catch {
+    } catch (error) {
+      actions.reportError(error, 'notification-settings');
       setState('error');
     } finally {
       setBusy(false);
@@ -166,14 +170,14 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
     setBusy(true);
     setTestSent(false);
     try {
-      const response = await fetch('/api/push/test', {
+      await requestJson('/api/push/test', {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
       });
-      if (!response.ok) throw new Error('push-test-failed');
       setTestSent(true);
-    } catch {
+    } catch (error) {
+      actions.reportError(error, 'notification-settings');
       setState('error');
     } finally {
       setBusy(false);
@@ -272,7 +276,7 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
         )}
 
         {state === 'error' && (
-          <Button className="h-11 w-full" disabled={busy} onClick={() => void enable()} type="button" variant="outline">
+          <Button className="h-11 w-full" disabled={busy} onClick={() => { actions.dismissIssue(); setState('loading'); setStatusAttempt((value) => value + 1); }} type="button" variant="outline">
             {t(locale, '다시 시도', 'Try again')}
           </Button>
         )}

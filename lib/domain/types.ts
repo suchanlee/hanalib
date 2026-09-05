@@ -125,7 +125,9 @@ export interface UpdateCatalogItemInput extends Pick<CatalogItem, 'condition' | 
 
 export interface HanaAppActions {
   refresh(): Promise<void>;
-  signOut(): void;
+  signOut(): Promise<void>;
+  reportError(error: unknown, operation?: string): void;
+  dismissIssue(): void;
   setLocale(locale: AppLocale): void;
   setScreen(screen: AppScreen): void;
   selectItem(itemId: string): void;
@@ -134,11 +136,11 @@ export interface HanaAppActions {
   addBook(input: AddBookInput): Promise<string>;
   updateItem(itemId: string, changes: UpdateCatalogItemInput): Promise<CatalogItem>;
   refreshItemCover(itemId: string): Promise<CatalogItem>;
-  archiveItem(itemId: string): void;
+  archiveItem(itemId: string): Promise<void>;
   requestBorrow(itemId: string): Promise<BorrowRequest>;
-  cancelRequest(requestId: string): void;
-  respondToRequest(requestId: string, decision: 'accepted' | 'declined'): void;
-  markReturned(loanId: string): void;
+  cancelRequest(requestId: string): Promise<void>;
+  respondToRequest(requestId: string, decision: 'accepted' | 'declined'): Promise<void>;
+  markReturned(loanId: string): Promise<void>;
   joinHold(itemId: string): Promise<Hold>;
   cancelHold(holdId: string): Promise<void>;
   claimHold(holdId: string): Promise<BorrowRequest>;
@@ -148,6 +150,9 @@ export interface HanaAppActions {
 
 export interface HanaAppState {
   isAuthenticated: boolean;
+  loadStatus: 'loading' | 'ready' | 'error';
+  isMutating: boolean;
+  issue?: UserIssue;
   authProvider?: AuthProvider;
   currentUserId: string;
   locale: AppLocale;
@@ -163,4 +168,12 @@ export interface HanaAppState {
   holdCounts: Record<string, number>;
   returnChecks: ReturnCheck[];
   announcement?: string;
+}
+
+export interface UserIssue {
+  code: string;
+  status: number;
+  requestId?: string;
+  operation: string;
+  occurredAt: string;
 }

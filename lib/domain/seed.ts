@@ -32,6 +32,8 @@ export const seedItems: CatalogItem[] = editions.map((edition, index) => ({
 
 export const initialAppState: HanaAppState = {
   isAuthenticated: false,
+  loadStatus: 'loading',
+  isMutating: false,
   currentUserId: 'jiwoo',
   locale: 'ko',
   screen: 'catalog',
