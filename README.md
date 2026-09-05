@@ -55,7 +55,7 @@ Immediate events are queued transactionally and delivery is attempted before the
 
 Web Push is attempted first for subscribed devices. If none is delivered, the worker falls back to the member's configured Kakao, email, SMS, or combined email/SMS channel. Failed outbox deliveries use exponential backoff from one minute up to six hours.
 
-The five-minute scheduler Worker is checked in at [`workers/notification-scheduler`](workers/notification-scheduler) and production activation is tracked in [`docs/TODO.md`](docs/TODO.md). Scheduled processing expires stale requests and offers, sends reminders and weekly return checks, and retries failed deliveries. Before delivery, the worker suppresses events that are no longer actionable, including return checks for already-returned books. Joining a waitlist does not itself notify another member; the first notification is sent when that member reaches the front of the queue and the book becomes available.
+The five-minute scheduler Worker in [`workers/notification-scheduler`](workers/notification-scheduler) is active in production. Scheduled processing expires stale requests and offers, sends reminders and weekly return checks, and retries failed deliveries. Before delivery, the worker suppresses events that are no longer actionable, including return checks for already-returned books. Joining a waitlist does not itself notify another member; the first notification is sent when that member reaches the front of the queue and the book becomes available.
 
 ## Operational invariants
 
