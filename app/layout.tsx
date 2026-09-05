@@ -8,13 +8,13 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: '하나도서관 · Hana Library',
+  title: '하나의씨앗 도서관 · Hana Library',
   description: 'A private community library for sharing books.',
   manifest: '/manifest.webmanifest',
-  applicationName: '하나도서관',
+  applicationName: '하나의씨앗 도서관',
   appleWebApp: {
     capable: true,
-    title: '하나도서관',
+    title: '하나의씨앗 도서관',
     statusBarStyle: 'default',
   },
 };

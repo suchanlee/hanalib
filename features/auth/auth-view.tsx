@@ -62,7 +62,7 @@ export function AuthView() {
             <span className="grid size-9 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
               <BookHeart aria-hidden="true" className="size-5" />
             </span>
-            <span>{ko ? '하나도서관' : 'Hana Library'}</span>
+            <span>{ko ? '하나의씨앗 도서관' : 'Hana Library'}</span>
           </div>
           <Button
             aria-label={ko ? 'English로 변경' : '한국어로 변경'}
