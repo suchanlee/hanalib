@@ -10,7 +10,16 @@ interface RouteContext {
 export async function GET(request: Request, context: RouteContext) {
   const logContext = requestLogContext(request);
   const respond = (response: Response) => withRequestId(response, logContext);
-  const member = await requireActiveMember(request);
+  let member;
+  try {
+    member = await requireActiveMember(request);
+  } catch (error) {
+    operationalLog('error', 'cover-read-failed', requestLogFields(logContext, 503, {
+      operation: 'member-lookup',
+      errorCode: safeErrorCode(error, 'database-read-failed'),
+    }));
+    return respond(Response.json({ error: 'cover-unavailable' }, { status: 503, headers: { 'cache-control': 'no-store' } }));
+  }
   if (!member) return respond(unauthorizedResponse());
   const { assetId } = await context.params;
   if (!/^[0-9a-f-]{36}$/i.test(assetId)) return respond(Response.json({ error: 'cover-not-found' }, { status: 404 }));

@@ -41,7 +41,13 @@ The secret is already generated in Sites and must be copied only into the schedu
 
 Allowlisted analytics contain only an event name, optional anonymous session ID, locale, and timestamp. Do not place ISBNs, titles, queries, names, emails, phone numbers, message bodies, or free-text notes in analytics. Operational audit events may retain actor and aggregate identifiers according to the documented retention window, but never notification content.
 
-## 7. Public-launch gates
+## 7. Logging and debugging
+
+Server failures emit one-line JSON records to the Sites-managed Worker log stream using the `hana.operations.v1` schema. Records contain only operational fields such as the request ID, normalized route, method, operation, status, duration, safe error code, provider state, event type, attempt number, and aggregate delivery counts. They must never contain names, book metadata, ISBN queries, contact details, OAuth credentials, message content, request bodies, or arbitrary exception messages.
+
+API responses include `x-request-id`; use that value, the route, and the approximate time to correlate a member report with recent Sites Worker logs. Start an investigation with error-only logs, then widen the same time window when successful surrounding requests are needed. Sites logs are a recent operational debugging surface, not permanent audit storage; durable domain history remains in the content-minimal audit tables.
+
+## 8. Public-launch gates
 
 - Validate real Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
 - Validate Korean and English ISBNs against live NLK and Google Books data.

@@ -15,7 +15,16 @@ import { requireActiveMember, unauthorizedResponse } from '@/lib/storage/request
 export async function POST(request: Request) {
   const logContext = requestLogContext(request);
   const respond = (response: Response) => withRequestId(response, logContext);
-  const member = await requireActiveMember(request);
+  let member;
+  try {
+    member = await requireActiveMember(request);
+  } catch (error) {
+    operationalLog('error', 'cover-storage-failed', requestLogFields(logContext, 503, {
+      operation: 'member-lookup',
+      errorCode: safeErrorCode(error, 'database-read-failed'),
+    }));
+    return respond(Response.json({ error: 'cover-storage-failed' }, { status: 503, headers: { 'cache-control': 'no-store' } }));
+  }
   if (!member) return respond(unauthorizedResponse());
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) {

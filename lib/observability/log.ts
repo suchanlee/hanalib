@@ -73,7 +73,7 @@ export function requestLogFields(
 }
 
 export function withRequestId(response: Response, context: Pick<RequestLogContext, 'requestId'>) {
-  response.headers.set('x-request-id', context.requestId);
+  if (!response.headers.has('x-request-id')) response.headers.set('x-request-id', context.requestId);
   return response;
 }
 

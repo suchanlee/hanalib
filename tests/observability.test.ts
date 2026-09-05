@@ -25,6 +25,11 @@ void test('adds the request id to responses so reported errors can be correlated
     requestId: 'a36199690a8e1722',
   });
   assert.equal(response.headers.get('x-request-id'), 'a36199690a8e1722');
+
+  const existing = withRequestId(new Response(null, { headers: { 'x-request-id': 'inner-request-id' } }), {
+    requestId: 'outer-request-id',
+  });
+  assert.equal(existing.headers.get('x-request-id'), 'inner-request-id');
 });
 
 void test('keeps only allowlisted operational fields out of structured logs', () => {
