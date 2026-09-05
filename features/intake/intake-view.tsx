@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent, type Synthe
 import Image from 'next/image';
 import {
   ArrowLeft,
+  Barcode,
   BookOpen,
   Camera,
   Check,
@@ -583,7 +584,12 @@ export function IntakeView() {
       {stage === 'idle' && (
         <div className="space-y-5">
           <section className="pt-3">
-            <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{c.title}</h1>
+            <h1 className="flex items-center gap-2 text-balance text-3xl leading-none font-semibold tracking-tight sm:text-4xl">
+              <span className="grid size-7 shrink-0 place-items-center self-center sm:size-8">
+                <Barcode aria-hidden="true" className="size-6 text-primary sm:size-7" />
+              </span>
+              <span>{c.title}</span>
+            </h1>
             <p className="mt-3 max-w-xl text-pretty leading-7 text-muted-foreground">{c.intro}</p>
           </section>
 

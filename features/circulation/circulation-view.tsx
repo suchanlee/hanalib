@@ -339,12 +339,11 @@ export function CirculationView() {
   return (
     <section className="mx-auto w-full max-w-3xl px-4 pt-5 pb-28 sm:px-6" data-testid="circulation-view">
       <header className="mb-5">
-        <p className="flex items-center gap-1.5 text-xs font-semibold tracking-[0.14em] text-primary uppercase">
-          <Send aria-hidden="true" className="size-3.5" />
-          {t(locale, '함께 읽는 기록', 'Sharing activity')}
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          {t(locale, '대여 관리', 'Borrowing')}
+        <h1 className="flex items-center gap-2 text-2xl leading-none font-semibold tracking-tight">
+          <span className="grid size-6 shrink-0 place-items-center self-center">
+            <Send aria-hidden="true" className="size-5 text-primary" />
+          </span>
+          <span>{t(locale, '대여 관리', 'Borrowing')}</span>
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {t(locale, '요청과 반납 상태를 한곳에서 확인하세요.', 'Keep requests and returns in one place.')}

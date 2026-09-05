@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Filter, Search, SlidersHorizontal, X } from 'lucide-react';
+import { BookOpen, Filter, Search, SlidersHorizontal, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,8 +35,8 @@ function FilterFields({
 
   return (
     <div className="space-y-5">
-      <label className="block space-y-2 text-sm font-medium">
-        <span>{t.ownerFilter}</span>
+      <label className="block text-sm font-medium">
+        <span className="mb-2 block">{t.ownerFilter}</span>
         <NativeSelect
           className={selectClass}
           value={value.ownerId}
@@ -52,8 +52,8 @@ function FilterFields({
         </NativeSelect>
       </label>
 
-      <label className="block space-y-2 text-sm font-medium">
-        <span>{t.statusFilter}</span>
+      <label className="block text-sm font-medium">
+        <span className="mb-2 block">{t.statusFilter}</span>
         <NativeSelect
           className={selectClass}
           value={value.status}
@@ -67,8 +67,8 @@ function FilterFields({
         </NativeSelect>
       </label>
 
-      <label className="block space-y-2 text-sm font-medium">
-        <span>{t.languageFilter}</span>
+      <label className="block text-sm font-medium">
+        <span className="mb-2 block">{t.languageFilter}</span>
         <NativeSelect
           className={selectClass}
           value={value.language}
@@ -131,7 +131,12 @@ export function CatalogView() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6 sm:pt-8" data-testid="catalog-view">
       <section className="mb-6 sm:mb-8">
-        <h1 className="max-w-xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t.title}</h1>
+        <h1 className="flex max-w-xl items-center gap-2 text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">
+          <span className="grid size-7 shrink-0 place-items-center self-center sm:size-8">
+            <BookOpen aria-hidden="true" className="size-6 text-primary sm:size-7" />
+          </span>
+          <span>{t.title}</span>
+        </h1>
       </section>
 
       <section aria-label={state.locale === 'ko' ? '도서 검색과 필터' : 'Book search and filters'}>
