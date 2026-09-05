@@ -1,4 +1,4 @@
-import type { AddBookInput, BorrowRequest, CatalogItem, Loan, Member } from '@/lib/domain/types';
+import type { AddBookInput, BorrowRequest, CatalogItem, Loan, Member, UpdateCatalogItemInput } from '@/lib/domain/types';
 
 export interface LibraryBootstrap {
   profile: Member;
@@ -18,7 +18,7 @@ export interface LibraryRepository {
   getBootstrap(context: Pick<RequestContext, 'actorId' | 'communityId'>): Promise<LibraryBootstrap>;
   listCatalog(context: Pick<RequestContext, 'actorId' | 'communityId'>): Promise<CatalogItem[]>;
   createCatalogItem(context: RequestContext, input: AddBookInput): Promise<CatalogItem>;
-  updateCatalogItem(context: RequestContext, itemId: string, changes: Pick<CatalogItem, 'condition' | 'ownerNotes'>): Promise<CatalogItem>;
+  updateCatalogItem(context: RequestContext, itemId: string, changes: UpdateCatalogItemInput): Promise<CatalogItem>;
   archiveCatalogItem(context: RequestContext, itemId: string): Promise<void>;
   createBorrowRequest(context: RequestContext, itemId: string): Promise<BorrowRequest>;
   cancelBorrowRequest(context: Pick<RequestContext, 'actorId' | 'communityId'>, requestId: string): Promise<BorrowRequest>;

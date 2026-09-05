@@ -89,6 +89,10 @@ export interface AddBookInput {
   provenance: Record<string, string>;
 }
 
+export interface UpdateCatalogItemInput extends Pick<CatalogItem, 'condition' | 'ownerNotes'> {
+  coverAssetId?: string;
+}
+
 export interface HanaAppActions {
   refresh(): Promise<void>;
   signOut(): void;
@@ -98,7 +102,7 @@ export interface HanaAppActions {
   setSearchQuery(query: string): void;
   setFilters(filters: Partial<CatalogFilters>): void;
   addBook(input: AddBookInput): Promise<string>;
-  updateItem(itemId: string, changes: Pick<CatalogItem, 'condition' | 'ownerNotes'>): void;
+  updateItem(itemId: string, changes: UpdateCatalogItemInput): Promise<CatalogItem>;
   archiveItem(itemId: string): void;
   requestBorrow(itemId: string): void;
   cancelRequest(requestId: string): void;

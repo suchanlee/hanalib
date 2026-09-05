@@ -12,6 +12,7 @@ export async function PATCH(request: Request, route: RouteContext) {
     return repository.updateCatalogItem(context, itemId, {
       condition: body.condition as CatalogItem['condition'],
       ownerNotes: typeof body.ownerNotes === 'string' ? body.ownerNotes : undefined,
+      coverAssetId: typeof body.coverAssetId === 'string' ? body.coverAssetId : undefined,
     });
   }, { mutation: true });
 }

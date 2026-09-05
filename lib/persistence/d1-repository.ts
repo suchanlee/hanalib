@@ -9,6 +9,7 @@ import type {
   Member,
   NotificationChannel,
   RequestStatus,
+  UpdateCatalogItemInput,
 } from '../domain/types.ts';
 import { parseIsbn } from '../isbn/isbn.ts';
 import { decryptContact, encryptContact, hashContact } from '../notifications/contact-crypto.ts';
@@ -36,6 +37,13 @@ const CATALOG_SELECT = `
     be.language AS language,
     be.page_count AS pageCount,
     be.description AS description,
+    (
+      SELECT ua.id
+      FROM uploaded_assets ua
+      WHERE ua.catalog_item_id = ci.id AND ua.kind = 'cover'
+      ORDER BY ua.created_at DESC
+      LIMIT 1
+    ) AS coverOverrideAssetId,
     be.cover_source_url AS coverSourceUrl,
     be.cover_storage_path AS coverStoragePath,
     be.cover_tone AS coverTone,
@@ -63,6 +71,7 @@ interface CatalogRow {
   language: string | null;
   pageCount: number | null;
   description: string | null;
+  coverOverrideAssetId: string | null;
   coverSourceUrl: string | null;
   coverStoragePath: string | null;
   coverTone: string;
@@ -217,11 +226,21 @@ function mapCatalogItem(row: CatalogRow): CatalogItem {
       language,
       pageCount: row.pageCount ?? undefined,
       description: row.description ?? undefined,
-      coverUrl: row.coverSourceUrl ?? (row.coverStoragePath ? `/api/covers/${encodeURIComponent(row.coverStoragePath)}` : undefined),
+      coverUrl: row.coverOverrideAssetId
+        ? `/api/covers/${encodeURIComponent(row.coverOverrideAssetId)}`
+        : row.coverSourceUrl ?? (row.coverStoragePath ? `/api/covers/${encodeURIComponent(row.coverStoragePath)}` : undefined),
       coverTone,
       provenance: parseJson<Record<string, string>>(row.provenanceJson, {}),
     },
   };
+}
+
+const coverAssetIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function coverAssetIdFromUrl(value?: string) {
+  if (!value) return undefined;
+  const match = value.match(/^\/api\/covers\/([0-9a-f-]{36})$/i);
+  return match && coverAssetIdPattern.test(match[1]) ? match[1] : undefined;
 }
 
 function requestStatus(value: string): RequestStatus {
@@ -470,10 +489,24 @@ export class D1LibraryRepository implements LibraryRepository {
       throw libraryError('invalid-input', 'Published year must be a four-digit year.');
     }
 
+    const uploadedCoverId = coverAssetIdFromUrl(input.coverUrl);
+    if (input.coverUrl?.startsWith('/api/covers/') && !uploadedCoverId) {
+      throw libraryError('invalid-input', 'The uploaded cover reference is invalid.');
+    }
+    if (uploadedCoverId) {
+      const cover = await this.db.prepare(`
+        SELECT id
+        FROM uploaded_assets
+        WHERE id = ? AND owner_id = ? AND kind = 'cover' AND catalog_item_id IS NULL
+        LIMIT 1
+      `).bind(uploadedCoverId, context.actorId).first<{ id: string }>();
+      if (!cover) throw libraryError('invalid-input', 'The uploaded cover is unavailable.');
+    }
+
     const editionId = id('edition');
     const itemId = id('item');
     const now = this.now().getTime();
-    const results = await this.db.batch([
+    const statements = [
       this.db.prepare(`
         INSERT INTO book_editions (
           id, isbn13, title, title_en, authors_json, authors_en_json, publisher,
@@ -488,7 +521,7 @@ export class D1LibraryRepository implements LibraryRepository {
           published_on = excluded.published_on,
           language = excluded.language,
           page_count = excluded.page_count,
-          cover_source_url = excluded.cover_source_url,
+          cover_source_url = COALESCE(excluded.cover_source_url, book_editions.cover_source_url),
           field_provenance_json = excluded.field_provenance_json,
           resolved_at = excluded.resolved_at
       `).bind(
@@ -501,7 +534,7 @@ export class D1LibraryRepository implements LibraryRepository {
         String(input.publishedYear),
         input.language,
         input.pageCount ?? null,
-        input.coverUrl ?? null,
+        uploadedCoverId ? null : input.coverUrl ?? null,
         coverToneFor(input.title),
         JSON.stringify(input.provenance),
         now,
@@ -525,8 +558,17 @@ export class D1LibraryRepository implements LibraryRepository {
         now,
         parsedIsbn.isbn13,
       ),
-    ]);
+    ];
+    if (uploadedCoverId) {
+      statements.push(this.db.prepare(`
+        UPDATE uploaded_assets
+        SET catalog_item_id = ?
+        WHERE id = ? AND owner_id = ? AND kind = 'cover' AND catalog_item_id IS NULL
+      `).bind(itemId, uploadedCoverId, context.actorId));
+    }
+    const results = await this.db.batch(statements);
     if (affected(results[1]) !== 1) throw libraryError('conflict', 'The book could not be added.');
+    if (uploadedCoverId && affected(results[2]) !== 1) throw libraryError('conflict', 'The cover could not be attached.');
     const item = await this.catalogItem(itemId, context.communityId);
     if (!item) throw libraryError('not-found', 'The newly created book could not be loaded.');
     return mapCatalogItem(item);
@@ -535,11 +577,33 @@ export class D1LibraryRepository implements LibraryRepository {
   async updateCatalogItem(
     context: RequestContext,
     itemId: string,
-    changes: Pick<CatalogItem, 'condition' | 'ownerNotes'>,
+    changes: UpdateCatalogItemInput,
   ) {
     await this.assertActiveMember(context);
     if (!validCondition(changes.condition)) throw libraryError('invalid-input', 'Invalid book condition.');
-    const result = await this.db.prepare(`
+    const ownedItem = await this.db.prepare(`
+      SELECT id
+      FROM catalog_items
+      WHERE id = ? AND community_id = ? AND owner_id = ? AND archived_at IS NULL
+      LIMIT 1
+    `).bind(itemId, context.communityId, context.actorId).first<{ id: string }>();
+    if (!ownedItem) throw libraryError('not-found', 'Only the owner can edit an active listing.');
+
+    if (changes.coverAssetId !== undefined) {
+      if (!coverAssetIdPattern.test(changes.coverAssetId)) {
+        throw libraryError('invalid-input', 'The uploaded cover reference is invalid.');
+      }
+      const cover = await this.db.prepare(`
+        SELECT id
+        FROM uploaded_assets
+        WHERE id = ? AND owner_id = ? AND kind = 'cover'
+          AND (catalog_item_id IS NULL OR catalog_item_id = ?)
+        LIMIT 1
+      `).bind(changes.coverAssetId, context.actorId, itemId).first<{ id: string }>();
+      if (!cover) throw libraryError('invalid-input', 'The uploaded cover is unavailable.');
+    }
+
+    const statements = [this.db.prepare(`
       UPDATE catalog_items
       SET condition = ?, owner_notes = ?, version = version + 1, updated_at = ?
       WHERE id = ? AND community_id = ? AND owner_id = ? AND archived_at IS NULL
@@ -550,8 +614,25 @@ export class D1LibraryRepository implements LibraryRepository {
       itemId,
       context.communityId,
       context.actorId,
-    ).run();
-    if (affected(result) !== 1) throw libraryError('not-found', 'Only the owner can edit an active listing.');
+    )];
+    if (changes.coverAssetId) {
+      statements.push(
+        this.db.prepare(`
+          UPDATE uploaded_assets
+          SET catalog_item_id = NULL
+          WHERE catalog_item_id = ? AND owner_id = ? AND kind = 'cover' AND id <> ?
+        `).bind(itemId, context.actorId, changes.coverAssetId),
+        this.db.prepare(`
+          UPDATE uploaded_assets
+          SET catalog_item_id = ?
+          WHERE id = ? AND owner_id = ? AND kind = 'cover'
+            AND (catalog_item_id IS NULL OR catalog_item_id = ?)
+        `).bind(itemId, changes.coverAssetId, context.actorId, itemId),
+      );
+    }
+    const results = await this.db.batch(statements);
+    if (affected(results[0]) !== 1) throw libraryError('not-found', 'Only the owner can edit an active listing.');
+    if (changes.coverAssetId && affected(results[2]) !== 1) throw libraryError('conflict', 'The cover could not be attached.');
     const item = await this.catalogItem(itemId, context.communityId);
     if (!item) throw libraryError('not-found', 'Book not found.');
     return mapCatalogItem(item);

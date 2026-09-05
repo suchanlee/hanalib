@@ -183,16 +183,19 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
         throw error;
       }
     },
-    updateItem(itemId, changes) {
-      void apiData<CatalogItem>(`/api/catalog/${encodeURIComponent(itemId)}`, mutationInit('PATCH', changes))
-        .then((item) => {
-          setState((current) => ({
-            ...current,
-            items: current.items.map((candidate) => candidate.id === item.id ? item : candidate),
-            announcement: current.locale === 'ko' ? '도서 정보를 저장했어요.' : 'Book details saved.',
-          }));
-        })
-        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
+    async updateItem(itemId, changes) {
+      try {
+        const item = await apiData<CatalogItem>(`/api/catalog/${encodeURIComponent(itemId)}`, mutationInit('PATCH', changes));
+        setState((current) => ({
+          ...current,
+          items: current.items.map((candidate) => candidate.id === item.id ? item : candidate),
+          announcement: current.locale === 'ko' ? '도서 정보를 저장했어요.' : 'Book details saved.',
+        }));
+        return item;
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
     },
     archiveItem(itemId) {
       void apiData<{ id: string; archived: boolean }>(`/api/catalog/${encodeURIComponent(itemId)}`, mutationInit('DELETE'))

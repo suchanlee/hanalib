@@ -29,6 +29,7 @@ import type { AddBookInput, AppLocale, CatalogItem } from '@/lib/domain/types';
 import { highResolutionCoverUrl } from '@/lib/isbn/cover-url';
 import { parseIsbn } from '@/lib/isbn/isbn';
 import { ResolvedBookProvider, type StitchedBookMetadata } from '@/lib/isbn/providers';
+import { uploadMemberCover, validCoverFile } from '@/lib/storage/client-cover';
 import type { IScannerControls } from '@zxing/browser';
 
 type IntakeStage = 'idle' | 'permission' | 'scanning' | 'lookup' | 'confirm' | 'error' | 'success';
@@ -224,26 +225,6 @@ function blankDraft(isbn13: string, locale: AppLocale): IntakeDraft {
 
 function barcodeDetectorConstructor() {
   return (globalThis as typeof globalThis & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
-}
-
-interface UploadedCover {
-  assetId: string;
-  coverUrl: string;
-  byteSize: number;
-  contentType: string;
-}
-
-async function uploadMemberCover(file: File, memberId: string) {
-  const headers = new Headers({ 'content-type': file.type, 'x-file-name': file.name });
-  if (process.env.NODE_ENV !== 'production') headers.set('x-hana-demo-member-id', memberId);
-  const response = await fetch('/api/covers', {
-    method: 'POST',
-    credentials: 'same-origin',
-    headers,
-    body: file,
-  });
-  if (!response.ok) throw new Error(`Cover upload failed (${response.status}).`);
-  return await response.json() as UploadedCover;
 }
 
 function ManualIsbnForm({
@@ -527,7 +508,7 @@ export function IntakeView() {
   const handleCoverUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) {
+    if (!validCoverFile(file)) {
       setCoverError(c.coverError);
       event.target.value = '';
       return;

@@ -210,6 +210,55 @@ void test('catalog intake accepts editions without a named author or publisher',
   assert.equal(database.batches.length, 1);
 });
 
+void test('an owner can attach a private cover override without changing the shared edition', async () => {
+  const coverAssetId = '123e4567-e89b-42d3-a456-426614174000';
+  const database = new RecordedD1((sql) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('FROM catalog_items') && !sql.includes('INNER JOIN book_editions')) return { id: 'item-1' };
+    if (sql.includes('INNER JOIN book_editions')) {
+      return {
+        itemId: 'item-1', ownerId: 'borrower', itemStatus: 'available', itemCondition: 'good',
+        ownerNotes: 'Front porch pickup', itemCreatedAt: fixedNow.getTime(), editionId: 'edition-1', isbn10: null,
+        isbn13: '9788936434267', title: '아몬드', titleEn: null, authorsJson: '["손원평"]', authorsEnJson: '[]',
+        publisher: '창비', publishedOn: '2017', language: 'ko', pageCount: 263, description: null,
+        coverOverrideAssetId: coverAssetId, coverSourceUrl: 'https://provider.test/cover.jpg', coverStoragePath: null,
+        coverTone: 'amber', provenanceJson: '{"coverUrl":"google-books"}',
+      };
+    }
+    if (sql.includes('FROM uploaded_assets')) return { id: coverAssetId };
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  const item = await repository.updateCatalogItem(context, 'item-1', {
+    condition: 'good', ownerNotes: 'Front porch pickup', coverAssetId,
+  });
+
+  assert.equal(item.edition.coverUrl, `/api/covers/${coverAssetId}`);
+  assert.equal(database.batches.length, 1);
+  assert.equal(database.batches[0].length, 3);
+  assert.ok(database.batches[0].some((statement) => statement.sql.includes('SET catalog_item_id = NULL')));
+  assert.ok(database.batches[0].some((statement) => statement.sql.includes('SET catalog_item_id = ?')));
+});
+
+void test('an owner cannot attach another member’s uploaded cover', async () => {
+  const database = new RecordedD1((sql) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('FROM catalog_items')) return { id: 'item-1' };
+    if (sql.includes('FROM uploaded_assets')) return null;
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  await assert.rejects(
+    repository.updateCatalogItem(context, 'item-1', {
+      condition: 'good', coverAssetId: '123e4567-e89b-42d3-a456-426614174000',
+    }),
+    (error: unknown) => error instanceof LibraryError && error.code === 'invalid-input',
+  );
+  assert.equal(database.batches.length, 0);
+});
+
 void test('all repository operations reject inactive community actors before preparing mutations', async () => {
   const database = new RecordedD1(() => null);
   const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });

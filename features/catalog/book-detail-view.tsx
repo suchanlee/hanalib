@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Hash, Languages, Library, Pencil, Trash2, UserRound } from 'lucide-react';
+import { useEffect, useState, type ChangeEvent } from 'react';
+import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Hash, ImagePlus, Languages, Library, Pencil, Trash2, UserRound } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +30,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useHanaApp } from '@/features/app/app-context';
 import type { CatalogItem } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
+import { uploadMemberCover, validCoverFile } from '@/lib/storage/client-cover';
 import { BookCover } from './book-cover';
 import { catalogCopy, conditionLabel, languageLabel, statusLabel } from './catalog-copy';
 
@@ -43,6 +44,14 @@ export function BookDetailView() {
   const [condition, setCondition] = useState<CatalogItem['condition']>(item?.condition ?? 'good');
   const [ownerNotes, setOwnerNotes] = useState(item?.ownerNotes ?? '');
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [coverFile, setCoverFile] = useState<File>();
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState('');
+  const [coverError, setCoverError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => () => {
+    if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+  }, [coverPreviewUrl]);
 
   if (!item || item.status === 'archived') {
     return (
@@ -65,14 +74,52 @@ export function BookDetailView() {
   const itemId = item.id;
   const itemStatus = item.status;
 
-  function saveListing() {
+  async function saveListing() {
     if (!isOwner) {
       setFeedback({ tone: 'error', text: state.locale === 'ko' ? '소유자만 이 도서를 수정할 수 있어요.' : 'Only the owner can edit this listing.' });
       return;
     }
-    actions.updateItem(itemId, { condition, ownerNotes: ownerNotes.trim() || undefined });
-    setEditOpen(false);
-    setFeedback({ tone: 'success', text: t.saved });
+
+    setIsSaving(true);
+    setCoverError('');
+    let coverAssetId: string | undefined;
+    if (coverFile) {
+      try {
+        coverAssetId = (await uploadMemberCover(coverFile, state.currentUserId)).assetId;
+      } catch {
+        setCoverError(t.coverUploadFailed);
+        setIsSaving(false);
+        return;
+      }
+    }
+    try {
+      await actions.updateItem(itemId, {
+        condition,
+        ownerNotes: ownerNotes.trim() || undefined,
+        coverAssetId,
+      });
+      setCoverFile(undefined);
+      setCoverPreviewUrl('');
+      setEditOpen(false);
+      setFeedback({ tone: 'success', text: t.saved });
+    } catch {
+      setCoverError(state.locale === 'ko' ? '변경사항을 저장하지 못했어요.' : 'We couldn’t save your changes.');
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  function selectCover(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!validCoverFile(file)) {
+      setCoverError(t.coverError);
+      event.target.value = '';
+      return;
+    }
+    setCoverFile(file);
+    setCoverPreviewUrl(URL.createObjectURL(file));
+    setCoverError('');
   }
 
   function removeListing() {
@@ -194,7 +241,7 @@ export function BookDetailView() {
 
             {isOwner ? (
               <>
-                <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <Dialog open={editOpen} onOpenChange={(open) => { if (!isSaving) setEditOpen(open); }}>
                   <DialogTrigger
                     render={
                       <Button
@@ -205,6 +252,9 @@ export function BookDetailView() {
                         onClick={() => {
                           setCondition(item.condition);
                           setOwnerNotes(item.ownerNotes ?? '');
+                          setCoverFile(undefined);
+                          setCoverPreviewUrl('');
+                          setCoverError('');
                           setEditOpen(true);
                         }}
                       />
@@ -218,7 +268,30 @@ export function BookDetailView() {
                       <DialogTitle>{t.editTitle}</DialogTitle>
                       <DialogDescription>{t.editHelp}</DialogDescription>
                     </DialogHeader>
-                    <form id="edit-listing-form" className="space-y-4" onSubmit={(event) => { event.preventDefault(); saveListing(); }}>
+                    <form id="edit-listing-form" className="space-y-4" onSubmit={(event) => { event.preventDefault(); void saveListing(); }}>
+                      <div className="grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4 rounded-2xl bg-muted/60 p-3">
+                        <BookCover
+                          edition={coverPreviewUrl ? { ...item.edition, coverUrl: coverPreviewUrl } : item.edition}
+                          className="aspect-[2/3] w-[72px] rounded-xl"
+                        />
+                        <div className="min-w-0">
+                          <Label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border bg-background px-3 text-sm font-medium">
+                            <ImagePlus aria-hidden="true" className="size-4" />
+                            {t.replaceCover}
+                            <input
+                              accept="image/jpeg,image/png,image/webp"
+                              capture="environment"
+                              className="sr-only"
+                              data-testid="edit-cover-upload"
+                              disabled={isSaving}
+                              onChange={selectCover}
+                              type="file"
+                            />
+                          </Label>
+                          <p className="mt-2 text-xs leading-5 text-muted-foreground">{t.coverHelp}</p>
+                        </div>
+                      </div>
+                      {coverError ? <p className="text-sm text-destructive" role="alert">{coverError}</p> : null}
                       <div className="space-y-2">
                         <Label htmlFor="item-condition">{t.condition}</Label>
                         <select
@@ -239,8 +312,8 @@ export function BookDetailView() {
                       </div>
                     </form>
                     <DialogFooter>
-                      <Button type="button" variant="outline" className="h-11" onClick={() => setEditOpen(false)}>{t.cancel}</Button>
-                      <Button type="submit" form="edit-listing-form" className="h-11" data-testid="save-listing">{t.save}</Button>
+                      <Button type="button" variant="outline" className="h-11" disabled={isSaving} onClick={() => setEditOpen(false)}>{t.cancel}</Button>
+                      <Button type="submit" form="edit-listing-form" className="h-11" disabled={isSaving} data-testid="save-listing">{isSaving ? t.saving : t.save}</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>

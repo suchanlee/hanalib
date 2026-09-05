@@ -10,6 +10,7 @@ import {
   sniffCoverContentType,
   validateCoverUpload,
 } from '../lib/storage/covers.ts';
+import { validCoverFile } from '../lib/storage/client-cover.ts';
 
 const jpeg = Uint8Array.from([0xff, 0xd8, 0xff, 0xdb, 0x00]);
 const png = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
@@ -26,6 +27,12 @@ void test('rejects spoofed, executable, and oversized cover payloads', () => {
   assert.throws(() => validateCoverUpload('image/jpeg', png), (error: unknown) => error instanceof CoverValidationError && error.code === 'content-mismatch');
   assert.throws(() => validateCoverUpload('image/svg+xml', new TextEncoder().encode('<svg onload="alert(1)"/>')), (error: unknown) => error instanceof CoverValidationError && error.code === 'unsupported-type');
   assert.throws(() => validateCoverUpload('image/jpeg', new Uint8Array(MAX_COVER_BYTES + 1)), (error: unknown) => error instanceof CoverValidationError && error.code === 'file-too-large');
+});
+
+void test('accepts only browser cover files supported by the server upload contract', () => {
+  assert.equal(validCoverFile(new File([jpeg], 'cover.jpg', { type: 'image/jpeg' })), true);
+  assert.equal(validCoverFile(new File([jpeg], 'cover.gif', { type: 'image/gif' })), false);
+  assert.equal(validCoverFile(new File([new Uint8Array(MAX_COVER_BYTES + 1)], 'huge.jpg', { type: 'image/jpeg' })), false);
 });
 
 void test('uses randomized, partitioned object keys and sanitizes supplied filenames', () => {
