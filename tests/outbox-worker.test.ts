@@ -42,3 +42,34 @@ void test('rejects malformed or unsupported outbox events', () => {
   assert.throws(() => renderOutboxMessage({ eventType: 'unknown', locale: 'en', payloadJson: '{}' }));
   assert.throws(() => renderOutboxMessage({ eventType: 'borrow_requested', locale: 'en', payloadJson: '{}' }));
 });
+
+void test('renders actionable hold offers and reminders with the book cover', () => {
+  const offer = renderOutboxMessage({
+    eventType: 'hold_available',
+    locale: 'en',
+    payloadJson: JSON.stringify({
+      bookTitle: 'Small Things Like These',
+      recipientName: 'Amy',
+      expiresAt: '2026-09-07T17:00:00.000Z',
+      offerUrl: 'https://example.com/borrowing?hold=hold-1',
+      coverUrl: 'https://covers.example/small-things.jpg',
+    }),
+  });
+  assert.match(offer.subject, /ready for you/);
+  assert.equal(offer.primaryUrl, 'https://example.com/borrowing?hold=hold-1');
+  assert.equal(offer.imageUrl, 'https://covers.example/small-things.jpg');
+  assert.deepEqual(offer.actions, [{ label: 'View my offer', url: 'https://example.com/borrowing?hold=hold-1' }]);
+
+  const reminder = renderOutboxMessage({
+    eventType: 'hold_offer_reminder',
+    locale: 'ko',
+    payloadJson: JSON.stringify({
+      bookTitle: '아몬드',
+      recipientName: '지우',
+      expiresAt: '2026-09-07T17:00:00.000Z',
+      offerUrl: 'https://example.com/borrowing?hold=hold-2',
+    }),
+  });
+  assert.match(reminder.subject, /알림/);
+  assert.match(reminder.text, /다음 분에게 넘겨주세요/);
+});

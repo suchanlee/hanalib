@@ -185,6 +185,51 @@ void test('accepting a request creates the loan, day-7 check, and both outbox ev
   assert.deepEqual(Object.keys(JSON.parse(String(due.values[2]))).sort(), ['actorName', 'bookTitle', 'recipientName', 'returnUrl']);
 });
 
+void test('claiming an offered hold inserts the request before attaching its foreign key', async () => {
+  const database = new RecordedD1((sql, values) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('FROM loan_requests') && sql.includes('idempotency_key = ?')) return null;
+    if (sql.includes('FROM holds h') && sql.includes('INNER JOIN profiles owner')) {
+      return {
+        holdId: 'hold-1',
+        itemId: 'item-1',
+        holdStatus: 'offered',
+        holdExpiresAt: new Date('2026-09-06T17:00:00.000Z').getTime(),
+        ownerId: 'owner',
+        itemStatus: 'held',
+        bookTitle: '아몬드',
+        coverSourceUrl: 'https://covers.example/almond.jpg',
+        ownerDisplayName: 'Owner',
+        ownerDisplayNameKo: '소유자',
+        ownerLocale: 'ko',
+        actorDisplayName: 'Holder',
+        actorDisplayNameKo: '대기자',
+      };
+    }
+    if (sql.includes('FROM loan_requests lr')) {
+      return {
+        id: String(values[0]),
+        catalogItemId: 'item-1',
+        requesterId: 'borrower',
+        status: 'pending',
+        requestedAt: fixedNow.getTime(),
+        expiresAt: new Date('2026-09-06T17:00:00.000Z').getTime(),
+      };
+    }
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, {
+    now: () => fixedNow,
+    baseUrl: 'https://library.example',
+  });
+
+  await repository.claimHold(context, 'hold-1');
+  const batch = database.batches[0];
+  assert.match(batch[0].sql, /INSERT INTO loan_requests/);
+  assert.match(batch[1].sql, /UPDATE holds/);
+  assert.ok(batch[2].sql.includes("'borrow_requested'"));
+});
+
 void test('catalog intake accepts editions without a named author or publisher', async () => {
   const database = new RecordedD1((sql, values) => {
     if (sql.includes('SELECT 1 AS active')) return { active: 1 };
