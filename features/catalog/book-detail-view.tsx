@@ -107,6 +107,7 @@ export function BookDetailView() {
   const pendingOwnerRequests = state.requests.filter((request) => request.catalogItemId === item.id && request.status === 'pending');
   const activeLoan = state.loans.find((loan) => loan.catalogItemId === item.id && loan.status === 'active');
   const borrower = activeLoan ? state.members.find((member) => member.id === activeLoan.borrowerId) : undefined;
+  const isCurrentBorrower = activeLoan?.borrowerId === state.currentUserId;
   const canReturn = Boolean(activeLoan && (activeLoan.ownerId === state.currentUserId || activeLoan.borrowerId === state.currentUserId));
   const ownHold = state.holds.find((hold) => hold.catalogItemId === item.id && (hold.status === 'queued' || hold.status === 'offered'));
   const holdCount = state.holdCounts[item.id] ?? 0;
@@ -364,7 +365,7 @@ export function BookDetailView() {
                 </div>
                 <Button type="button" variant="outline" className="h-12 sm:col-span-2" onClick={cancelRequest} data-testid="cancel-borrow-request">{t.cancelRequest}</Button>
               </>
-            ) : ownHold?.status === 'offered' ? (
+            ) : !isCurrentBorrower && ownHold?.status === 'offered' ? (
               <div className="rounded-2xl border border-primary/30 bg-secondary/60 p-4 sm:col-span-2" data-testid="hold-offer">
                 <div className="flex items-start gap-3">
                   <Clock3 className="mt-0.5 size-5 shrink-0 text-primary" />
@@ -397,7 +398,7 @@ export function BookDetailView() {
                   </Button>
                 </div>
               </div>
-            ) : ownHold?.status === 'queued' ? (
+            ) : !isCurrentBorrower && ownHold?.status === 'queued' ? (
               <div className="rounded-2xl border bg-muted/40 p-4 sm:col-span-2" data-testid="hold-queued">
                 <p className="font-semibold">{t.waitlistPosition(ownHold.position, holdCount)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t.joinWaitlistHelp}</p>
@@ -405,7 +406,7 @@ export function BookDetailView() {
                   {t.leaveWaitlist}
                 </Button>
               </div>
-            ) : !isOwner && activeLoan?.borrowerId !== state.currentUserId && item.status !== 'available' ? (
+            ) : !isOwner && !isCurrentBorrower && item.status !== 'available' ? (
               <div className="rounded-2xl border bg-muted/40 p-4 sm:col-span-2">
                 <p className="font-semibold">{t.waitingCount(holdCount)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t.joinWaitlistHelp}</p>

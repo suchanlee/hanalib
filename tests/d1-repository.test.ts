@@ -176,7 +176,8 @@ void test('accepting a request creates the loan, day-7 check, and both outbox ev
   assert.equal(result.loan?.nextCheckAt, '2026-09-11T17:00:00.000Z');
   assert.equal(database.batches.length, 1);
   const batch = database.batches[0];
-  assert.equal(batch.length, 7);
+  assert.equal(batch.length, 8);
+  assert.ok(batch.some((statement) => statement.sql.includes("UPDATE holds") && statement.sql.includes("status = 'canceled'")));
   assert.ok(batch.some((statement) => statement.sql.includes('INSERT INTO return_checkins')));
   assert.ok(batch.some((statement) => statement.sql.includes("'borrow_accepted'")));
   const due = batch.find((statement) => statement.sql.includes("'return_check_due'"));

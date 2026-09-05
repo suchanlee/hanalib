@@ -1383,6 +1383,11 @@ export class D1LibraryRepository implements LibraryRepository {
         WHERE catalog_item_id = ? AND id <> ? AND status = 'pending'
       `).bind(now.getTime(), context.actorId, info.catalogItemId, requestId),
       this.db.prepare(`
+        UPDATE holds
+        SET status = 'canceled'
+        WHERE catalog_item_id = ? AND member_id = ? AND status IN ('queued', 'offered')
+      `).bind(info.catalogItemId, info.requesterId),
+      this.db.prepare(`
         INSERT INTO loans (
           id, community_id, catalog_item_id, request_id, owner_id, borrower_id,
           status, started_at, next_check_at, version
@@ -1415,7 +1420,7 @@ export class D1LibraryRepository implements LibraryRepository {
         WHERE l.id = ? AND l.status = 'active'
       `).bind(id('event'), locale(info.requesterLocale), JSON.stringify(returnPayload), loanId),
     ]);
-    if (affected(results[0]) !== 1 || affected(results[1]) !== 1 || affected(results[3]) !== 1 || affected(results[4]) !== 1 || affected(results[5]) !== 1 || affected(results[6]) !== 1) {
+    if (affected(results[0]) !== 1 || affected(results[1]) !== 1 || affected(results[4]) !== 1 || affected(results[5]) !== 1 || affected(results[6]) !== 1 || affected(results[7]) !== 1) {
       throw libraryError('conflict', 'The request could not be accepted.');
     }
     const [request, loan] = await Promise.all([
