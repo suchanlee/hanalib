@@ -1,6 +1,6 @@
 'use client';
 
-import { Globe2, LockKeyhole, MessageCircle, UsersRound } from 'lucide-react';
+import { Globe2, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -56,7 +56,7 @@ export function AuthView() {
       <div aria-hidden="true" className="absolute -top-24 -right-32 -z-10 size-80 rounded-full bg-primary/12 blur-3xl" />
       <div aria-hidden="true" className="absolute -bottom-32 -left-32 -z-10 size-80 rounded-full bg-amber-300/15 blur-3xl" />
 
-      <div className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-md flex-col justify-between gap-10">
+      <div className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-md flex-col gap-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 font-semibold tracking-tight">
             <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
@@ -75,7 +75,7 @@ export function AuthView() {
           </Button>
         </div>
 
-        <section className="space-y-7">
+        <section className="my-auto space-y-7">
           <div className="space-y-3">
             <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
               {ko ? '우리 동네 책장' : 'Our neighborhood shelf'}
@@ -90,77 +90,52 @@ export function AuthView() {
             </p>
           </div>
 
-          <div className="grid gap-3 rounded-3xl border bg-card/80 p-4 shadow-sm backdrop-blur">
-            <div className="flex gap-3">
-              <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-secondary text-secondary-foreground">
-                <UsersRound aria-hidden="true" className="size-4" />
-              </span>
-              <div>
-                <p className="font-medium">{ko ? '누구나 가입 가능' : 'Open registration'}</p>
-                <p className="mt-0.5 text-sm leading-5 text-muted-foreground">
-                  {ko ? '카카오 계정으로 출시 커뮤니티에 바로 가입해요.' : 'Join the launch community with your Kakao account.'}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-secondary text-secondary-foreground">
-                <LockKeyhole aria-hidden="true" className="size-4" />
-              </span>
-              <div>
-                <p className="font-medium">{ko ? '회원 전용 도서 목록' : 'Members-only catalog'}</p>
-                <p className="mt-0.5 text-sm leading-5 text-muted-foreground">
-                  {ko ? '로그인한 활성 회원만 도서와 소유자 정보를 볼 수 있어요.' : 'Only signed-in active members can view books and owners.'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section aria-label={ko ? '로그인' : 'Sign in'} className="space-y-3">
-          <Button
-            className="h-12 w-full rounded-xl bg-[#FEE500] text-base font-semibold text-[#191919] hover:bg-[#F5DC00]"
-            data-testid="auth-kakao"
-            disabled={providers?.kakao !== true}
-            onClick={beginSignIn}
-          >
-            <MessageCircle aria-hidden="true" className="size-5 fill-current" />
-            {ko ? '카카오로 계속' : 'Continue with Kakao'}
-          </Button>
-          {providers && !providers.kakao && (
-            <output className="block px-2 text-center text-xs leading-5 text-muted-foreground" data-testid="auth-provider-status">
-              {ko
-                ? '로그인 연결을 준비 중이에요. 운영자가 제공자 설정을 완료한 뒤 이용할 수 있어요.'
-                : 'Sign-in setup is still in progress. Access will open after the provider configuration is complete.'}
-            </output>
-          )}
-          {providers?.demo && (
-            <div className="rounded-xl border border-dashed p-3 text-center" data-testid="auth-demo-note">
-              <p className="text-xs leading-5 text-muted-foreground">
+          <div aria-label={ko ? '로그인' : 'Sign in'} className="space-y-3" role="region">
+            <Button
+              className="h-12 w-full rounded-xl bg-[#FEE500] text-base font-semibold text-[#191919] hover:bg-[#F5DC00]"
+              data-testid="auth-kakao"
+              disabled={providers?.kakao !== true}
+              onClick={beginSignIn}
+            >
+              <MessageCircle aria-hidden="true" className="size-5 fill-current" />
+              {ko ? '카카오로 계속' : 'Continue with Kakao'}
+            </Button>
+            {providers && !providers.kakao && (
+              <output className="block px-2 text-center text-xs leading-5 text-muted-foreground" data-testid="auth-provider-status">
                 {ko
-                  ? '개발 모드가 켜져 있어요. 아래 계정은 로컬 미리보기에서만 사용할 수 있습니다.'
-                  : 'Development mode is enabled. This account is available only in local preview.'}
-              </p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <Button data-testid="auth-demo-owner" onClick={() => void demoSignIn('owner')} size="sm" variant="secondary">
-                  {ko ? '소유자로 계속' : 'Continue as owner'}
-                </Button>
-                <Button data-testid="auth-demo-borrower" onClick={() => void demoSignIn('borrower')} size="sm" variant="outline">
-                  {ko ? '대여자로 계속' : 'Continue as borrower'}
-                </Button>
+                  ? '로그인 연결을 준비 중이에요. 운영자가 제공자 설정을 완료한 뒤 이용할 수 있어요.'
+                  : 'Sign-in setup is still in progress. Access will open after the provider configuration is complete.'}
+              </output>
+            )}
+            {providers?.demo && (
+              <div className="rounded-xl border border-dashed p-3 text-center" data-testid="auth-demo-note">
+                <p className="text-xs leading-5 text-muted-foreground">
+                  {ko
+                    ? '개발 모드가 켜져 있어요. 아래 계정은 로컬 미리보기에서만 사용할 수 있습니다.'
+                    : 'Development mode is enabled. This account is available only in local preview.'}
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <Button data-testid="auth-demo-owner" onClick={() => void demoSignIn('owner')} size="sm" variant="secondary">
+                    {ko ? '소유자로 계속' : 'Continue as owner'}
+                  </Button>
+                  <Button data-testid="auth-demo-borrower" onClick={() => void demoSignIn('borrower')} size="sm" variant="outline">
+                    {ko ? '대여자로 계속' : 'Continue as borrower'}
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-          <p className="px-2 text-center text-xs leading-5 text-muted-foreground">
-            {ko ? '계속하면 ' : 'By continuing, you agree to the '}
-            <Link className="underline underline-offset-4 hover:text-foreground" href="/terms">
-              {ko ? '이용약관' : 'Terms'}
-            </Link>
-            {ko ? '과 ' : ' and acknowledge the '}
-            <Link className="underline underline-offset-4 hover:text-foreground" href="/privacy">
-              {ko ? '개인정보 처리방침' : 'Privacy Policy'}
-            </Link>
-            {ko ? '에 동의합니다.' : '.'}
-          </p>
+            )}
+            <p className="px-2 text-center text-xs leading-5 text-muted-foreground">
+              {ko ? '계속하면 ' : 'By continuing, you agree to the '}
+              <Link className="underline underline-offset-4 hover:text-foreground" href="/terms">
+                {ko ? '이용약관' : 'Terms'}
+              </Link>
+              {ko ? '과 ' : ' and acknowledge the '}
+              <Link className="underline underline-offset-4 hover:text-foreground" href="/privacy">
+                {ko ? '개인정보 처리방침' : 'Privacy Policy'}
+              </Link>
+              {ko ? '에 동의합니다.' : '.'}
+            </p>
+          </div>
         </section>
       </div>
     </main>
