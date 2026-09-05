@@ -65,3 +65,76 @@ The copied `Report` field distinguishes a server acknowledgment from a report th
 - Complete physical iOS Safari and Android Chrome camera tests; the automated browser cannot prove camera permission UX on real hardware.
 - Review keyboard/screen-reader behavior, backup/restore, retention/deletion, abuse response, and monitoring.
 - Confirm production demo auth and ISBN fixtures remain disabled, then change the Sites audience from owner-private to public.
+
+## 9. Repeatable Sites release
+
+Use this sequence only after the user explicitly asks to deploy. It publishes the application Worker and assets to the existing public Sites project. It does not recreate the Site, change its audience, replace environment variables, or redeploy the separate notification-scheduler Worker.
+
+### 9.1 Validate and commit once
+
+Run these checks from the repository root before touching production:
+
+```bash
+git status --short
+git diff --check
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
+
+If there are intended uncommitted changes, stage only their exact paths and commit them. Do not include unrelated work. Then require a clean worktree and capture the full commit SHA:
+
+```bash
+git status --short
+git rev-parse --verify HEAD
+```
+
+The build may be reused only when it completed successfully for that exact unchanged source. Otherwise build once here; do not rebuild between packaging and version creation. If `db/schema.ts` changed, generate and inspect a new immutable migration before validation.
+
+### 9.2 Publish the exact commit through Sites
+
+The Sites project ID is the opaque `project_id` in `.openai/hosting.json`. Perform these actions in order because every later action consumes an ID produced by an earlier one:
+
+1. Call Sites `get_site` once. Confirm that the project is active, the current user may publish, and the existing access mode is still `public`. Do not change access as part of a release.
+2. Call `create_source_repository_write_credential` for the same project. The result is short-lived; never save its token in a file, remote URL, Git configuration, log, or user-facing output.
+3. Push `HEAD` to the credential's returned branch and remote using its per-command HTTP authorization header. The existing `sites` Git remote contains only the credential-free URL. A representative command shape is:
+
+   ```bash
+   git -c http.extraHeader='Authorization: Bearer <short-lived-token>' push sites HEAD:main
+   ```
+
+4. After the push succeeds, run `git rev-parse --verify HEAD` again. Its full output is the `commit_sha`; never use an abbreviated SHA or infer it from push output.
+5. Create a temporary directory with `mktemp -d /tmp/hanalib-sites.XXXXXX`. Use the currently installed Sites plugin's root-level `scripts/package-site.sh` to package the repository into `<temporary-directory>/site.tar.gz`. The helper validates and stages `dist/server/index.js`, client assets, `.openai/hosting.json`, and migrations.
+6. Call `save_site_version` with the project ID, exact `commit_sha`, and absolute archive path. Copy the returned version ID unchanged.
+7. Because the existing audience is public and deployment was explicitly requested, call `deploy_site_version` with that saved version ID.
+8. Poll `get_deployment_status` with the returned deployment ID until it reports `succeeded` or `failed`. Do not announce success while it is pending, building, or publishing.
+
+The dependency chain is therefore:
+
+```text
+validated commit -> source push -> package -> saved version -> deployment -> terminal status
+```
+
+### 9.3 Verify and finish
+
+After Sites reports success, verify both the custom domain and health endpoint:
+
+```bash
+curl -I https://library.hanaseed.org/
+curl -fsS https://library.hanaseed.org/api/health
+```
+
+Require an HTTP success response. Remove only the exact temporary directory created for this release, confirm the Git worktree is still clean, and report the custom-domain URL plus the deployed commit. Browser E2E testing is a separate step: run it when the user asks or when the release changes a critical interactive journey.
+
+### 9.4 Fast-path and failure rules
+
+- Do not run `npm install` when the existing lockfile dependencies are already installed.
+- Do not recreate the Site, rotate secrets, edit `.openai/hosting.json`, change the public audience, or touch the scheduler when those inputs did not change.
+- Treat `Could not resolve host` from a sandboxed Git or `curl` command as a local network-permission failure. Retry that exact command once with the standard network approval; do not rebuild or create another Sites version.
+- If source push fails, obtain a fresh short-lived credential and retry the same push. Do not embed the token in the remote.
+- If packaging or version saving fails, fix that stage and reuse the already validated commit. Never deploy an unsaved version.
+- If deployment fails, read its failure message and fix the cause before creating a new version. Do not redeploy the identical failed archive blindly.
+- To roll back application code, list saved Site versions, select the last known-good version ID, deploy it to the unchanged public audience, and poll to success. D1 migrations are forward-only and are not undone by a code rollback.
+
+For a normal source-only release with dependencies installed and no migration or environment change, the only unavoidable serial publishing calls are: inspect Site, obtain credential, save version, deploy version, and poll status.
