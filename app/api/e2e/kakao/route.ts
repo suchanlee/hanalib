@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     await db.batch([
       db.prepare('DELETE FROM audit_events WHERE actor_id = ?').bind(demo.profileId),
       db.prepare('DELETE FROM notification_endpoints WHERE user_id = ?').bind(demo.profileId),
-      db.prepare('DELETE FROM community_members WHERE profile_id = ?').bind(demo.profileId),
+      db.prepare('DELETE FROM community_members WHERE user_id = ?').bind(demo.profileId),
       db.prepare("DELETE FROM auth_identities WHERE profile_id = ? AND provider = 'demo'").bind(demo.profileId),
       db.prepare('DELETE FROM profiles WHERE id = ?').bind(demo.profileId),
     ]);
