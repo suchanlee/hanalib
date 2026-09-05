@@ -8,7 +8,9 @@ Create a Kakao Developers application and enable Kakao Login, OpenID Connect, th
 
 `https://hana-community-library.lee-suchan.chatgpt.site/api/auth/kakao/callback`
 
-Keep every credential server-only. Successful first sign-in creates an active member in the open `hana-launch` community; every catalog and mutation endpoint independently checks the session and active membership. Google and Apple identity rows remain in D1 for record continuity, but their sign-in routes are no longer exposed. Existing signed sessions remain valid until their normal expiry so current owners are not abruptly separated from their catalog records.
+Keep every credential server-only. Successful first sign-in creates an active member in the open `hana-launch` community; every catalog and mutation endpoint independently checks the session and active membership. Legacy identity rows may remain in D1 for record continuity, but Google and Apple sign-in routes are no longer exposed. Existing signed sessions remain valid until their normal expiry so current owners are not abruptly separated from their catalog records.
+
+For a one-time Google-to-Kakao profile cutover, set `KAKAO_MIGRATION_SUBJECT` and `KAKAO_MIGRATION_GOOGLE_EMAIL` together for the verified member. On that member's next Kakao callback, the exact Kakao identity is attached to the existing profile and the matching legacy Google identity is removed. Remove both migration variables immediately after verifying the cutover.
 
 ## 2. Database and cover storage
 

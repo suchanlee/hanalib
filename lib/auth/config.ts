@@ -10,6 +10,10 @@ export interface AuthBaseConfig {
   launchCommunityId: string;
   launchCommunityName: string;
   demoMode: boolean;
+  kakaoIdentityMigration?: {
+    kakaoSubject: string;
+    googleEmail: string;
+  };
 }
 
 export interface AuthServerConfig extends AuthBaseConfig {
@@ -49,6 +53,18 @@ export function readAuthBaseConfig(source: AuthEnvSource = process.env): AuthBas
     throw new Error('LAUNCH_COMMUNITY_ID must be a stable lowercase identifier');
   }
 
+  const kakaoSubject = source.KAKAO_MIGRATION_SUBJECT?.trim();
+  const googleEmail = source.KAKAO_MIGRATION_GOOGLE_EMAIL?.trim().toLowerCase();
+  if (Boolean(kakaoSubject) !== Boolean(googleEmail)) {
+    throw new Error('Kakao identity migration requires both subject and Google email');
+  }
+  if (kakaoSubject && !/^\d{1,30}$/u.test(kakaoSubject)) {
+    throw new Error('KAKAO_MIGRATION_SUBJECT must be a Kakao numeric subject');
+  }
+  if (googleEmail && (googleEmail.length > 320 || !googleEmail.includes('@'))) {
+    throw new Error('KAKAO_MIGRATION_GOOGLE_EMAIL must be a valid email address');
+  }
+
   return {
     publicAppUrl: appUrl(source),
     sessionSecret: signingSecret(source, 'AUTH_SESSION_SECRET'),
@@ -56,6 +72,9 @@ export function readAuthBaseConfig(source: AuthEnvSource = process.env): AuthBas
     launchCommunityId,
     launchCommunityName: source.LAUNCH_COMMUNITY_NAME?.trim() || 'Hana Library',
     demoMode: source.AUTH_DEMO_MODE === 'true',
+    kakaoIdentityMigration: kakaoSubject && googleEmail
+      ? { kakaoSubject, googleEmail }
+      : undefined,
   };
 }
 
