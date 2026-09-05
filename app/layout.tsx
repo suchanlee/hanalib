@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
     shortcut: '/favicon.svg',
+    apple: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
   },
   applicationName: '하나의씨앗 도서관',
   appleWebApp: {

@@ -2,11 +2,9 @@
 
 import { useState, type SyntheticEvent } from 'react';
 import {
-  Bell,
   CheckCircle2,
   Globe2,
   LogOut,
-  MessageCircle,
   ShieldCheck,
   UserRoundCog,
 } from 'lucide-react';
@@ -24,9 +22,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useHanaApp } from '@/features/app/app-context';
-import { oauthStartUrl } from '@/features/auth/provider-config';
 import type { AppLocale } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
+import { PushNotificationCard } from './push-notification-card';
 
 function t(locale: AppLocale, ko: string, en: string) {
   return locale === 'ko' ? ko : en;
@@ -41,7 +39,6 @@ export function SettingsView() {
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const notificationsConnected = member.notificationChannel === 'kakao';
   const namesValid = displayName.trim().length > 0 && displayNameKo.trim().length > 0;
 
   function save(event: SyntheticEvent<HTMLFormElement>) {
@@ -58,10 +55,6 @@ export function SettingsView() {
         setSaveError(true);
       })
       .finally(() => setSaving(false));
-  }
-
-  function connectNotifications() {
-    window.location.assign(oauthStartUrl('kakao', '/settings'));
   }
 
   async function signOut() {
@@ -175,40 +168,7 @@ export function SettingsView() {
             </CardContent>
           </Card>
 
-          <Card data-testid="kakao-notification-card">
-            <CardHeader>
-              <CardTitle>{t(locale, '카카오톡 알림', 'KakaoTalk notifications')}</CardTitle>
-              <CardDescription>
-                {t(locale, '대여 요청, 결과, 반납 확인을 나와의 채팅으로 받아요.', 'Receive requests, decisions, and return checks in My Chatroom.')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-2.5 rounded-xl bg-muted/60 p-3 text-sm">
-                <Bell aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary" />
-                <div>
-                  <p className="font-medium" data-testid="kakao-notification-status">
-                    {notificationsConnected
-                      ? t(locale, '나와의 채팅에 연결됨', 'Connected to My Chatroom')
-                      : t(locale, '알림 권한이 아직 연결되지 않았어요', 'Notification permission is not connected yet')}
-                  </p>
-                  <p className="mt-1 text-muted-foreground">
-                    {t(locale, '알림은 다른 사람이 볼 수 없는 개인 채팅으로 오며, 버튼을 눌러 앱에서 처리해요.', 'Notifications are private and include a button to take action in the app.')}
-                  </p>
-                </div>
-              </div>
-              {!notificationsConnected && (
-                <Button
-                  className="h-11 w-full bg-[#FEE500] text-[#191919] hover:bg-[#F5DC00]"
-                  data-testid="kakao-notification-connect"
-                  onClick={connectNotifications}
-                  type="button"
-                >
-                  <MessageCircle aria-hidden="true" className="fill-current" />
-                  {t(locale, '카카오톡 알림 연결', 'Connect KakaoTalk notifications')}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+          <PushNotificationCard locale={locale} />
 
           <Button
             className="h-11 w-full"
