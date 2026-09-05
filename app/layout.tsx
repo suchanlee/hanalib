@@ -29,12 +29,12 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: '/seed-logo.svg', type: 'image/svg+xml' }],
     shortcut: '/seed-logo.svg',
-    apple: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
-  applicationName: '씨앗책장',
+  applicationName: '씨앗 도서관',
   appleWebApp: {
     capable: true,
-    title: '씨앗책장',
+    title: '씨앗 도서관',
     statusBarStyle: 'default',
   },
 };

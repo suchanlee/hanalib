@@ -1,6 +1,6 @@
 {
-  "name": "씨앗책장 · Hana Seed Books",
-  "short_name": "씨앗책장",
+  "name": "씨앗 도서관",
+  "short_name": "씨앗 도서관",
   "description": "A mobile-first community library for sharing Korean and English books.",
   "start_url": "/",
   "display": "standalone",
