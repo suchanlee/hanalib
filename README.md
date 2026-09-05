@@ -36,6 +36,24 @@ npm run build
 
 The application is deployed through OpenAI Sites on Cloudflare Workers with managed D1 and R2 bindings. Core application secrets are managed by Sites, and local secrets remain ignored. Public launch still requires the third-party credentials and callback/webhook setup in [`docs/production-runbook.md`](docs/production-runbook.md); development fixtures and demo authentication are disabled in production.
 
+## Notifications
+
+Immediate events are queued transactionally and delivery is attempted before the triggering API request completes. Scheduled events are stored in the same outbox but require the protected notification job to be invoked regularly.
+
+| Kind | Event | Recipient | Timing and cadence |
+| --- | --- | --- | --- |
+| Immediate | Borrow request created | Book owner | Once, immediately after the request is submitted. The request expires after 48 hours. |
+| Immediate | Borrow request accepted | Borrower | Once, immediately after the owner accepts. |
+| Immediate | Borrow request declined | Borrower | Once, immediately after the owner declines. |
+| Immediate | Held book becomes available | First eligible member on the waitlist | Once when a return, pass, cancellation, or decline advances the queue. Advancing an expired offer requires the scheduled job. |
+| Scheduled | Hold-offer reminder | Member whose turn it is | Once, 24 hours after the offer. The offer expires after 48 hours. |
+| Scheduled | Return check | Borrower | First at day 7 of an active loan, then every 7 days after the previous check is successfully sent until the book is returned. |
+| Manual | Test notification | Signed-in member | On demand from Settings; Web Push only. |
+
+Web Push is attempted first for subscribed devices. If none is delivered, the worker falls back to the member's configured Kakao, email, SMS, or combined email/SMS channel. Failed outbox deliveries use exponential backoff from one minute up to six hours.
+
+The external five-minute scheduler is not connected in production yet. Until the item in [`docs/TODO.md`](docs/TODO.md) is completed, hold reminders, automatic offer expiration, weekly return checks, and unattended delivery retries do not run automatically. Joining a waitlist, canceling or expiring a borrow request, and marking a book returned do not themselves notify the other party; a return can still notify the next eligible holder.
+
 ## Operational invariants
 
 - The catalog is visible only after authentication and active-community membership checks.
