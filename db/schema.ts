@@ -178,6 +178,27 @@ export const notificationEndpoints = sqliteTable(
   (table) => [uniqueIndex('notification_endpoints_user_kind_unique').on(table.userId, table.kind)],
 );
 
+export const webPushSubscriptions = sqliteTable(
+  'web_push_subscriptions',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => profiles.id),
+    endpointHash: text('endpoint_hash').notNull(),
+    subscriptionEncrypted: text('subscription_encrypted').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+    lastDeliveredAt: integer('last_delivered_at', { mode: 'timestamp_ms' }),
+    failureCount: integer('failure_count').notNull().default(0),
+    disabledAt: integer('disabled_at', { mode: 'timestamp_ms' }),
+  },
+  (table) => [
+    uniqueIndex('web_push_subscriptions_endpoint_hash_unique').on(table.endpointHash),
+    index('web_push_subscriptions_user_active_idx')
+      .on(table.userId)
+      .where(sql`${table.disabledAt} IS NULL`),
+  ],
+);
+
 export const phoneVerifications = sqliteTable('phone_verifications', {
   userId: text('user_id').primaryKey().references(() => profiles.id),
   codeHash: text('code_hash').notNull(),
