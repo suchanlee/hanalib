@@ -10,6 +10,7 @@ function fixture() {
     CREATE TABLE return_checkins (id TEXT PRIMARY KEY, loan_id TEXT, scheduled_for INTEGER, sent_at INTEGER, next_scheduled_for INTEGER, UNIQUE(loan_id, scheduled_for));
     CREATE TABLE profiles (id TEXT PRIMARY KEY, notification_channel TEXT);
     CREATE TABLE auth_identities (profile_id TEXT, email TEXT, last_signed_in_at INTEGER);
+    CREATE TABLE notification_endpoints (user_id TEXT, kind TEXT, address_encrypted TEXT, verified_at INTEGER, enabled INTEGER);
     CREATE TABLE outbox_events (id TEXT PRIMARY KEY, event_type TEXT, aggregate_type TEXT, aggregate_id TEXT, recipient_id TEXT, locale TEXT, payload_json TEXT, available_at INTEGER, attempt_count INTEGER DEFAULT 0, processed_at INTEGER);
     CREATE TABLE notification_deliveries (id TEXT PRIMARY KEY, event_id TEXT, recipient_id TEXT, channel TEXT, provider_message_id TEXT, status TEXT, attempt_count INTEGER, sent_at INTEGER, created_at INTEGER);
     INSERT INTO profiles VALUES ('member', 'email');

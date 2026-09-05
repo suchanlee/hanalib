@@ -1,6 +1,6 @@
 # 씨앗책장 · Hana Seed Books
 
-Mobile-first community-library application for sharing Korean and English books. The working preview includes Kakao-only member authentication, a bilingual catalog, owner/status/language filters, book details, barcode-first intake, circulation, weekly return check-ins, profile settings, and deterministic demo identities for end-to-end testing.
+Mobile-first community-library application for sharing Korean and English books. The working preview includes Google and Kakao member authentication, a bilingual catalog, owner/status/language filters, book details, barcode-first intake, circulation, weekly return check-ins, profile settings, and deterministic demo identities for end-to-end testing.
 
 The product and implementation blueprint lives in [`docs/community-library-plan.md`](docs/community-library-plan.md).
 
@@ -30,7 +30,7 @@ npm run build
 - `features/` contains the mobile product journeys: auth, catalog/detail, intake, circulation, and settings.
 - `lib/domain/` holds shared state contracts and timing/authorization rules.
 - `lib/isbn/` resolves and stitches NLK and Google Books metadata behind provider interfaces. Naver Book Search is deliberately excluded because the service retired on July 31, 2026.
-- `lib/notifications/` sends Korean/English circulation alerts through Resend email for every recipient with a verified sign-in email, independently of encrypted per-device Web Push delivery. Kakao and SMS remain fallback adapters when no push succeeds; successful channels are recorded separately to avoid resending them on retries.
+- `lib/notifications/` sends Korean/English circulation alerts through Resend email for every recipient with a verified Google or member-supplied email, independently of encrypted per-device Web Push delivery. Kakao and SMS remain fallback adapters when no push succeeds; successful channels are recorded separately to avoid resending them on retries.
 - `db/schema.ts` defines durable Cloudflare D1 data. Generated SQL migrations in `drizzle/` are immutable after application.
 - Cover uploads use the `FILES` R2 binding; structured state uses the `DB` D1 binding declared in `.openai/hosting.json`.
 

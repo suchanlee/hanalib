@@ -52,12 +52,12 @@ export function issueMessage(issue: UserIssue, locale: AppLocale) {
       : 'Your session has expired. Please sign in again.';
   if (issue.code === 'access_denied')
     return ko
-      ? '카카오 로그인을 취소했어요. 계속하려면 다시 로그인해 주세요.'
-      : 'Kakao sign-in was canceled. Sign in again when you’re ready.';
+      ? '로그인을 취소했어요. 계속하려면 다시 로그인해 주세요.'
+      : 'Sign-in was canceled. Sign in again when you’re ready.';
   if (['invalid_state', 'missing_code'].includes(issue.code))
     return ko
-      ? '로그인 연결이 만료됐어요. 카카오로 계속을 다시 눌러 주세요.'
-      : 'The sign-in link expired. Select Continue with Kakao to try again.';
+      ? '로그인 연결이 만료됐어요. 로그인 방법을 다시 선택해 주세요.'
+      : 'The sign-in link expired. Select a sign-in option to try again.';
   if (issue.operation === 'sign-in')
     return ko
       ? '로그인을 완료하지 못했어요. 잠시 후 다시 시도해 주세요. 계속 실패하면 아래 오류 정보를 운영자에게 보내 주세요.'

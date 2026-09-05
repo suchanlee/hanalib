@@ -27,6 +27,7 @@ interface OutboxRow {
 interface RecipientRow {
   notificationChannel: string;
   email: string | null;
+  emailEncrypted?: string | null;
 }
 
 interface SmsRow {
@@ -299,11 +300,17 @@ export async function processReadyOutbox(
       const message = renderOutboxMessage(row);
       const person = await db.prepare(`
         SELECT p.notification_channel AS notificationChannel,
-          (SELECT ai.email FROM auth_identities ai WHERE ai.profile_id = p.id AND ai.email IS NOT NULL
-           ORDER BY ai.last_signed_in_at DESC LIMIT 1) AS email
+          (SELECT ai.email FROM auth_identities ai WHERE ai.profile_id = p.id AND ai.email <> ''
+           ORDER BY ai.last_signed_in_at DESC LIMIT 1) AS email,
+          (SELECT ne.address_encrypted FROM notification_endpoints ne
+           WHERE ne.user_id = p.id AND ne.kind = 'email' AND ne.enabled = 1
+             AND ne.verified_at IS NOT NULL LIMIT 1) AS emailEncrypted
         FROM profiles p WHERE p.id = ? LIMIT 1
       `).bind(row.recipientId).first<RecipientRow>();
       if (!person) throw new Error('recipient-not-found');
+      if (!person.email && person.emailEncrypted && config.contactEncryptionKey) {
+        person.email = await decryptContact(person.emailEncrypted, config.contactEncryptionKey);
+      }
       const previous = await db.prepare(`
         SELECT channel FROM notification_deliveries WHERE event_id = ? AND status = 'sent'
       `).bind(row.id).all<{ channel: DeliveryResult['channel'] }>();

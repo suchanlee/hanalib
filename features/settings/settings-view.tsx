@@ -91,7 +91,11 @@ export function SettingsView() {
               </Avatar>
               <div className="min-w-0">
                 <CardTitle>{memberName(locale, member)}</CardTitle>
-                <CardDescription>{t(locale, '카카오 계정', 'Kakao account')}</CardDescription>
+                <CardDescription>
+                  {member.email
+                    ? member.email
+                    : t(locale, '로그인 계정', 'Sign-in account')}
+                </CardDescription>
               </div>
               <Badge className="ml-auto" variant="secondary">
                 <ShieldCheck aria-hidden="true" />

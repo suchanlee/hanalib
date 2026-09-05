@@ -7,6 +7,7 @@ import { BookDetailView, CatalogView } from '@/features/catalog';
 import { CirculationView } from '@/features/circulation';
 import { IntakeView } from '@/features/intake';
 import { SettingsView } from '@/features/settings';
+import { EmailCompletionDialog } from '@/features/settings/email-completion-dialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { AppScreen } from '@/lib/domain/types';
@@ -131,6 +132,7 @@ function LibraryShell() {
       </nav>
 
       <output aria-live="polite" className="sr-only">{state.announcement}</output>
+      <EmailCompletionDialog />
     </div>
   );
 }

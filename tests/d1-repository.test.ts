@@ -3,6 +3,7 @@ import test from 'node:test';
 import { D1LibraryRepository } from '../lib/persistence/d1-repository.ts';
 import { expireStaleBorrowRequests } from '../lib/persistence/borrow-request-expiry.ts';
 import { LibraryError } from '../lib/persistence/errors.ts';
+import { encryptContact } from '../lib/notifications/contact-crypto.ts';
 
 class RecordedStatement {
   readonly sql: string;
@@ -553,6 +554,38 @@ void test('bootstrap exposes requests and loans only to their participants', asy
   assert.ok(loanQuery);
   assert.match(loanQuery.sql, /owner_id = \? OR borrower_id = \?/);
   assert.deepEqual(loanQuery.values, ['hana', 'borrower', 'borrower']);
+});
+
+void test('bootstrap hydrates a verified manual email when sign-in supplied none', async () => {
+  const encryptionKey = 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8';
+  const encryptedEmail = await encryptContact('reader@example.com', encryptionKey);
+  const database = new RecordedD1(
+    (sql) => sql.includes('SELECT 1 AS active') ? { active: 1 } : null,
+    undefined,
+    (_sql, _values, index) => [
+      [{
+        id: 'borrower', displayName: 'Borrower', displayNameKo: '대여자', locale: 'ko',
+        notificationChannel: 'email', phone: '', phoneVerified: 0, email: '',
+      }],
+      [],
+      [],
+      [],
+      [{ kind: 'email', addressEncrypted: encryptedEmail, verifiedAt: fixedNow.getTime() }],
+      [],
+      [],
+      [],
+      [],
+    ][index] ?? [],
+  );
+  const repository = new D1LibraryRepository(database as unknown as D1Database, {
+    now: () => fixedNow,
+    contactEncryptionKey: encryptionKey,
+  });
+
+  const bootstrap = await repository.getBootstrap(context);
+  assert.equal(bootstrap.profile.email, 'reader@example.com');
+  assert.equal(bootstrap.members[0].email, 'reader@example.com');
+  assert.match(database.batches[0][5].sql, /email <> ''/);
 });
 
 void test('book detail refresh returns current item state while keeping circulation data participant-scoped', async () => {

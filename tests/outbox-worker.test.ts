@@ -13,8 +13,12 @@ const pushConfig = {
 };
 const emailConfig = { resendApiKey: 'test-key', emailFrom: 'Books <notifications@library.example>' };
 
-async function deliveryFixture(email: string | null = 'member@example.com') {
-  const person = { notificationChannel: 'email', email };
+async function deliveryFixture(email: string | null = 'member@example.com', manualEmail?: string) {
+  const person = {
+    notificationChannel: 'email',
+    email,
+    emailEncrypted: manualEmail ? await encryptContact(manualEmail, encryptionKey) : null,
+  };
   const deliveries = new Map<string, unknown[]>();
   const row = {
     id: 'event-delivery', eventType: 'borrow_declined', aggregateId: 'request-1', recipientId: 'member-1',
@@ -146,6 +150,24 @@ void test('members without email can still receive push', async () => {
   });
   assert.equal(result.sent, 1);
   assert.deepEqual([...fixture.deliveries.keys()], ['push']);
+});
+
+void test('sends notification email to a verified manually supplied address', async () => {
+  const fixture = await deliveryFixture(null, 'manual@example.com');
+  let recipient = '';
+  const result = await processReadyOutbox(fixture.db, { ...emailConfig, ...pushConfig }, {
+    now: 1000,
+    pushSender: async () => false,
+    fetcher: async (_url, init) => {
+      const body = init?.body;
+      assert.equal(typeof body, 'string');
+      recipient = JSON.parse(body as string).to[0];
+      return Response.json({ id: 'email-manual' });
+    },
+  });
+  assert.equal(result.sent, 1);
+  assert.equal(recipient, 'manual@example.com');
+  assert.deepEqual([...fixture.deliveries.keys()], ['email']);
 });
 
 void test('missing email configuration leaves email pending while preserving a successful push', async () => {

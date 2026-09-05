@@ -1,14 +1,18 @@
 # Production activation runbook
 
-The application runs publicly on OpenAI Sites backed by Cloudflare Workers. Sites owns the production `DB` D1 database and `FILES` R2 bucket declared in `.openai/hosting.json`. Opening the public page does not require a ChatGPT account, while the application catalog still requires Kakao authentication.
+The application runs publicly on OpenAI Sites backed by Cloudflare Workers. Sites owns the production `DB` D1 database and `FILES` R2 bucket declared in `.openai/hosting.json`. Opening the public page does not require a ChatGPT account, while the application catalog still requires Google or Kakao authentication.
 
 ## 1. Identity and membership
 
-Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` consent item. Convert the application to a Kakao Biz app, complete its business-information review, request the personal-information consent permission, and then enable `account_email` as optional consent. The login request includes both scopes; verified Kakao email claims are stored for notification delivery. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
+In Kakao Developers, enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` and `talk_message` consent items. The application deliberately does not request `account_email`, so a Korean mobile-number identity check is not required merely to provide an email. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
 `https://library.hanaseed.org/api/auth/kakao/callback`
 
-Keep every credential server-only. Successful first sign-in creates an active member in the open `hana-launch` community; every catalog and mutation endpoint independently checks the session and active membership. Production accepts Kakao sessions only; Google and Apple sign-in routes and session providers are removed.
+Create a Google Cloud OAuth web client, set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, configure the OAuth consent screen, and register this redirect URI:
+
+`https://library.hanaseed.org/api/auth/google/callback`
+
+Keep every credential server-only. Successful first sign-in creates an active member in the open `hana-launch` community; every catalog and mutation endpoint independently checks the session and active membership. Production accepts both Google and Kakao sessions. Identities are never merged solely by matching email addresses.
 
 ## 2. Database and cover storage
 
@@ -20,7 +24,7 @@ Open Library is the credential-free baseline. Set `NLK_API_KEY` and `GOOGLE_BOOK
 
 ## 4. Email and Web Push notifications
 
-Verify `library.hanaseed.org` as a sending domain in Resend, then set `RESEND_API_KEY` as a Sites secret. The sender is `EMAIL_FROM="Hana Seed Library <notifications@library.hanaseed.org>"`. Every circulation event sends email when the recipient has a verified email from sign-in, regardless of Web Push availability or their legacy notification-channel preference. Members without an email can still receive Web Push; this does not add an email collection or verification flow. Missing Resend configuration leaves email delivery pending for retry, even if push succeeds.
+Verify `library.hanaseed.org` as a sending domain in Resend, then set `RESEND_API_KEY` as a Sites secret. The sender is `EMAIL_FROM="Hana Seed Library <notifications@library.hanaseed.org>"`. Every circulation event sends email when the recipient has a verified Google email or a manually supplied address verified through the one-hour signed link. Members without a verified address are prompted on each fresh app visit and can postpone for that visit. Missing Resend configuration prevents both verification and notification mail; queued circulation email remains pending for retry even if push succeeds.
 
 Generate one VAPID P-256 key pair and set `WEB_PUSH_PUBLIC_KEY`, `WEB_PUSH_PRIVATE_KEY`, and an HTTPS `WEB_PUSH_SUBJECT`. Keep the private key server-only. The browser registers `/sw.js`, requests notification permission only after a member presses the enable button, and stores each subscription as AES-GCM-encrypted JSON plus a keyed endpoint hash in `web_push_subscriptions`. The endpoint is a bearer capability and must never appear in logs.
 
@@ -57,7 +61,8 @@ The copied `Report` field distinguishes a server acknowledgment from a report th
 
 ## 8. Public-launch gates
 
-- Validate real Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
+- Validate real Google and Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
+- For a Kakao member without email, submit an address, open the verification link, reload the app, and confirm both that the prompt disappears and a test circulation email arrives.
 - Validate Korean and English ISBNs against live NLK and Google Books data.
 - Install the app on a physical iPhone and Android phone, enable notifications, and verify the Settings test alert while the app is closed.
 - Trigger each circulation event and verify its device notification and authenticated deep link.

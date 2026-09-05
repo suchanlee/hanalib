@@ -93,6 +93,7 @@ interface MemberRow {
   phoneVerified: number | boolean;
   email: string;
   phoneEncrypted?: string | null;
+  emailEncrypted?: string | null;
 }
 
 interface ContactRow {
@@ -570,7 +571,7 @@ export class D1LibraryRepository implements LibraryRepository {
       this.db.prepare(`
         SELECT email
         FROM auth_identities
-        WHERE profile_id = ?
+        WHERE profile_id = ? AND email <> ''
         ORDER BY last_signed_in_at DESC
         LIMIT 1
       `).bind(context.actorId),
@@ -631,7 +632,11 @@ export class D1LibraryRepository implements LibraryRepository {
     const phone = encryptedPhone && this.contactEncryptionKey
       ? await decryptContact(encryptedPhone, this.contactEncryptionKey)
       : '';
-    const email = (results[5].results[0] as { email?: string } | undefined)?.email ?? '';
+    const oauthEmail = (results[5].results[0] as { email?: string } | undefined)?.email ?? '';
+    const emailContact = contacts.find((contact) => contact.kind === 'email' && contact.verifiedAt);
+    const email = oauthEmail || (emailContact?.addressEncrypted && this.contactEncryptionKey
+      ? await decryptContact(emailContact.addressEncrypted, this.contactEncryptionKey)
+      : '');
     const hydratedProfile = { ...profile, phone, phoneVerified: Boolean(phoneContact?.verifiedAt), email };
     return {
       profile: hydratedProfile,
@@ -1770,8 +1775,15 @@ export class D1LibraryRepository implements LibraryRepository {
         0 AS phoneVerified,
         COALESCE((
           SELECT ai.email FROM auth_identities ai
-          WHERE ai.profile_id = p.id ORDER BY ai.last_signed_in_at DESC LIMIT 1
+          WHERE ai.profile_id = p.id AND ai.email <> ''
+          ORDER BY ai.last_signed_in_at DESC LIMIT 1
         ), '') AS email,
+        (
+          SELECT ne.address_encrypted FROM notification_endpoints ne
+          WHERE ne.user_id = p.id AND ne.kind = 'email' AND ne.enabled = 1
+            AND ne.verified_at IS NOT NULL
+          LIMIT 1
+        ) AS emailEncrypted,
         (
           SELECT ne.address_encrypted FROM notification_endpoints ne
           WHERE ne.user_id = p.id AND ne.kind = 'sms' AND ne.enabled = 1 LIMIT 1
@@ -1790,6 +1802,9 @@ export class D1LibraryRepository implements LibraryRepository {
     const currentPhone = existing.phoneEncrypted && this.contactEncryptionKey
       ? await decryptContact(existing.phoneEncrypted, this.contactEncryptionKey)
       : '';
+    const currentEmail = existing.email || (existing.emailEncrypted && this.contactEncryptionKey
+      ? await decryptContact(existing.emailEncrypted, this.contactEncryptionKey)
+      : '');
     const next = {
       displayName: changes.displayName?.trim() ?? existing.displayName,
       displayNameKo: changes.displayNameKo?.trim() ?? existing.displayNameKo,
@@ -1850,6 +1865,6 @@ export class D1LibraryRepository implements LibraryRepository {
       const result = await profileStatement.run();
       if (affected(result) !== 1) throw libraryError('not-found', 'Profile not found.');
     }
-    return mapMember({ ...existing, ...next });
+    return mapMember({ ...existing, ...next, email: currentEmail });
   }
 }

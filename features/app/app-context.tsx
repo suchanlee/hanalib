@@ -677,6 +677,20 @@ export function HanaAppProvider({
                 : 'Recorded as still borrowing.',
           }));
         }),
+      requestEmailVerification: (email) =>
+        perform('verify-email', async () => {
+          await apiData<{ sent: boolean }>(
+            '/api/profile/email-verification',
+            mutationInit('POST', { email }),
+          );
+          setState((current) => ({
+            ...current,
+            announcement:
+              current.locale === 'ko'
+                ? '인증 메일을 보냈어요.'
+                : 'Verification email sent.',
+          }));
+        }),
       updateProfile: (changes) =>
         perform('save-settings', async () => {
           const member = await apiData<Member>(
