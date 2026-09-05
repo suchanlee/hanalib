@@ -4,12 +4,13 @@ import type { OutboxPayloadByType, LibraryOutboxEventType } from '../persistence
 import { operationalLog, safeErrorCode } from '../observability/log.ts';
 import { decryptContact, encryptContact } from './contact-crypto.ts';
 import { parseKakaoCredential, refreshKakaoCredential } from './kakao.ts';
-import { sendNotification, type DeliveryResult, type NotificationSenderConfig } from './sender.ts';
+import { sendNotification, sendResendEmail, type DeliveryResult, type NotificationSenderConfig } from './sender.ts';
 import { bookReturnedTemplate, borrowRequestReminderTemplate, borrowRequestTemplate, decisionTemplate, holdOfferTemplate, requestClosedTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
 import {
   isWebPushConfigured,
   sendWebPushToUser,
   type WebPushConfig,
+  type WebPushSender,
 } from './web-push.ts';
 
 interface OutboxRow {
@@ -212,20 +213,11 @@ async function eventIsActionable(db: D1Database, row: OutboxRow, now: number) {
 async function recipient(
   db: D1Database,
   row: OutboxRow,
+  person: RecipientRow,
   config: OutboxWorkerConfig,
   fetcher: typeof fetch,
   now: number,
 ) {
-  const person = await db.prepare(`
-    SELECT
-      p.notification_channel AS notificationChannel,
-      (SELECT ai.email FROM auth_identities ai WHERE ai.profile_id = p.id ORDER BY ai.last_signed_in_at DESC LIMIT 1) AS email
-    FROM profiles p
-    WHERE p.id = ?
-    LIMIT 1
-  `).bind(row.recipientId).first<RecipientRow>();
-  if (!person) throw new Error('recipient-not-found');
-
   const kakao = await db.prepare(`
     SELECT id, address_encrypted AS addressEncrypted
     FROM notification_endpoints
@@ -262,7 +254,7 @@ async function recipient(
 export async function processReadyOutbox(
   db: D1Database,
   config: OutboxWorkerConfig,
-  options: { now?: number; limit?: number; fetcher?: typeof fetch; requestId?: string } = {},
+  options: { now?: number; limit?: number; fetcher?: typeof fetch; requestId?: string; pushSender?: WebPushSender } = {},
 ): Promise<OutboxWorkerResult> {
   const now = options.now ?? Date.now();
   const limit = Math.max(1, Math.min(options.limit ?? 20, 50));
@@ -296,26 +288,22 @@ export async function processReadyOutbox(
         continue;
       }
       const message = renderOutboxMessage(row);
-      let deliveries: DeliveryResult[] = [];
-      if (isWebPushConfigured(config)) {
-        const push = await sendWebPushToUser(db, row.recipientId, message, `hana-${row.id}`, config, { now });
-        if (push.delivered > 0) {
-          deliveries = [{ channel: 'push', providerMessageId: `web-push:${push.delivered}` }];
-        }
-      }
-      if (deliveries.length === 0) {
-        const target = await recipient(db, row, config, options.fetcher ?? fetch, now);
-        deliveries = await sendNotification(
-          config,
-          target,
-          message,
-          options.fetcher ?? fetch,
-          `hana-${row.id}`,
-        );
-      }
-      const sentAt = Date.now();
-      await db.batch([
-        ...deliveries.map((delivery) => db.prepare(`
+      const person = await db.prepare(`
+        SELECT p.notification_channel AS notificationChannel,
+          (SELECT ai.email FROM auth_identities ai WHERE ai.profile_id = p.id AND ai.email IS NOT NULL
+           ORDER BY ai.last_signed_in_at DESC LIMIT 1) AS email
+        FROM profiles p WHERE p.id = ? LIMIT 1
+      `).bind(row.recipientId).first<RecipientRow>();
+      if (!person) throw new Error('recipient-not-found');
+      const previous = await db.prepare(`
+        SELECT channel FROM notification_deliveries WHERE event_id = ? AND status = 'sent'
+      `).bind(row.id).all<{ channel: DeliveryResult['channel'] }>();
+      const sentChannels = new Set(previous.results.map((delivery) => delivery.channel));
+      const fetcher = options.fetcher ?? fetch;
+      // Persist each success immediately so a failure on another channel does not resend it.
+      async function recordDelivery(delivery: DeliveryResult) {
+        const sentAt = Date.now();
+        await db.prepare(`
           INSERT OR REPLACE INTO notification_deliveries (
             id, event_id, recipient_id, channel, provider_message_id,
             status, attempt_count, sent_at, created_at
@@ -329,10 +317,41 @@ export async function processReadyOutbox(
           row.attemptCount + 1,
           sentAt,
           sentAt,
-        )),
-        db.prepare('UPDATE outbox_events SET processed_at = ?, available_at = ? WHERE id = ? AND processed_at IS NULL')
-          .bind(sentAt, row.availableAt, row.id),
+        ).run();
+        sentChannels.add(delivery.channel);
+      }
+      const outcomes = await Promise.allSettled([
+        (async () => {
+          if (person.email && !sentChannels.has('email')) {
+            await recordDelivery(await sendResendEmail(config, person.email, message, fetcher, `hana-${row.id}`));
+          }
+        })(),
+        (async () => {
+          if (sentChannels.has('push')) return;
+          if (isWebPushConfigured(config)) {
+            const push = await sendWebPushToUser(db, row.recipientId, message, `hana-${row.id}`, config, {
+              now, sender: options.pushSender,
+            });
+            if (push.delivered > 0) {
+              await recordDelivery({ channel: 'push', providerMessageId: `web-push:${push.delivered}` });
+              return;
+            }
+          }
+          // Email is always handled independently; retain the other legacy fallbacks.
+          const target = await recipient(db, row, person, config, fetcher, now);
+          if (target.channel === 'email') return;
+          const fallbackChannel = target.channel === 'both' ? 'sms' : target.channel;
+          if (sentChannels.has(fallbackChannel)) return;
+          const deliveries = await sendNotification(config, { ...target, channel: fallbackChannel }, message, fetcher, `hana-${row.id}`);
+          for (const delivery of deliveries) await recordDelivery(delivery);
+        })(),
       ]);
+      const failure = outcomes.find((outcome) => outcome.status === 'rejected');
+      if (failure?.status === 'rejected') throw failure.reason;
+      if (sentChannels.size === 0) throw new Error('recipient-has-no-verified-contact');
+      const sentAt = Date.now();
+      await db.prepare('UPDATE outbox_events SET processed_at = ?, available_at = ? WHERE id = ? AND processed_at IS NULL')
+        .bind(sentAt, row.availableAt, row.id).run();
       await scheduleNextReturnCheck(db, row, sentAt);
       result.sent += 1;
     } catch (error) {
