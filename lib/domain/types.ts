@@ -103,6 +103,7 @@ export interface AddBookInput {
   publishedYear: number;
   language: 'ko' | 'en' | 'other';
   pageCount?: number;
+  description?: string;
   coverUrl?: string;
   condition: CatalogItem['condition'];
   ownerNotes?: string;

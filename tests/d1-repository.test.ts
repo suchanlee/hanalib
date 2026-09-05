@@ -321,6 +321,8 @@ void test('catalog intake accepts editions without a named author or publisher',
   assert.deepEqual(item.edition.authors, []);
   assert.equal(item.edition.publisher, '');
   assert.equal(database.batches.length, 1);
+  assert.equal(database.batches[0][0].values[9], null);
+  assert.equal(JSON.parse(String(database.batches[0][1].values[5])).description, null);
 });
 
 void test('an owner can attach a private cover override without changing the shared edition', async () => {
@@ -477,11 +479,28 @@ void test('catalog intake never overwrites a shared ISBN edition', async () => {
   await repository.createCatalogItem(context, {
     isbn13: '9788936434267', title: 'My copy title', authors: ['손원평'], publisher: '창비',
     publishedYear: 2017, language: 'ko', condition: 'good', provenance: { title: 'manual' },
+    description: '  감정을 느끼기 어려운 소년 윤재의 성장 이야기.  ',
   });
 
   assert.match(database.batches[0][0].sql, /ON CONFLICT\(isbn13\) DO NOTHING/);
   assert.doesNotMatch(database.batches[0][0].sql, /DO UPDATE/);
   assert.match(database.batches[0][1].sql, /metadata_overrides_json/);
+  assert.equal(database.batches[0][0].values[9], '감정을 느끼기 어려운 소년 윤재의 성장 이야기.');
+  assert.equal(JSON.parse(String(database.batches[0][1].values[5])).description, '감정을 느끼기 어려운 소년 윤재의 성장 이야기.');
+});
+
+void test('catalog intake rejects invalid descriptions before writing', async () => {
+  for (const description of [42, null, 'a'.repeat(5_001)]) {
+    const database = new RecordedD1((sql) => sql.includes('SELECT 1 AS active') ? { active: 1 } : null);
+    const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+    await assert.rejects(repository.createCatalogItem(context, {
+      isbn13: '9788936434267', title: '아몬드', authors: ['손원평'], publisher: '창비',
+      publishedYear: 2017, language: 'ko', condition: 'good', provenance: {},
+      description: description as string,
+    }), (error: unknown) => error instanceof LibraryError && error.code === 'invalid-input');
+    assert.equal(database.batches.length, 0);
+  }
 });
 
 void test('provider cover refresh rejects non-HTTPS URLs before writing', async () => {

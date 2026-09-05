@@ -674,6 +674,7 @@ export class D1LibraryRepository implements LibraryRepository {
       !input.authors.every((author) => typeof author === 'string') ||
       typeof input.publisher !== 'string' ||
       (input.titleEn !== undefined && typeof input.titleEn !== 'string') ||
+      (input.description !== undefined && typeof input.description !== 'string') ||
       (input.ownerNotes !== undefined && typeof input.ownerNotes !== 'string') ||
       (input.coverUrl !== undefined && typeof input.coverUrl !== 'string') ||
       (input.pageCount !== undefined && (!Number.isInteger(input.pageCount) || input.pageCount <= 0)) ||
@@ -693,6 +694,7 @@ export class D1LibraryRepository implements LibraryRepository {
       (input.titleEn !== undefined && !boundedText(input.titleEn, 300)) ||
       !validAuthors(input.authors) ||
       !boundedText(input.publisher, 200) ||
+      (input.description !== undefined && !boundedText(input.description, 5_000)) ||
       (input.ownerNotes !== undefined && !boundedText(input.ownerNotes, 1_000)) ||
       (input.coverUrl !== undefined && input.coverUrl.length > 2_048) ||
       !validProvenance(input.provenance)
@@ -729,9 +731,9 @@ export class D1LibraryRepository implements LibraryRepository {
       this.db.prepare(`
         INSERT INTO book_editions (
           id, isbn13, title, title_en, authors_json, authors_en_json, publisher,
-          published_on, language, page_count, cover_source_url, cover_tone,
+          published_on, language, page_count, description, cover_source_url, cover_tone,
           field_provenance_json, resolver_version, resolved_at
-        ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, ?, 1, ?)
+        ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
         ON CONFLICT(isbn13) DO NOTHING
       `).bind(
         editionId,
@@ -743,6 +745,7 @@ export class D1LibraryRepository implements LibraryRepository {
         String(input.publishedYear),
         input.language,
         input.pageCount ?? null,
+        input.description?.trim() || null,
         uploadedCoverId ? null : input.coverUrl ?? null,
         coverToneFor(input.title),
         JSON.stringify(input.provenance),
@@ -767,7 +770,7 @@ export class D1LibraryRepository implements LibraryRepository {
           title: input.title.trim(), titleEn: input.titleEn?.trim() || null,
           authors: input.authors.map((author) => author.trim()), authorsEn: [],
           publisher: input.publisher.trim() || null, publishedOn: String(input.publishedYear),
-          language: input.language, pageCount: input.pageCount ?? null, description: null,
+          language: input.language, pageCount: input.pageCount ?? null, description: input.description?.trim() || null,
           coverTone: coverToneFor(input.title),
         }),
         uploadedCoverId ? null : input.coverUrl ?? null,

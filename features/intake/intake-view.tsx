@@ -44,6 +44,7 @@ interface IntakeDraft {
   publishedYear: string;
   language: AddBookInput['language'];
   pageCount: string;
+  description: string;
   coverUrl: string;
   condition: CatalogItem['condition'];
   ownerNotes: string;
@@ -203,6 +204,7 @@ function createDraft(metadata: StitchedBookMetadata): IntakeDraft {
     publishedYear: String(metadata.publishedYear),
     language: metadata.language === 'en' ? 'en' : 'ko',
     pageCount: metadata.pageCount ? String(metadata.pageCount) : '',
+    description: metadata.description?.trim().slice(0, 5_000) ?? '',
     coverUrl: metadata.coverUrl ?? '',
     condition: 'good',
     ownerNotes: '',
@@ -556,6 +558,7 @@ export function IntakeView() {
         publishedYear,
         language: draft.language,
         pageCount: pageCount && pageCount > 0 ? pageCount : undefined,
+        description: draft.description || undefined,
         coverUrl: persistedCoverUrl,
         condition: draft.condition,
         ownerNotes: draft.ownerNotes.trim() || undefined,
