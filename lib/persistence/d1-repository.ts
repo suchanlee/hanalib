@@ -16,7 +16,7 @@ import type {
 } from '../domain/types.ts';
 import { parseIsbn } from '../isbn/isbn.ts';
 import { decryptContact, encryptContact, hashContact } from '../notifications/contact-crypto.ts';
-import type { LibraryBootstrap, LibraryRepository, RequestContext } from './contracts.ts';
+import type { LibraryBootstrap, LibraryItemDetail, LibraryRepository, RequestContext } from './contracts.ts';
 import { libraryError } from './errors.ts';
 import type { OutboxPayloadByType } from './outbox.ts';
 import { offerNextHold } from './hold-queue.ts';
@@ -644,6 +644,87 @@ export class D1LibraryRepository implements LibraryRepository {
         (results[7].results as unknown as Array<{ catalogItemId: string; count: number }>).map((row) => [row.catalogItemId, Number(row.count)]),
       ),
       returnChecks: (results[8].results as unknown as ReturnCheckRow[]).map(mapReturnCheck),
+    };
+  }
+
+  async getItemDetail(
+    context: Pick<RequestContext, 'actorId' | 'communityId'>,
+    itemId: string,
+  ): Promise<LibraryItemDetail> {
+    await this.assertActiveMember(context);
+    const results = await this.db.batch([
+      this.db.prepare(`${CATALOG_SELECT} WHERE ci.id = ? AND ci.community_id = ? AND ci.archived_at IS NULL AND ci.status <> 'archived' LIMIT 1`)
+        .bind(itemId, context.communityId),
+      this.db.prepare(`
+        SELECT
+          lr.id,
+          lr.catalog_item_id AS catalogItemId,
+          lr.requester_id AS requesterId,
+          lr.status,
+          lr.requested_at AS requestedAt,
+          lr.expires_at AS expiresAt
+        FROM loan_requests lr
+        INNER JOIN catalog_items ci ON ci.id = lr.catalog_item_id
+        WHERE lr.community_id = ? AND lr.catalog_item_id = ?
+          AND (lr.requester_id = ? OR ci.owner_id = ?)
+        ORDER BY lr.requested_at DESC
+        LIMIT 50
+      `).bind(context.communityId, itemId, context.actorId, context.actorId),
+      this.db.prepare(`
+        SELECT
+          id,
+          catalog_item_id AS catalogItemId,
+          request_id AS requestId,
+          owner_id AS ownerId,
+          borrower_id AS borrowerId,
+          status,
+          started_at AS startedAt,
+          next_check_at AS nextCheckAt,
+          returned_at AS returnedAt,
+          returned_by AS returnedBy
+        FROM loans
+        WHERE community_id = ? AND catalog_item_id = ?
+          AND (owner_id = ? OR borrower_id = ?)
+        ORDER BY started_at DESC
+        LIMIT 50
+      `).bind(context.communityId, itemId, context.actorId, context.actorId),
+      this.db.prepare(`
+        SELECT
+          h.id,
+          h.catalog_item_id AS catalogItemId,
+          h.member_id AS memberId,
+          h.status,
+          h.created_at AS createdAt,
+          h.offered_at AS offeredAt,
+          h.expires_at AS expiresAt,
+          h.borrow_request_id AS borrowRequestId,
+          (
+            SELECT COUNT(*) FROM holds ahead
+            WHERE ahead.catalog_item_id = h.catalog_item_id
+              AND ahead.status IN ('queued', 'offered')
+              AND (ahead.created_at < h.created_at OR (ahead.created_at = h.created_at AND ahead.id <= h.id))
+          ) AS position
+        FROM holds h
+        WHERE h.community_id = ? AND h.catalog_item_id = ? AND h.member_id = ?
+          AND h.status IN ('queued', 'offered')
+        ORDER BY h.created_at ASC
+        LIMIT 10
+      `).bind(context.communityId, itemId, context.actorId),
+      this.db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM holds
+        WHERE community_id = ? AND catalog_item_id = ? AND status IN ('queued', 'offered')
+      `).bind(context.communityId, itemId),
+    ]);
+    const itemRow = results[0].results[0] as unknown as CatalogRow | undefined;
+    if (!itemRow) throw libraryError('not-found', 'Book not found.');
+    const holdCountRow = results[4].results[0] as { count?: number } | undefined;
+    return {
+      item: mapCatalogItem(itemRow),
+      requests: (results[1].results as unknown as RequestRow[]).map(mapRequest),
+      loans: (results[2].results as unknown as LoanRow[]).map(mapLoan),
+      holds: (results[3].results as unknown as HoldRow[]).map(mapHold),
+      holdCount: Number(holdCountRow?.count ?? 0),
     };
   }
 

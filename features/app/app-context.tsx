@@ -24,7 +24,7 @@ import type {
   Loan,
   Member,
 } from '@/lib/domain/types';
-import type { LibraryBootstrap } from '@/lib/persistence/contracts';
+import type { LibraryBootstrap, LibraryItemDetail } from '@/lib/persistence/contracts';
 import {
   APP_HISTORY_STATE_KEY,
   appHref,
@@ -214,6 +214,76 @@ export function HanaAppProvider({
       });
   }, [refresh]);
 
+  const itemRefreshVersion = useRef(0);
+  const refreshItemInBackground = useCallback((itemId: string) => {
+    if (
+      !stateRef.current.isAuthenticated ||
+      document.visibilityState !== 'visible' ||
+      !navigator.onLine ||
+      mutating.current
+    )
+      return;
+    const itemVersion = ++itemRefreshVersion.current;
+    const appVersion = refreshVersion.current;
+    void apiData<LibraryItemDetail>(
+      `/api/catalog/${encodeURIComponent(itemId)}`,
+      { cache: 'no-store' },
+    )
+      .then((detail) => {
+        if (
+          itemVersion !== itemRefreshVersion.current ||
+          appVersion !== refreshVersion.current ||
+          stateRef.current.selectedItemId !== itemId
+        )
+          return;
+        setState((current) => ({
+          ...current,
+          items: current.items.map((item) =>
+            item.id === itemId ? detail.item : item,
+          ),
+          requests: [
+            ...current.requests.filter(
+              (request) => request.catalogItemId !== itemId,
+            ),
+            ...detail.requests,
+          ],
+          loans: [
+            ...current.loans.filter((loan) => loan.catalogItemId !== itemId),
+            ...detail.loans,
+          ],
+          holds: [
+            ...current.holds.filter((hold) => hold.catalogItemId !== itemId),
+            ...detail.holds,
+          ],
+          holdCounts: { ...current.holdCounts, [itemId]: detail.holdCount },
+        }));
+      })
+      .catch((error) => {
+        if (
+          itemVersion !== itemRefreshVersion.current ||
+          appVersion !== refreshVersion.current
+        )
+          return;
+        if (error instanceof ApiError && error.status === 401) {
+          reportError(error, 'refresh-book');
+        } else if (error instanceof ApiError && error.status === 404) {
+          setState((current) => ({
+            ...current,
+            items: current.items.filter((item) => item.id !== itemId),
+            requests: current.requests.filter(
+              (request) => request.catalogItemId !== itemId,
+            ),
+            loans: current.loans.filter((loan) => loan.catalogItemId !== itemId),
+            holds: current.holds.filter((hold) => hold.catalogItemId !== itemId),
+            holdCounts: Object.fromEntries(
+              Object.entries(current.holdCounts).filter(([id]) => id !== itemId),
+            ),
+          }));
+        }
+        // Other background failures leave the last usable snapshot in place.
+      });
+  }, [reportError]);
+
   useEffect(() => {
     if (!state.isAuthenticated) return;
     const serviceWorker = navigator.serviceWorker;
@@ -245,9 +315,20 @@ export function HanaAppProvider({
       screen: state.screen,
       selectedItemId: state.selectedItemId,
     };
-    if (!sameAppRoute(previousRoute.current, route)) refreshInBackground();
+    if (!sameAppRoute(previousRoute.current, route)) {
+      if (route.screen === 'detail' && route.selectedItemId) {
+        refreshItemInBackground(route.selectedItemId);
+      } else {
+        refreshInBackground();
+      }
+    }
     previousRoute.current = route;
-  }, [state.screen, state.selectedItemId, refreshInBackground]);
+  }, [
+    state.screen,
+    state.selectedItemId,
+    refreshInBackground,
+    refreshItemInBackground,
+  ]);
 
   const syncAfterMutation = useCallback(async () => {
     try {

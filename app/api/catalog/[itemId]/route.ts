@@ -5,6 +5,13 @@ interface RouteContext {
   params: Promise<{ itemId: string }>;
 }
 
+export async function GET(request: Request, route: RouteContext) {
+  return withLibraryApi(request, async (repository, context) => {
+    const { itemId } = await route.params;
+    return repository.getItemDetail(context, itemId);
+  });
+}
+
 export async function PATCH(request: Request, route: RouteContext) {
   return withLibraryApi(request, async (repository, context) => {
     const { itemId } = await route.params;

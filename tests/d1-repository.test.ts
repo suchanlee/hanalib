@@ -35,15 +35,18 @@ class RecordedStatement {
 class RecordedD1 {
   readonly first: (sql: string, values: unknown[]) => unknown;
   readonly all: (sql: string, values: unknown[]) => unknown[];
+  readonly batchRows: (sql: string, values: unknown[], index: number) => unknown[];
   readonly prepared: RecordedStatement[] = [];
   readonly batches: RecordedStatement[][] = [];
 
   constructor(
     first: (sql: string, values: unknown[]) => unknown,
     all: (sql: string, values: unknown[]) => unknown[] = () => [],
+    batchRows: (sql: string, values: unknown[], index: number) => unknown[] = () => [],
   ) {
     this.first = first;
     this.all = all;
+    this.batchRows = batchRows;
   }
 
   prepare(sql: string) {
@@ -54,7 +57,11 @@ class RecordedD1 {
 
   batch(statements: RecordedStatement[]) {
     this.batches.push(statements);
-    return Promise.resolve(statements.map(() => ({ success: true, results: [], meta: { changes: 1 } })));
+    return Promise.resolve(statements.map((statement, index) => ({
+      success: true,
+      results: this.batchRows(statement.sql, statement.values, index),
+      meta: { changes: 1 },
+    })));
   }
 }
 
@@ -546,6 +553,56 @@ void test('bootstrap exposes requests and loans only to their participants', asy
   assert.ok(loanQuery);
   assert.match(loanQuery.sql, /owner_id = \? OR borrower_id = \?/);
   assert.deepEqual(loanQuery.values, ['hana', 'borrower', 'borrower']);
+});
+
+void test('book detail refresh returns current item state while keeping circulation data participant-scoped', async () => {
+  const database = new RecordedD1(
+    (sql) => sql.includes('SELECT 1 AS active') ? { active: 1 } : null,
+    undefined,
+    (_sql, _values, index) => [
+      [{
+        itemId: 'item-1', ownerId: 'owner', itemStatus: 'borrowed', itemCondition: 'good',
+        ownerNotes: null, itemCreatedAt: fixedNow.getTime(), editionId: 'edition-1', isbn10: null,
+        isbn13: '9788954682152', title: '작별하지 않는다', titleEn: null,
+        authorsJson: '["한강"]', authorsEnJson: '[]', publisher: '문학동네',
+        publishedOn: '2021-09-09', language: 'ko', pageCount: 332, description: null,
+        coverOverrideAssetId: null, coverSourceUrl: null, coverStoragePath: null,
+        coverTone: 'blue', provenanceJson: '{}',
+      }],
+      [{
+        id: 'request-1', catalogItemId: 'item-1', requesterId: 'borrower', status: 'accepted',
+        requestedAt: fixedNow.getTime(), expiresAt: fixedNow.getTime() + 172_800_000,
+      }],
+      [{
+        id: 'loan-1', catalogItemId: 'item-1', requestId: 'request-1', ownerId: 'owner',
+        borrowerId: 'borrower', status: 'active', startedAt: fixedNow.getTime(),
+        nextCheckAt: fixedNow.getTime() + 604_800_000, returnedAt: null, returnedBy: null,
+      }],
+      [{
+        id: 'hold-1', catalogItemId: 'item-1', memberId: 'borrower', status: 'queued',
+        createdAt: fixedNow.getTime(), offeredAt: null, expiresAt: null,
+        borrowRequestId: null, position: 2,
+      }],
+      [{ count: 3 }],
+    ][index] ?? [],
+  );
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  const detail = await repository.getItemDetail(context, 'item-1');
+
+  assert.equal(detail.item.status, 'borrowed');
+  assert.equal(detail.requests[0].status, 'accepted');
+  assert.equal(detail.loans[0].status, 'active');
+  assert.equal(detail.holds[0].position, 2);
+  assert.equal(detail.holdCount, 3);
+  const [itemQuery, requestQuery, loanQuery, holdQuery, holdCountQuery] = database.batches[0];
+  assert.deepEqual(itemQuery.values, ['item-1', 'hana']);
+  assert.match(requestQuery.sql, /lr\.requester_id = \? OR ci\.owner_id = \?/);
+  assert.deepEqual(requestQuery.values, ['hana', 'item-1', 'borrower', 'borrower']);
+  assert.match(loanQuery.sql, /owner_id = \? OR borrower_id = \?/);
+  assert.deepEqual(loanQuery.values, ['hana', 'item-1', 'borrower', 'borrower']);
+  assert.deepEqual(holdQuery.values, ['hana', 'item-1', 'borrower']);
+  assert.deepEqual(holdCountQuery.values, ['hana', 'item-1']);
 });
 
 void test('returning a queued book keeps it held until the queue offer is created', async () => {

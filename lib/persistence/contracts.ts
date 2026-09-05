@@ -11,6 +11,14 @@ export interface LibraryBootstrap {
   returnChecks: ReturnCheck[];
 }
 
+export interface LibraryItemDetail {
+  item: CatalogItem;
+  requests: BorrowRequest[];
+  loans: Loan[];
+  holds: Hold[];
+  holdCount: number;
+}
+
 export interface RequestContext {
   actorId: string;
   communityId: string;
@@ -19,6 +27,7 @@ export interface RequestContext {
 
 export interface LibraryRepository {
   getBootstrap(context: Pick<RequestContext, 'actorId' | 'communityId'>): Promise<LibraryBootstrap>;
+  getItemDetail(context: Pick<RequestContext, 'actorId' | 'communityId'>, itemId: string): Promise<LibraryItemDetail>;
   listCatalog(context: Pick<RequestContext, 'actorId' | 'communityId'>): Promise<CatalogItem[]>;
   createCatalogItem(context: RequestContext, input: AddBookInput): Promise<CatalogItem>;
   updateCatalogItem(context: RequestContext, itemId: string, changes: UpdateCatalogItemInput): Promise<CatalogItem>;

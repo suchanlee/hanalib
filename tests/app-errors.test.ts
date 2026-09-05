@@ -279,6 +279,80 @@ void test('background polling skips hidden/offline apps, coalesces reads, recove
   }
 });
 
+void test('opening a book renders immediately and revalidates only its current detail state', async (t) => {
+  const item = {
+    id: 'item-1',
+    ownerId: 'owner',
+    status: 'available',
+    condition: 'good',
+    createdAt: '2026-09-05T00:00:00.000Z',
+    edition: {
+      id: 'edition-1',
+      isbn13: '9788954682152',
+      title: '작별하지 않는다',
+      authors: ['한강'],
+      publisher: '문학동네',
+      publishedYear: 2021,
+      language: 'ko',
+      coverTone: 'blue',
+      provenance: {},
+    },
+  };
+  const staleRequest = {
+    id: 'request-1',
+    catalogItemId: item.id,
+    requesterId: profile.id,
+    status: 'pending',
+    requestedAt: '2026-09-05T00:00:00.000Z',
+    expiresAt: '2026-09-07T00:00:00.000Z',
+  };
+  const detail = deferred<Response>();
+  const paths: string[] = [];
+  t.mock.method(globalThis, 'fetch', async (url: string) => {
+    paths.push(url);
+    if (url === '/api/app') {
+      return Response.json({
+        data: {
+          ...bootstrap,
+          items: [item],
+          requests: [staleRequest],
+          holdCounts: { [item.id]: 0 },
+        },
+      });
+    }
+    if (url === '/api/catalog/item-1') return detail.promise;
+    throw new Error(`Unexpected request: ${url}`);
+  });
+  const view = await mount();
+  try {
+    await act(async () => current.actions.selectItem(item.id));
+    assert.equal(current.state.items[0].status, 'available');
+    assert.equal(current.state.holdCounts[item.id], 0);
+    assert.deepEqual(paths, ['/api/app', '/api/catalog/item-1']);
+
+    await act(async () => detail.resolve(Response.json({ data: {
+      item: { ...item, status: 'borrowed' },
+      requests: [{ ...staleRequest, status: 'accepted' }],
+      loans: [{
+        id: 'loan-1', catalogItemId: item.id, requestId: staleRequest.id,
+        ownerId: 'owner', borrowerId: profile.id, status: 'active',
+        startedAt: '2026-09-05T01:00:00.000Z', nextCheckAt: '2026-09-12T01:00:00.000Z',
+      }],
+      holds: [],
+      holdCount: 2,
+    } })));
+
+    assert.equal(current.state.items[0].status, 'borrowed');
+    assert.equal(current.state.requests[0].status, 'accepted');
+    assert.equal(current.state.loans[0].status, 'active');
+    assert.equal(current.state.holdCounts[item.id], 2);
+    assert.deepEqual(paths, ['/api/app', '/api/catalog/item-1']);
+  } finally {
+    await view.close();
+    window.history.replaceState(null, '', '/');
+  }
+});
+
 void test('an older background read cannot undo a cancellation or run during a mutation', async (t) => {
   const request = {
     id: 'request',
