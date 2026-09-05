@@ -1,6 +1,20 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
+import { ThemeProvider } from '@/features/app/theme-context';
 import './globals.css';
+
+const themeInitializer = `
+  (() => {
+    try {
+      const stored = localStorage.getItem('hana-theme');
+      const theme = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+      const dark = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+    } catch {}
+  })();
+`;
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,8 +48,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
-      <body className={`${geistSans.variable} antialiased`}>{children}</body>
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitializer }} />
+      </head>
+      <body className={`${geistSans.variable} antialiased`}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
