@@ -66,7 +66,7 @@ export async function oauthTransactionFromRequest(
   if (
     !value ||
     value.version !== 1 ||
-    value.provider !== 'kakao' ||
+    (value.provider !== 'google' && value.provider !== 'kakao') ||
     typeof value.state !== 'string' || value.state.length < 32 ||
     typeof value.nonce !== 'string' || value.nonce.length < 32 ||
     typeof value.verifier !== 'string' || value.verifier.length < 43 ||

@@ -56,6 +56,19 @@ void test('binds Kakao state, nonce, verifier, and return path in a signed short
   assert.match(setCookie, /; Secure/u);
 });
 
+void test('recovers a signed Google OAuth transaction', async () => {
+  const transaction = newOAuthTransaction('google', '/', now);
+  const setCookie = await oauthTransactionCookie(transaction, transactionSecret, true);
+  const request = new Request('https://library.example/api/auth/google/callback', {
+    headers: { cookie: setCookie.split(';', 1)[0] },
+  });
+
+  assert.deepEqual(
+    await oauthTransactionFromRequest(request, transactionSecret, true, now),
+    transaction,
+  );
+});
+
 void test('builds Kakao OIDC authorization with nonce and PKCE', async () => {
   const kakao = readProviderAuthConfig('kakao', baseEnv);
   const transaction = newOAuthTransaction('kakao', '/', now);
