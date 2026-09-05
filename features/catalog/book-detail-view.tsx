@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ChangeEvent } from 'react';
-import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Hash, ImagePlus, Languages, Library, Pencil, RefreshCw, Trash2, UserRound } from 'lucide-react';
+import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Clock3, Hash, ImagePlus, Languages, Library, Pencil, RefreshCw, Trash2, UserRound, UsersRound } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,10 +25,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 import { useHanaApp } from '@/features/app/app-context';
-import type { CatalogItem } from '@/lib/domain/types';
+import type { BookEdition, CatalogItem } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
 import { uploadMemberCover, validCoverFile } from '@/lib/storage/client-cover';
 import { BookCover } from './book-cover';
@@ -36,13 +38,43 @@ import { catalogCopy, conditionLabel, languageLabel, statusLabel } from './catal
 
 type Feedback = { tone: 'success' | 'error'; text: string } | null;
 
+interface EditListingDraft {
+  title: string;
+  titleEn: string;
+  authors: string;
+  authorsEn: string;
+  publisher: string;
+  publishedYear: string;
+  language: BookEdition['language'];
+  pageCount: string;
+  description: string;
+  condition: CatalogItem['condition'];
+  ownerNotes: string;
+}
+
+function editListingDraft(item?: CatalogItem): EditListingDraft {
+  return {
+    title: item?.edition.title ?? '',
+    titleEn: item?.edition.titleEn ?? '',
+    authors: item?.edition.authors.join(', ') ?? '',
+    authorsEn: item?.edition.authorsEn?.join(', ') ?? '',
+    publisher: item?.edition.publisher ?? '',
+    publishedYear: item ? String(item.edition.publishedYear) : '',
+    language: item?.edition.language ?? 'ko',
+    pageCount: item?.edition.pageCount ? String(item.edition.pageCount) : '',
+    description: item?.edition.description ?? '',
+    condition: item?.condition ?? 'good',
+    ownerNotes: item?.ownerNotes ?? '',
+  };
+}
+
 export function BookDetailView() {
   const { state, actions } = useHanaApp();
   const t = catalogCopy[state.locale];
   const item = state.items.find((candidate) => candidate.id === state.selectedItemId);
   const [editOpen, setEditOpen] = useState(false);
-  const [condition, setCondition] = useState<CatalogItem['condition']>(item?.condition ?? 'good');
-  const [ownerNotes, setOwnerNotes] = useState(item?.ownerNotes ?? '');
+  const [editDraft, setEditDraft] = useState<EditListingDraft>(() => editListingDraft(item));
+  const [editError, setEditError] = useState('');
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [coverFile, setCoverFile] = useState<File>();
   const [coverPreviewUrl, setCoverPreviewUrl] = useState('');
@@ -51,6 +83,8 @@ export function BookDetailView() {
   const [isRefreshingCover, setIsRefreshingCover] = useState(false);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
+  const [holdClaimDialogOpen, setHoldClaimDialogOpen] = useState(false);
 
   useEffect(() => () => {
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
@@ -74,6 +108,8 @@ export function BookDetailView() {
   const activeLoan = state.loans.find((loan) => loan.catalogItemId === item.id && loan.status === 'active');
   const borrower = activeLoan ? state.members.find((member) => member.id === activeLoan.borrowerId) : undefined;
   const canReturn = Boolean(activeLoan && (activeLoan.ownerId === state.currentUserId || activeLoan.borrowerId === state.currentUserId));
+  const ownHold = state.holds.find((hold) => hold.catalogItemId === item.id && (hold.status === 'queued' || hold.status === 'offered'));
+  const holdCount = state.holdCounts[item.id] ?? 0;
   const itemId = item.id;
   const itemStatus = item.status;
 
@@ -83,8 +119,22 @@ export function BookDetailView() {
       return;
     }
 
+    const publishedYear = Number(editDraft.publishedYear);
+    const pageCount = editDraft.pageCount.trim() ? Number(editDraft.pageCount) : null;
+    if (
+      !editDraft.title.trim() ||
+      !Number.isInteger(publishedYear) ||
+      publishedYear < 1000 ||
+      publishedYear > 2200 ||
+      (pageCount !== null && (!Number.isInteger(pageCount) || pageCount <= 0))
+    ) {
+      setEditError(t.editValidation);
+      return;
+    }
+
     setIsSaving(true);
     setCoverError('');
+    setEditError('');
     let coverAssetId: string | undefined;
     if (coverFile) {
       try {
@@ -97,8 +147,17 @@ export function BookDetailView() {
     }
     try {
       await actions.updateItem(itemId, {
-        condition,
-        ownerNotes: ownerNotes.trim() || undefined,
+        title: editDraft.title.trim(),
+        titleEn: editDraft.titleEn.trim() || null,
+        authors: editDraft.authors.split(',').map((author) => author.trim()).filter(Boolean),
+        authorsEn: editDraft.authorsEn.split(',').map((author) => author.trim()).filter(Boolean),
+        publisher: editDraft.publisher.trim(),
+        publishedYear,
+        language: editDraft.language,
+        pageCount,
+        description: editDraft.description.trim() || null,
+        condition: editDraft.condition,
+        ownerNotes: editDraft.ownerNotes.trim() || undefined,
         coverAssetId,
       });
       setCoverFile(undefined);
@@ -110,6 +169,10 @@ export function BookDetailView() {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function editField<K extends keyof EditListingDraft>(field: K, value: EditListingDraft[K]) {
+    setEditDraft((current) => ({ ...current, [field]: value }));
   }
 
   function selectCover(event: ChangeEvent<HTMLInputElement>) {
@@ -185,6 +248,51 @@ export function BookDetailView() {
     setFeedback({ tone: 'success', text: t.returned });
   }
 
+  async function joinWaitlist() {
+    setIsHolding(true);
+    try {
+      await actions.joinHold(itemId);
+      setFeedback({ tone: 'success', text: t.joinedWaitlist });
+    } catch {
+      setFeedback({ tone: 'error', text: t.requestFailed });
+    } finally {
+      setIsHolding(false);
+    }
+  }
+
+  async function leaveWaitlist() {
+    if (!ownHold) return;
+    setIsHolding(true);
+    try {
+      await actions.cancelHold(ownHold.id);
+      setFeedback({ tone: 'success', text: state.locale === 'ko' ? '대기 목록에서 나왔어요.' : 'You left the waitlist.' });
+    } catch {
+      setFeedback({ tone: 'error', text: t.requestFailed });
+    } finally {
+      setIsHolding(false);
+    }
+  }
+
+  async function claimWaitlistOffer() {
+    if (!ownHold || ownHold.status !== 'offered') return;
+    setIsHolding(true);
+    try {
+      await actions.claimHold(ownHold.id);
+      setHoldClaimDialogOpen(false);
+      setFeedback({ tone: 'success', text: t.requested });
+    } catch {
+      setFeedback({ tone: 'error', text: t.requestFailed });
+    } finally {
+      setIsHolding(false);
+    }
+  }
+
+  const holdExpiry = ownHold?.expiresAt
+    ? new Intl.DateTimeFormat(state.locale === 'ko' ? 'ko-KR' : 'en-US', {
+        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles',
+      }).format(new Date(ownHold.expiresAt))
+    : '';
+
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-32 pt-3 sm:px-6 sm:pt-6" data-testid="book-detail-view">
       <Button type="button" variant="ghost" className="-ml-2 h-11" onClick={() => actions.setScreen('catalog')} data-testid="detail-back">
@@ -201,6 +309,7 @@ export function BookDetailView() {
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={item.status === 'available' ? 'secondary' : 'outline'} data-testid="detail-status">{statusLabel(state.locale, item.status)}</Badge>
             {isOwner ? <Badge variant="outline">{t.mine}</Badge> : null}
+            {holdCount > 0 ? <Badge variant="outline"><UsersRound className="size-3" />{t.waitingCount(holdCount)}</Badge> : null}
             {activeLoan?.borrowerId === state.currentUserId ? <Badge>{t.onLoanToYou}</Badge> : null}
             {activeLoan?.ownerId === state.currentUserId ? <Badge>{t.lentByYou}</Badge> : null}
           </div>
@@ -255,6 +364,55 @@ export function BookDetailView() {
                 </div>
                 <Button type="button" variant="outline" className="h-12 sm:col-span-2" onClick={cancelRequest} data-testid="cancel-borrow-request">{t.cancelRequest}</Button>
               </>
+            ) : ownHold?.status === 'offered' ? (
+              <div className="rounded-2xl border border-primary/30 bg-secondary/60 p-4 sm:col-span-2" data-testid="hold-offer">
+                <div className="flex items-start gap-3">
+                  <Clock3 className="mt-0.5 size-5 shrink-0 text-primary" />
+                  <div>
+                    <p className="font-semibold">{t.holdReady}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{t.holdReadyHelp(holdExpiry)}</p>
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <AlertDialog open={holdClaimDialogOpen} onOpenChange={(open) => { if (!isHolding) setHoldClaimDialogOpen(open); }}>
+                    <AlertDialogTrigger render={<Button type="button" className="h-11" data-testid="claim-hold" />}>
+                      {t.claimHold}
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogMedia><BookMarked /></AlertDialogMedia>
+                        <AlertDialogTitle>{t.requestConfirmTitle}</AlertDialogTitle>
+                        <AlertDialogDescription>{t.requestConfirmHelp(owner ? memberName(state.locale, owner) : '—')}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="h-11" disabled={isHolding}>{t.cancel}</AlertDialogCancel>
+                        <AlertDialogAction className="h-11" disabled={isHolding} onClick={() => { void claimWaitlistOffer(); }} data-testid="confirm-claim-hold">
+                          {isHolding ? t.requesting : t.confirmRequest}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  <Button type="button" variant="outline" className="h-11" disabled={isHolding} onClick={() => { void leaveWaitlist(); }} data-testid="pass-hold">
+                    {t.passHold}
+                  </Button>
+                </div>
+              </div>
+            ) : ownHold?.status === 'queued' ? (
+              <div className="rounded-2xl border bg-muted/40 p-4 sm:col-span-2" data-testid="hold-queued">
+                <p className="font-semibold">{t.waitlistPosition(ownHold.position, holdCount)}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{t.joinWaitlistHelp}</p>
+                <Button type="button" variant="outline" className="mt-4 h-11 w-full" disabled={isHolding} onClick={() => { void leaveWaitlist(); }} data-testid="cancel-hold">
+                  {t.leaveWaitlist}
+                </Button>
+              </div>
+            ) : !isOwner && activeLoan?.borrowerId !== state.currentUserId && item.status !== 'available' ? (
+              <div className="rounded-2xl border bg-muted/40 p-4 sm:col-span-2">
+                <p className="font-semibold">{t.waitingCount(holdCount)}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{t.joinWaitlistHelp}</p>
+                <Button type="button" className="mt-4 h-11 w-full" disabled={isHolding} onClick={() => { void joinWaitlist(); }} data-testid="join-hold">
+                  {t.joinWaitlist}
+                </Button>
+              </div>
             ) : !isOwner && item.status === 'available' ? (
               <AlertDialog open={requestDialogOpen} onOpenChange={(open) => { if (!isRequesting) setRequestDialogOpen(open); }}>
                 <AlertDialogTrigger
@@ -302,8 +460,8 @@ export function BookDetailView() {
                         className="h-12"
                         data-testid="edit-listing"
                         onClick={() => {
-                          setCondition(item.condition);
-                          setOwnerNotes(item.ownerNotes ?? '');
+                          setEditDraft(editListingDraft(item));
+                          setEditError('');
                           setCoverFile(undefined);
                           setCoverPreviewUrl('');
                           setCoverError('');
@@ -315,12 +473,12 @@ export function BookDetailView() {
                     <Pencil className="size-4" />
                     {t.edit}
                   </DialogTrigger>
-                  <DialogContent className="max-w-md">
+                  <DialogContent className="max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)_auto] sm:max-w-lg">
                     <DialogHeader>
                       <DialogTitle>{t.editTitle}</DialogTitle>
                       <DialogDescription>{t.editHelp}</DialogDescription>
                     </DialogHeader>
-                    <form id="edit-listing-form" className="space-y-4" onSubmit={(event) => { event.preventDefault(); void saveListing(); }}>
+                    <form id="edit-listing-form" className="min-h-0 space-y-4 overflow-y-auto pr-1" onSubmit={(event) => { event.preventDefault(); void saveListing(); }}>
                       <div className="grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4 rounded-2xl bg-muted/60 p-3">
                         <BookCover
                           edition={coverPreviewUrl ? { ...item.edition, coverUrl: coverPreviewUrl } : item.edition}
@@ -356,23 +514,77 @@ export function BookDetailView() {
                       </div>
                       {coverError ? <p className="text-sm text-destructive" role="alert">{coverError}</p> : null}
                       <div className="space-y-2">
+                        <Label htmlFor="item-isbn">ISBN</Label>
+                        <Input id="item-isbn" className="h-11 bg-muted/40 text-muted-foreground" readOnly value={item.edition.isbn13} />
+                        <p className="text-xs text-muted-foreground">{t.isbnHelp}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="item-title">{t.titleLabel}</Label>
+                        <Input id="item-title" className="h-11" required value={editDraft.title} onChange={(event) => editField('title', event.target.value)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="item-title-en">{t.titleEnLabel}</Label>
+                        <Input id="item-title-en" className="h-11" value={editDraft.titleEn} onChange={(event) => editField('titleEn', event.target.value)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="item-authors">{t.authorsLabel}</Label>
+                        <Input id="item-authors" className="h-11" value={editDraft.authors} onChange={(event) => editField('authors', event.target.value)} />
+                        <p className="text-xs text-muted-foreground">{t.authorsHelp}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="item-authors-en">{t.authorsEnLabel}</Label>
+                        <Input id="item-authors-en" className="h-11" value={editDraft.authorsEn} onChange={(event) => editField('authorsEn', event.target.value)} />
+                        <p className="text-xs text-muted-foreground">{t.authorsHelp}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="item-publisher">{t.publisherLabel}</Label>
+                        <Input id="item-publisher" className="h-11" value={editDraft.publisher} onChange={(event) => editField('publisher', event.target.value)} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="item-published-year">{t.publishedYearLabel}</Label>
+                          <Input id="item-published-year" className="h-11" inputMode="numeric" min="1000" max="2200" required type="number" value={editDraft.publishedYear} onChange={(event) => editField('publishedYear', event.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="item-page-count">{t.pageCountLabel}</Label>
+                          <Input id="item-page-count" className="h-11" inputMode="numeric" min="1" type="number" value={editDraft.pageCount} onChange={(event) => editField('pageCount', event.target.value)} />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="item-language">{t.language}</Label>
+                        <NativeSelect
+                          id="item-language"
+                          className="w-full [&_select]:h-11 [&_select]:bg-background [&_select]:px-3 [&_select]:text-base"
+                          value={editDraft.language}
+                          onChange={(event) => editField('language', event.target.value as EditListingDraft['language'])}
+                        >
+                          <NativeSelectOption value="ko">{t.korean}</NativeSelectOption>
+                          <NativeSelectOption value="en">{t.english}</NativeSelectOption>
+                        </NativeSelect>
+                      </div>
+                      <div className="space-y-2">
                         <Label htmlFor="item-condition">{t.condition}</Label>
-                        <select
+                        <NativeSelect
                           id="item-condition"
-                          className="h-11 w-full rounded-xl border border-input bg-background px-3 text-base outline-none focus:border-ring focus:ring-3 focus:ring-ring/30"
-                          value={condition}
-                          onChange={(event) => setCondition(event.target.value as CatalogItem['condition'])}
+                          className="w-full [&_select]:h-11 [&_select]:bg-background [&_select]:px-3 [&_select]:text-base"
+                          value={editDraft.condition}
+                          onChange={(event) => editField('condition', event.target.value as EditListingDraft['condition'])}
                           data-testid="item-condition"
                         >
-                          <option value="like-new">{t.likeNew}</option>
-                          <option value="good">{t.good}</option>
-                          <option value="well-loved">{t.wellLoved}</option>
-                        </select>
+                          <NativeSelectOption value="like-new">{t.likeNew}</NativeSelectOption>
+                          <NativeSelectOption value="good">{t.good}</NativeSelectOption>
+                          <NativeSelectOption value="well-loved">{t.wellLoved}</NativeSelectOption>
+                        </NativeSelect>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="item-description">{t.descriptionLabel}</Label>
+                        <Textarea id="item-description" value={editDraft.description} onChange={(event) => editField('description', event.target.value)} className="min-h-24" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="owner-notes">{t.ownerNote}</Label>
-                        <Textarea id="owner-notes" value={ownerNotes} onChange={(event) => setOwnerNotes(event.target.value)} maxLength={280} className="min-h-24" data-testid="owner-notes" />
+                        <Textarea id="owner-notes" value={editDraft.ownerNotes} onChange={(event) => editField('ownerNotes', event.target.value)} maxLength={280} className="min-h-24" data-testid="owner-notes" />
                       </div>
+                      {editError ? <p className="text-sm text-destructive" role="alert">{editError}</p> : null}
                     </form>
                     <DialogFooter>
                       <Button type="button" variant="outline" className="h-11" disabled={isSaving} onClick={() => setEditOpen(false)}>{t.cancel}</Button>
@@ -423,7 +635,7 @@ export function BookDetailView() {
           <Metadata icon={<BookMarked />} label={t.condition} value={conditionLabel(state.locale, item.condition)} />
           {item.edition.pageCount ? <Metadata icon={<Library />} label={state.locale === 'ko' ? '분량' : 'Length'} value={`${item.edition.pageCount} ${t.pages}`} /> : null}
         </dl>
-        <div className="mt-3 rounded-2xl border bg-card p-4">
+        <div className="mt-3 rounded-xl border bg-card p-4">
           <dt className="text-xs font-medium text-muted-foreground">{t.ownerNote}</dt>
           <dd className="mt-1 text-sm leading-relaxed">{item.ownerNotes || t.noOwnerNote}</dd>
         </div>
@@ -434,7 +646,7 @@ export function BookDetailView() {
 
 function Metadata({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border bg-card p-4">
+    <div className="flex items-start gap-3 rounded-xl border bg-card p-4">
       <span className="mt-0.5 text-primary [&>svg]:size-4">{icon}</span>
       <div className="min-w-0">
         <dt className="text-xs font-medium text-muted-foreground">{label}</dt>

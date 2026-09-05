@@ -200,7 +200,7 @@ function createDraft(metadata: StitchedBookMetadata): IntakeDraft {
     authors: metadata.authors.join(', '),
     publisher: metadata.publisher,
     publishedYear: String(metadata.publishedYear),
-    language: metadata.language,
+    language: metadata.language === 'en' ? 'en' : 'ko',
     pageCount: metadata.pageCount ? String(metadata.pageCount) : '',
     coverUrl: metadata.coverUrl ?? '',
     condition: 'good',
@@ -775,7 +775,6 @@ export function IntakeView() {
               <NativeSelect className="w-full" id="book-language" onChange={(event) => editDraft('language', event.target.value as IntakeDraft['language'])} value={draft.language}>
                 <NativeSelectOption value="ko">{c.korean}</NativeSelectOption>
                 <NativeSelectOption value="en">{c.english}</NativeSelectOption>
-                <NativeSelectOption value="other">{c.other}</NativeSelectOption>
               </NativeSelect>
             </div>
             <div className="space-y-2">

@@ -20,5 +20,5 @@ export async function DELETE(request: Request, route: RouteContext) {
   return withLibraryApi(request, async (repository, context) => {
     const { requestId } = await route.params;
     return repository.cancelBorrowRequest(context, requestId);
-  }, { mutation: true });
+  }, { dispatchNotifications: true, mutation: true });
 }

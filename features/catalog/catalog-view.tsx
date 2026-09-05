@@ -5,6 +5,7 @@ import { Filter, Search, SlidersHorizontal, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import {
   Sheet,
   SheetClose,
@@ -30,54 +31,54 @@ function FilterFields({
 }) {
   const { state } = useHanaApp();
   const t = catalogCopy[state.locale];
-  const selectClass = 'h-11 w-full rounded-xl border border-input bg-background px-3 text-base outline-none transition focus:border-ring focus:ring-3 focus:ring-ring/30';
+  const selectClass = 'w-full [&_select]:h-11 [&_select]:bg-background [&_select]:px-3 [&_select]:text-base';
 
   return (
     <div className="space-y-5">
       <label className="block space-y-2 text-sm font-medium">
         <span>{t.ownerFilter}</span>
-        <select
+        <NativeSelect
           className={selectClass}
           value={value.ownerId}
           onChange={(event) => onChange({ ownerId: event.target.value })}
           data-testid="owner-filter"
         >
-          <option value="all">{t.allOwners}</option>
+          <NativeSelectOption value="all">{t.allOwners}</NativeSelectOption>
           {state.members.map((member) => (
-            <option key={member.id} value={member.id}>
+            <NativeSelectOption key={member.id} value={member.id}>
               {memberName(state.locale, member)}{member.id === state.currentUserId ? ` · ${t.mine}` : ''}
-            </option>
+            </NativeSelectOption>
           ))}
-        </select>
+        </NativeSelect>
       </label>
 
       <label className="block space-y-2 text-sm font-medium">
         <span>{t.statusFilter}</span>
-        <select
+        <NativeSelect
           className={selectClass}
           value={value.status}
           onChange={(event) => onChange({ status: event.target.value as CatalogFilters['status'] })}
           data-testid="status-filter"
         >
-          <option value="all">{t.allStatuses}</option>
-          <option value="available">{copy[state.locale].available}</option>
-          <option value="borrowed">{copy[state.locale].borrowed}</option>
-        </select>
+          <NativeSelectOption value="all">{t.allStatuses}</NativeSelectOption>
+          <NativeSelectOption value="available">{copy[state.locale].available}</NativeSelectOption>
+          <NativeSelectOption value="borrowed">{copy[state.locale].borrowed}</NativeSelectOption>
+        </NativeSelect>
       </label>
 
       <label className="block space-y-2 text-sm font-medium">
         <span>{t.languageFilter}</span>
-        <select
+        <NativeSelect
           className={selectClass}
           value={value.language}
           onChange={(event) => onChange({ language: event.target.value as CatalogFilters['language'] })}
           data-testid="language-filter"
         >
-          <option value="all">{t.allLanguages}</option>
-          <option value="ko">{t.korean}</option>
-          <option value="en">{t.english}</option>
-          <option value="other">{t.otherLanguage}</option>
-        </select>
+          <NativeSelectOption value="all">{t.allLanguages}</NativeSelectOption>
+          <NativeSelectOption value="ko">{t.korean}</NativeSelectOption>
+          <NativeSelectOption value="en">{t.english}</NativeSelectOption>
+          <NativeSelectOption value="other">{t.otherLanguage}</NativeSelectOption>
+        </NativeSelect>
       </label>
     </div>
   );
@@ -228,6 +229,7 @@ export function CatalogView() {
           {results.map((item) => {
             const owner = state.members.find((member) => member.id === item.ownerId);
             const isMine = item.ownerId === state.currentUserId;
+            const holdCount = state.holdCounts[item.id] ?? 0;
             return (
               <button
                 key={item.id}
@@ -245,6 +247,11 @@ export function CatalogView() {
                   >
                     {statusLabel(state.locale, item.status)}
                   </Badge>
+                  {holdCount > 0 ? (
+                    <Badge className="absolute right-2 top-2 bg-background/90 text-foreground shadow-sm backdrop-blur" variant="outline">
+                      {t.waitingCount(holdCount)}
+                    </Badge>
+                  ) : null}
                 </div>
                 <h2 className="mt-3 line-clamp-2 text-[0.95rem] font-semibold leading-snug tracking-[-0.015em] sm:text-base">{item.edition.title}</h2>
                 <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{t.bookBy(item.edition.authors.join(', '))}</p>

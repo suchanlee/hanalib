@@ -6,6 +6,7 @@ import {
   BookOpen,
   Check,
   Clock3,
+  Hourglass,
   MessageSquareText,
   RotateCcw,
   Send,
@@ -30,6 +31,8 @@ import type {
   CatalogItem,
   Loan,
   Member,
+  Hold,
+  ReturnCheck,
 } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
 
@@ -93,6 +96,55 @@ function EmptyState({
         </p>
       </div>
     </div>
+  );
+}
+
+function HoldCard({
+  hold,
+  item,
+  count,
+  locale,
+  onOpen,
+  onCancel,
+}: {
+  hold: Hold;
+  item: CatalogItem;
+  count: number;
+  locale: AppLocale;
+  onOpen: () => void;
+  onCancel: () => void;
+}) {
+  const offered = hold.status === 'offered';
+  return (
+    <Card className={offered ? 'border-primary/35 bg-secondary/25' : ''} data-testid={`hold-${hold.status}-${hold.id}`}>
+      <CardHeader>
+        <div className="flex items-start gap-3">
+          <BookThumb item={item} />
+          <div className="min-w-0 flex-1">
+            <Badge className="mb-2" variant={offered ? 'default' : 'secondary'}>
+              {offered ? t(locale, '내 차례', 'Your turn') : t(locale, '대기 중', 'Waiting')}
+            </Badge>
+            <CardTitle className="line-clamp-2">{item.edition.title}</CardTitle>
+            <CardDescription className="mt-1">
+              {offered
+                ? expiresLabel(locale, hold.expiresAt ?? new Date().toISOString())
+                : t(locale, `내 순서 ${hold.position}번째 · 총 ${count}명`, `You are #${hold.position} of ${count}`)}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardFooter className="gap-2">
+        {offered ? (
+          <Button className="h-10 w-full" onClick={onOpen} data-testid={`hold-review-${hold.id}`}>
+            {t(locale, '내 차례 확인', 'Review offer')}
+          </Button>
+        ) : (
+          <Button className="h-10 w-full" variant="outline" onClick={onCancel} data-testid={`hold-cancel-${hold.id}`}>
+            {t(locale, '대기 취소', 'Leave waitlist')}
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 }
 
@@ -198,6 +250,8 @@ function LoanCard({
   view,
   locale,
   onReturn,
+  returnCheck,
+  onStillBorrowing,
 }: {
   loan: Loan;
   item: CatalogItem;
@@ -205,6 +259,8 @@ function LoanCard({
   view: 'borrowed' | 'lent';
   locale: AppLocale;
   onReturn: () => void;
+  returnCheck?: ReturnCheck;
+  onStillBorrowing: () => void;
 }) {
   const borrowed = view === 'borrowed';
   return (
@@ -232,8 +288,9 @@ function LoanCard({
         <div className="flex items-start gap-2.5 rounded-xl border bg-background p-3">
           <BellRing aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary" />
           <div className="text-sm leading-5">
-            <p className="font-medium">
-              {t(locale, `다음 반납 확인 · ${shortDate(locale, loan.nextCheckAt)}`, `Next return check · ${shortDate(locale, loan.nextCheckAt)}`)}
+            <p className="font-medium">{returnCheck
+              ? t(locale, '반납 여부를 알려주세요', 'Return check is ready')
+              : t(locale, `다음 반납 확인 · ${shortDate(locale, loan.nextCheckAt)}`, `Next return check · ${shortDate(locale, loan.nextCheckAt)}`)}
             </p>
             <p className="mt-0.5 text-muted-foreground">
               {t(locale, '대여 7일째부터 매주 대여자에게 확인해요.', 'We check with the borrower on day 7, then weekly.')}
@@ -241,16 +298,21 @@ function LoanCard({
           </div>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="gap-2">
         <Button
-          className="h-10 w-full"
+          className="h-10 flex-1"
           data-testid={`loan-return-${loan.id}`}
           onClick={onReturn}
           variant={borrowed ? 'default' : 'outline'}
         >
           {borrowed ? <BookCheck aria-hidden="true" /> : <RotateCcw aria-hidden="true" />}
-          {t(locale, '반납 완료', 'Mark returned')}
+          {t(locale, '반납 완료', 'Returned')}
         </Button>
+        {returnCheck ? (
+          <Button className="h-10 flex-1" variant="outline" onClick={onStillBorrowing} data-testid={`loan-still-borrowing-${loan.id}`}>
+            {t(locale, '아직 대여 중', 'Still borrowing')}
+          </Button>
+        ) : null}
       </CardFooter>
     </Card>
   );
@@ -269,6 +331,7 @@ export function CirculationView() {
   });
   const borrowed = state.loans.filter((loan) => loan.status === 'active' && loan.borrowerId === state.currentUserId);
   const lent = state.loans.filter((loan) => loan.status === 'active' && loan.ownerId === state.currentUserId);
+  const myHolds = state.holds.filter((hold) => hold.status === 'queued' || hold.status === 'offered');
   const defaultTab = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('loan')
     ? 'borrowed'
     : 'requests';
@@ -305,7 +368,27 @@ export function CirculationView() {
         </TabsList>
 
         <TabsContent className="mt-4 space-y-3" value="requests">
-          {pending.length === 0 && <EmptyState kind="requests" locale={locale} />}
+          {myHolds.length > 0 ? (
+            <div className="mb-5 space-y-3" data-testid="hold-list">
+              <h2 className="flex items-center gap-2 text-sm font-semibold"><Hourglass className="size-4 text-primary" />{t(locale, '내 대기 목록', 'My waitlists')}</h2>
+              {myHolds.map((hold) => {
+                const item = itemById.get(hold.catalogItemId);
+                if (!item) return null;
+                return (
+                  <HoldCard
+                    key={hold.id}
+                    hold={hold}
+                    item={item}
+                    count={state.holdCounts[item.id] ?? 0}
+                    locale={locale}
+                    onOpen={() => actions.selectItem(item.id)}
+                    onCancel={() => { void actions.cancelHold(hold.id); }}
+                  />
+                );
+              })}
+            </div>
+          ) : null}
+          {pending.length === 0 && myHolds.length === 0 && <EmptyState kind="requests" locale={locale} />}
           {pending.map((request) => {
             const item = itemById.get(request.catalogItemId);
             if (!item) return null;
@@ -333,6 +416,7 @@ export function CirculationView() {
           {borrowed.map((loan) => {
             const item = itemById.get(loan.catalogItemId);
             const owner = memberById.get(loan.ownerId);
+            const returnCheck = state.returnChecks.find((check) => check.loanId === loan.id);
             if (!item || !owner) return null;
             return (
               <LoanCard
@@ -341,6 +425,8 @@ export function CirculationView() {
                 loan={loan}
                 locale={locale}
                 onReturn={() => actions.markReturned(loan.id)}
+                returnCheck={returnCheck}
+                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false); }}
                 otherMember={owner}
                 view="borrowed"
               />
@@ -353,6 +439,7 @@ export function CirculationView() {
           {lent.map((loan) => {
             const item = itemById.get(loan.catalogItemId);
             const borrower = memberById.get(loan.borrowerId);
+            const returnCheck = state.returnChecks.find((check) => check.loanId === loan.id);
             if (!item || !borrower) return null;
             return (
               <LoanCard
@@ -361,6 +448,8 @@ export function CirculationView() {
                 loan={loan}
                 locale={locale}
                 onReturn={() => actions.markReturned(loan.id)}
+                returnCheck={returnCheck}
+                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false); }}
                 otherMember={borrower}
                 view="lent"
               />

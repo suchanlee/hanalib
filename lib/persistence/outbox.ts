@@ -25,6 +25,20 @@ export interface OutboxPayloadByType {
     actorName: string;
     returnUrl: string;
   };
+  hold_available: {
+    bookTitle: string;
+    recipientName: string;
+    expiresAt: string;
+    offerUrl: string;
+    coverUrl?: string;
+  };
+  hold_offer_reminder: {
+    bookTitle: string;
+    recipientName: string;
+    expiresAt: string;
+    offerUrl: string;
+    coverUrl?: string;
+  };
 }
 
 export type LibraryOutboxEventType = keyof OutboxPayloadByType;

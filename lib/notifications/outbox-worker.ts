@@ -4,7 +4,8 @@ import { operationalLog, safeErrorCode } from '../observability/log.ts';
 import { decryptContact, encryptContact } from './contact-crypto.ts';
 import { parseKakaoCredential, refreshKakaoCredential } from './kakao.ts';
 import { sendNotification, type DeliveryResult, type NotificationSenderConfig } from './sender.ts';
-import { borrowRequestTemplate, decisionTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
+import { borrowRequestTemplate, decisionTemplate, holdOfferTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
+import { offerNextHold } from '../persistence/hold-queue.ts';
 import {
   isWebPushConfigured,
   sendWebPushToUser,
@@ -55,7 +56,7 @@ function locale(value: string): AppLocale {
 }
 
 function eventType(value: string): LibraryOutboxEventType | undefined {
-  return ['borrow_requested', 'borrow_accepted', 'borrow_declined', 'return_check_due'].includes(value)
+  return ['borrow_requested', 'borrow_accepted', 'borrow_declined', 'return_check_due', 'hold_available', 'hold_offer_reminder'].includes(value)
     ? value as LibraryOutboxEventType
     : undefined;
 }
@@ -96,6 +97,19 @@ export function renderOutboxMessage(row: Pick<OutboxRow, 'eventType' | 'locale' 
       borrowerName: value.recipientName,
       bookTitle: value.bookTitle,
       returnUrl: value.returnUrl,
+    });
+  }
+  if (type === 'hold_available' || type === 'hold_offer_reminder') {
+    const value = payload(fullRow, type);
+    if (typeof value.expiresAt !== 'string' || typeof value.offerUrl !== 'string') throw new Error('invalid-outbox-payload');
+    return holdOfferTemplate({
+      locale: language,
+      memberName: value.recipientName,
+      bookTitle: value.bookTitle,
+      expiresAt: new Date(value.expiresAt),
+      offerUrl: value.offerUrl,
+      coverUrl: typeof value.coverUrl === 'string' ? value.coverUrl : undefined,
+      reminder: type === 'hold_offer_reminder',
     });
   }
   const value = payload(fullRow, type);
@@ -283,9 +297,22 @@ export async function processReadyOutbox(
   return result;
 }
 
-export async function expireStaleBorrowRequests(db: D1Database, now = Date.now()) {
+export async function expireStaleBorrowRequests(
+  db: D1Database,
+  now = Date.now(),
+  baseUrl = 'https://hanalib.app',
+) {
+  const converted = await db.prepare(`
+    SELECT DISTINCT h.catalog_item_id AS catalogItemId
+    FROM holds h
+    INNER JOIN loan_requests lr ON lr.id = h.borrow_request_id
+    WHERE h.status = 'converted' AND lr.status = 'pending' AND lr.expires_at <= ?
+  `).bind(now).all<{ catalogItemId: string }>();
   const result = await db.prepare("UPDATE loan_requests SET status = 'expired' WHERE status = 'pending' AND expires_at <= ?")
     .bind(now)
     .run();
+  for (const hold of converted.results) {
+    await offerNextHold(db, hold.catalogItemId, now, baseUrl);
+  }
   return affected(result);
 }

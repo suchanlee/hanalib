@@ -1,12 +1,12 @@
 import { withLibraryApi } from '@/lib/persistence/server';
 
 interface RouteContext {
-  params: Promise<{ loanId: string }>;
+  params: Promise<{ holdId: string }>;
 }
 
-export async function POST(request: Request, route: RouteContext) {
+export async function DELETE(request: Request, route: RouteContext) {
   return withLibraryApi(request, async (repository, context) => {
-    const { loanId } = await route.params;
-    return repository.markReturned(context, loanId);
+    const { holdId } = await route.params;
+    return repository.cancelHold(context, holdId);
   }, { dispatchNotifications: true, mutation: true });
 }

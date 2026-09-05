@@ -164,6 +164,34 @@ export const loans = sqliteTable(
   ],
 );
 
+export const holds = sqliteTable(
+  'holds',
+  {
+    id: text('id').primaryKey(),
+    communityId: text('community_id').notNull().references(() => communities.id),
+    catalogItemId: text('catalog_item_id').notNull().references(() => catalogItems.id),
+    memberId: text('member_id').notNull().references(() => profiles.id),
+    status: text('status').notNull().default('queued'),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    offeredAt: integer('offered_at', { mode: 'timestamp_ms' }),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }),
+    remindedAt: integer('reminded_at', { mode: 'timestamp_ms' }),
+    borrowRequestId: text('borrow_request_id').references(() => loanRequests.id),
+    idempotencyKey: text('idempotency_key'),
+  },
+  (table) => [
+    index('holds_item_queue_idx').on(table.catalogItemId, table.status, table.createdAt),
+    index('holds_member_status_idx').on(table.memberId, table.status),
+    uniqueIndex('holds_one_active_member_item_unique')
+      .on(table.catalogItemId, table.memberId)
+      .where(sql`${table.status} IN ('queued', 'offered')`),
+    uniqueIndex('holds_one_offer_item_unique')
+      .on(table.catalogItemId)
+      .where(sql`${table.status} = 'offered'`),
+    uniqueIndex('holds_idempotency_unique').on(table.idempotencyKey),
+  ],
+);
+
 export const notificationEndpoints = sqliteTable(
   'notification_endpoints',
   {

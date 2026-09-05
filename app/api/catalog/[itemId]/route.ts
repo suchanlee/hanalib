@@ -12,6 +12,15 @@ export async function PATCH(request: Request, route: RouteContext) {
     return repository.updateCatalogItem(context, itemId, {
       condition: body.condition as CatalogItem['condition'],
       ownerNotes: typeof body.ownerNotes === 'string' ? body.ownerNotes : undefined,
+      title: typeof body.title === 'string' ? body.title : undefined,
+      titleEn: typeof body.titleEn === 'string' || body.titleEn === null ? body.titleEn : undefined,
+      authors: Array.isArray(body.authors) ? body.authors as string[] : undefined,
+      authorsEn: Array.isArray(body.authorsEn) ? body.authorsEn as string[] : undefined,
+      publisher: typeof body.publisher === 'string' ? body.publisher : undefined,
+      publishedYear: typeof body.publishedYear === 'number' ? body.publishedYear : undefined,
+      language: typeof body.language === 'string' ? body.language as CatalogItem['edition']['language'] : undefined,
+      pageCount: typeof body.pageCount === 'number' || body.pageCount === null ? body.pageCount : undefined,
+      description: typeof body.description === 'string' || body.description === null ? body.description : undefined,
       coverAssetId: typeof body.coverAssetId === 'string' ? body.coverAssetId : undefined,
     });
   }, { mutation: true });

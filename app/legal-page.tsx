@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface LegalSection {
   title: string;
@@ -20,8 +21,8 @@ export function LegalPage({
     <main className="min-h-dvh bg-background px-5 py-8 text-foreground sm:px-8 sm:py-12">
       <article className="mx-auto w-full max-w-2xl">
         <Link className="inline-flex items-center gap-2.5 font-semibold tracking-tight" href="/">
-          <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
-          <span>씨앗책장 · Hana Seed Books</span>
+          <Image src="/seed-logo.svg" alt="" aria-hidden="true" width={36} height={36} className="size-9 shrink-0" />
+          <span>도서관 · Books</span>
         </Link>
 
         <header className="mt-10 border-b pb-8">

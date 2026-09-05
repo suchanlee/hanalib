@@ -5,10 +5,13 @@ import type {
   BorrowRequest,
   CatalogItem,
   CatalogStatus,
+  Hold,
+  HoldStatus,
   Loan,
   Member,
   NotificationChannel,
   RequestStatus,
+  ReturnCheck,
   UpdateCatalogItemInput,
 } from '../domain/types.ts';
 import { parseIsbn } from '../isbn/isbn.ts';
@@ -16,6 +19,7 @@ import { decryptContact, encryptContact, hashContact } from '../notifications/co
 import type { LibraryBootstrap, LibraryRepository, RequestContext } from './contracts.ts';
 import { libraryError } from './errors.ts';
 import type { OutboxPayloadByType } from './outbox.ts';
+import { offerNextHold } from './hold-queue.ts';
 
 const CATALOG_SELECT = `
   SELECT
@@ -118,6 +122,25 @@ interface LoanRow {
   returnedBy: string | null;
 }
 
+interface HoldRow {
+  id: string;
+  catalogItemId: string;
+  memberId: string;
+  status: string;
+  createdAt: number;
+  offeredAt: number | null;
+  expiresAt: number | null;
+  borrowRequestId: string | null;
+  position: number;
+}
+
+interface ReturnCheckRow {
+  id: string;
+  loanId: string;
+  scheduledFor: number;
+  sentAt: number;
+}
+
 interface RequestInfoRow extends RequestRow {
   communityId: string;
   ownerId: string;
@@ -197,7 +220,7 @@ function mapMember(row: MemberRow): Member {
 }
 
 function catalogStatus(value: string): CatalogStatus {
-  return value === 'borrowed' || value === 'archived' ? value : 'available';
+  return value === 'held' || value === 'borrowed' || value === 'archived' ? value : 'available';
 }
 
 function mapCatalogItem(row: CatalogRow): CatalogItem {
@@ -272,6 +295,34 @@ function mapLoan(row: LoanRow): Loan {
     nextCheckAt: iso(row.nextCheckAt),
     returnedAt: row.returnedAt == null ? undefined : iso(row.returnedAt),
     returnedBy: row.returnedBy ?? undefined,
+  };
+}
+
+function holdStatus(value: string): HoldStatus {
+  const statuses: HoldStatus[] = ['queued', 'offered', 'converted', 'canceled', 'expired'];
+  return statuses.includes(value as HoldStatus) ? value as HoldStatus : 'expired';
+}
+
+function mapHold(row: HoldRow): Hold {
+  return {
+    id: row.id,
+    catalogItemId: row.catalogItemId,
+    memberId: row.memberId,
+    status: holdStatus(row.status),
+    createdAt: iso(row.createdAt),
+    offeredAt: row.offeredAt == null ? undefined : iso(row.offeredAt),
+    expiresAt: row.expiresAt == null ? undefined : iso(row.expiresAt),
+    borrowRequestId: row.borrowRequestId ?? undefined,
+    position: Number(row.position),
+  };
+}
+
+function mapReturnCheck(row: ReturnCheckRow): ReturnCheck {
+  return {
+    id: row.id,
+    loanId: row.loanId,
+    scheduledFor: iso(row.scheduledFor),
+    sentAt: iso(row.sentAt),
   };
 }
 
@@ -364,6 +415,29 @@ export class D1LibraryRepository implements LibraryRepository {
     `).bind(loanId, communityId).first<LoanRow>();
   }
 
+  private async hold(holdId: string, communityId: string, memberId: string) {
+    return this.db.prepare(`
+      SELECT
+        h.id,
+        h.catalog_item_id AS catalogItemId,
+        h.member_id AS memberId,
+        h.status,
+        h.created_at AS createdAt,
+        h.offered_at AS offeredAt,
+        h.expires_at AS expiresAt,
+        h.borrow_request_id AS borrowRequestId,
+        CASE WHEN h.status IN ('queued', 'offered') THEN (
+          SELECT COUNT(*) FROM holds ahead
+          WHERE ahead.catalog_item_id = h.catalog_item_id
+            AND ahead.status IN ('queued', 'offered')
+            AND (ahead.created_at < h.created_at OR (ahead.created_at = h.created_at AND ahead.id <= h.id))
+        ) ELSE 0 END AS position
+      FROM holds h
+      WHERE h.id = ? AND h.community_id = ? AND h.member_id = ?
+      LIMIT 1
+    `).bind(holdId, communityId, memberId).first<HoldRow>();
+  }
+
   async getBootstrap(context: Pick<RequestContext, 'actorId' | 'communityId'>): Promise<LibraryBootstrap> {
     await this.assertActiveMember(context);
     const results = await this.db.batch([
@@ -424,6 +498,50 @@ export class D1LibraryRepository implements LibraryRepository {
         ORDER BY last_signed_in_at DESC
         LIMIT 1
       `).bind(context.actorId),
+      this.db.prepare(`
+        SELECT
+          h.id,
+          h.catalog_item_id AS catalogItemId,
+          h.member_id AS memberId,
+          h.status,
+          h.created_at AS createdAt,
+          h.offered_at AS offeredAt,
+          h.expires_at AS expiresAt,
+          h.borrow_request_id AS borrowRequestId,
+          (
+            SELECT COUNT(*) FROM holds ahead
+            WHERE ahead.catalog_item_id = h.catalog_item_id
+              AND ahead.status IN ('queued', 'offered')
+              AND (ahead.created_at < h.created_at OR (ahead.created_at = h.created_at AND ahead.id <= h.id))
+          ) AS position
+        FROM holds h
+        WHERE h.community_id = ? AND h.member_id = ? AND h.status IN ('queued', 'offered')
+        ORDER BY h.created_at ASC
+      `).bind(context.communityId, context.actorId),
+      this.db.prepare(`
+        SELECT catalog_item_id AS catalogItemId, COUNT(*) AS count
+        FROM holds
+        WHERE community_id = ? AND status IN ('queued', 'offered')
+        GROUP BY catalog_item_id
+      `).bind(context.communityId),
+      this.db.prepare(`
+        SELECT
+          rc.id,
+          rc.loan_id AS loanId,
+          rc.scheduled_for AS scheduledFor,
+          rc.sent_at AS sentAt
+        FROM return_checkins rc
+        INNER JOIN loans l ON l.id = rc.loan_id
+        WHERE l.community_id = ? AND l.status = 'active'
+          AND (l.owner_id = ? OR l.borrower_id = ?)
+          AND rc.sent_at IS NOT NULL AND rc.response IS NULL
+          AND rc.scheduled_for = (
+            SELECT MAX(latest.scheduled_for)
+            FROM return_checkins latest
+            WHERE latest.loan_id = rc.loan_id AND latest.sent_at IS NOT NULL AND latest.response IS NULL
+          )
+        ORDER BY rc.sent_at DESC
+      `).bind(context.communityId, context.actorId, context.actorId),
     ]);
     const members = (results[0].results as unknown as MemberRow[]).map(mapMember);
     const profile = members.find((member) => member.id === context.actorId);
@@ -442,6 +560,11 @@ export class D1LibraryRepository implements LibraryRepository {
       items: (results[1].results as unknown as CatalogRow[]).map(mapCatalogItem),
       requests: (results[2].results as unknown as RequestRow[]).map(mapRequest),
       loans: (results[3].results as unknown as LoanRow[]).map(mapLoan),
+      holds: (results[6].results as unknown as HoldRow[]).map(mapHold),
+      holdCounts: Object.fromEntries(
+        (results[7].results as unknown as Array<{ catalogItemId: string; count: number }>).map((row) => [row.catalogItemId, Number(row.count)]),
+      ),
+      returnChecks: (results[8].results as unknown as ReturnCheckRow[]).map(mapReturnCheck),
     };
   }
 
@@ -582,6 +705,19 @@ export class D1LibraryRepository implements LibraryRepository {
   ) {
     await this.assertActiveMember(context);
     if (!validCondition(changes.condition)) throw libraryError('invalid-input', 'Invalid book condition.');
+    if (
+      (changes.title !== undefined && (typeof changes.title !== 'string' || !changes.title.trim())) ||
+      (changes.titleEn !== undefined && changes.titleEn !== null && typeof changes.titleEn !== 'string') ||
+      (changes.authors !== undefined && (!Array.isArray(changes.authors) || !changes.authors.every((author) => typeof author === 'string'))) ||
+      (changes.authorsEn !== undefined && (!Array.isArray(changes.authorsEn) || !changes.authorsEn.every((author) => typeof author === 'string'))) ||
+      (changes.publisher !== undefined && typeof changes.publisher !== 'string') ||
+      (changes.publishedYear !== undefined && (!Number.isInteger(changes.publishedYear) || changes.publishedYear < 1000 || changes.publishedYear > 2200)) ||
+      (changes.language !== undefined && !['ko', 'en', 'other'].includes(changes.language)) ||
+      (changes.pageCount !== undefined && changes.pageCount !== null && (!Number.isInteger(changes.pageCount) || changes.pageCount <= 0)) ||
+      (changes.description !== undefined && changes.description !== null && typeof changes.description !== 'string')
+    ) {
+      throw libraryError('invalid-input', 'Invalid book details.');
+    }
     const ownedItem = await this.db.prepare(`
       SELECT id
       FROM catalog_items
@@ -589,6 +725,29 @@ export class D1LibraryRepository implements LibraryRepository {
       LIMIT 1
     `).bind(itemId, context.communityId, context.actorId).first<{ id: string }>();
     if (!ownedItem) throw libraryError('not-found', 'Only the owner can edit an active listing.');
+
+    const hasEditionChanges = [
+      changes.title,
+      changes.titleEn,
+      changes.authors,
+      changes.authorsEn,
+      changes.publisher,
+      changes.publishedYear,
+      changes.language,
+      changes.pageCount,
+      changes.description,
+    ].some((value) => value !== undefined);
+    let editionId: string | undefined;
+    if (hasEditionChanges) {
+      editionId = (await this.db.prepare(`
+        SELECT be.id AS editionId
+        FROM catalog_items ci
+        INNER JOIN book_editions be ON be.id = ci.edition_id
+        WHERE ci.id = ? AND ci.community_id = ? AND ci.owner_id = ? AND ci.archived_at IS NULL
+        LIMIT 1
+      `).bind(itemId, context.communityId, context.actorId).first<{ editionId: string }>())?.editionId;
+      if (!editionId) throw libraryError('not-found', 'Book details could not be loaded.');
+    }
 
     if (changes.coverAssetId !== undefined) {
       if (!coverAssetIdPattern.test(changes.coverAssetId)) {
@@ -616,6 +775,45 @@ export class D1LibraryRepository implements LibraryRepository {
       context.communityId,
       context.actorId,
     )];
+    if (editionId) {
+      statements.push(this.db.prepare(`
+        UPDATE book_editions
+        SET
+          title = CASE WHEN ? = 1 THEN ? ELSE title END,
+          title_en = CASE WHEN ? = 1 THEN ? ELSE title_en END,
+          authors_json = CASE WHEN ? = 1 THEN ? ELSE authors_json END,
+          authors_en_json = CASE WHEN ? = 1 THEN ? ELSE authors_en_json END,
+          publisher = CASE WHEN ? = 1 THEN ? ELSE publisher END,
+          published_on = CASE WHEN ? = 1 THEN ? ELSE published_on END,
+          language = CASE WHEN ? = 1 THEN ? ELSE language END,
+          page_count = CASE WHEN ? = 1 THEN ? ELSE page_count END,
+          description = CASE WHEN ? = 1 THEN ? ELSE description END,
+          cover_tone = CASE WHEN ? = 1 THEN ? ELSE cover_tone END
+        WHERE id = ?
+      `).bind(
+        changes.title !== undefined ? 1 : 0,
+        changes.title?.trim() ?? null,
+        changes.titleEn !== undefined ? 1 : 0,
+        changes.titleEn?.trim() || null,
+        changes.authors !== undefined ? 1 : 0,
+        changes.authors === undefined ? null : JSON.stringify(changes.authors.map((author) => author.trim()).filter(Boolean)),
+        changes.authorsEn !== undefined ? 1 : 0,
+        changes.authorsEn === undefined ? null : JSON.stringify(changes.authorsEn.map((author) => author.trim()).filter(Boolean)),
+        changes.publisher !== undefined ? 1 : 0,
+        changes.publisher?.trim() ?? null,
+        changes.publishedYear !== undefined ? 1 : 0,
+        changes.publishedYear === undefined ? null : String(changes.publishedYear),
+        changes.language !== undefined ? 1 : 0,
+        changes.language ?? null,
+        changes.pageCount !== undefined ? 1 : 0,
+        changes.pageCount ?? null,
+        changes.description !== undefined ? 1 : 0,
+        changes.description?.trim() || null,
+        changes.title !== undefined ? 1 : 0,
+        changes.title === undefined ? null : coverToneFor(changes.title),
+        editionId,
+      ));
+    }
     if (changes.coverAssetId) {
       statements.push(
         this.db.prepare(`
@@ -633,7 +831,8 @@ export class D1LibraryRepository implements LibraryRepository {
     }
     const results = await this.db.batch(statements);
     if (affected(results[0]) !== 1) throw libraryError('not-found', 'Only the owner can edit an active listing.');
-    if (changes.coverAssetId && affected(results[2]) !== 1) throw libraryError('conflict', 'The cover could not be attached.');
+    if (editionId && affected(results[1]) !== 1) throw libraryError('conflict', 'The book details could not be saved.');
+    if (changes.coverAssetId && affected(results[results.length - 1]) !== 1) throw libraryError('conflict', 'The cover could not be attached.');
     const item = await this.catalogItem(itemId, context.communityId);
     if (!item) throw libraryError('not-found', 'Book not found.');
     return mapCatalogItem(item);
@@ -814,6 +1013,208 @@ export class D1LibraryRepository implements LibraryRepository {
     return mapRequest(request);
   }
 
+  async createHold(context: RequestContext, itemId: string) {
+    await this.assertActiveMember(context);
+    const operationKey = requireIdempotency(context, 'hold-create');
+    const previous = await this.db.prepare('SELECT id FROM holds WHERE idempotency_key = ? LIMIT 1')
+      .bind(operationKey)
+      .first<{ id: string }>();
+    if (previous) {
+      const existing = await this.hold(previous.id, context.communityId, context.actorId);
+      if (existing) return mapHold(existing);
+    }
+
+    const item = await this.db.prepare(`
+      SELECT id, owner_id AS ownerId, status
+      FROM catalog_items
+      WHERE id = ? AND community_id = ? AND archived_at IS NULL
+      LIMIT 1
+    `).bind(itemId, context.communityId).first<{ id: string; ownerId: string; status: string }>();
+    if (!item) throw libraryError('not-found', 'Book not found.');
+    if (item.ownerId === context.actorId) throw libraryError('conflict', 'Owners cannot hold their own books.');
+    if (item.status !== 'borrowed' && item.status !== 'held') {
+      throw libraryError('conflict', 'Available books can be requested immediately.');
+    }
+
+    const holdId = id('hold');
+    const now = this.now().getTime();
+    const result = await this.db.prepare(`
+      INSERT INTO holds (
+        id, community_id, catalog_item_id, member_id, status, created_at, idempotency_key
+      )
+      SELECT ?, ?, ci.id, ?, 'queued', ?, ?
+      FROM catalog_items ci
+      WHERE ci.id = ? AND ci.community_id = ? AND ci.status IN ('borrowed', 'held')
+        AND ci.owner_id <> ? AND ci.archived_at IS NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM holds active
+          WHERE active.catalog_item_id = ci.id AND active.member_id = ?
+            AND active.status IN ('queued', 'offered')
+        )
+        AND NOT EXISTS (
+          SELECT 1 FROM loans l
+          WHERE l.catalog_item_id = ci.id AND l.borrower_id = ? AND l.status = 'active'
+        )
+    `).bind(
+      holdId,
+      context.communityId,
+      context.actorId,
+      now,
+      operationKey,
+      itemId,
+      context.communityId,
+      context.actorId,
+      context.actorId,
+      context.actorId,
+    ).run();
+    if (affected(result) !== 1) throw libraryError('conflict', 'You are already waiting for this book.');
+    const hold = await this.hold(holdId, context.communityId, context.actorId);
+    if (!hold) throw libraryError('not-found', 'The new hold could not be loaded.');
+    return mapHold(hold);
+  }
+
+  async cancelHold(
+    context: Pick<RequestContext, 'actorId' | 'communityId'>,
+    holdId: string,
+  ) {
+    await this.assertActiveMember(context);
+    const existing = await this.hold(holdId, context.communityId, context.actorId);
+    if (!existing) throw libraryError('not-found', 'Hold not found.');
+    if (existing.status === 'canceled' || existing.status === 'expired') return mapHold(existing);
+    if (existing.status !== 'queued' && existing.status !== 'offered') {
+      throw libraryError('conflict', 'This hold can no longer be canceled.');
+    }
+    const now = this.now().getTime();
+    const expired = existing.status === 'offered' && existing.expiresAt != null && existing.expiresAt <= now;
+    const nextStatus = expired ? 'expired' : 'canceled';
+    const result = await this.db.prepare(`
+      UPDATE holds SET status = ?
+      WHERE id = ? AND community_id = ? AND member_id = ? AND status IN ('queued', 'offered')
+    `).bind(nextStatus, holdId, context.communityId, context.actorId).run();
+    if (affected(result) !== 1) throw libraryError('conflict', 'This hold has already changed.');
+    if (existing.status === 'offered') {
+      await offerNextHold(this.db, existing.catalogItemId, now, this.baseUrl);
+    }
+    const hold = await this.hold(holdId, context.communityId, context.actorId);
+    if (!hold) throw libraryError('not-found', 'Hold not found.');
+    return mapHold(hold);
+  }
+
+  async claimHold(context: RequestContext, holdId: string) {
+    await this.assertActiveMember(context);
+    const operationKey = requireIdempotency(context, 'hold-claim');
+    const previous = await this.db.prepare(`
+      SELECT id FROM loan_requests
+      WHERE community_id = ? AND requester_id = ? AND idempotency_key = ?
+      LIMIT 1
+    `).bind(context.communityId, context.actorId, operationKey).first<{ id: string }>();
+    if (previous) {
+      const existing = await this.request(previous.id, context.communityId);
+      if (existing) return mapRequest(existing);
+    }
+
+    const info = await this.db.prepare(`
+      SELECT
+        h.id AS holdId,
+        h.catalog_item_id AS itemId,
+        h.status AS holdStatus,
+        h.expires_at AS holdExpiresAt,
+        ci.owner_id AS ownerId,
+        ci.status AS itemStatus,
+        be.title AS bookTitle,
+        be.cover_source_url AS coverSourceUrl,
+        owner.display_name AS ownerDisplayName,
+        owner.display_name_ko AS ownerDisplayNameKo,
+        owner.locale AS ownerLocale,
+        actor.display_name AS actorDisplayName,
+        actor.display_name_ko AS actorDisplayNameKo
+      FROM holds h
+      INNER JOIN catalog_items ci ON ci.id = h.catalog_item_id
+      INNER JOIN book_editions be ON be.id = ci.edition_id
+      INNER JOIN profiles owner ON owner.id = ci.owner_id
+      INNER JOIN profiles actor ON actor.id = h.member_id
+      WHERE h.id = ? AND h.community_id = ? AND h.member_id = ?
+      LIMIT 1
+    `).bind(holdId, context.communityId, context.actorId).first<ItemRequestInfoRow & {
+      holdId: string;
+      holdStatus: string;
+      holdExpiresAt: number | null;
+    }>();
+    if (!info) throw libraryError('not-found', 'Hold not found.');
+    const requestedAt = this.now();
+    if (info.holdStatus !== 'offered' || info.holdExpiresAt == null || info.holdExpiresAt <= requestedAt.getTime()) {
+      if (info.holdStatus === 'offered') {
+        await this.db.prepare("UPDATE holds SET status = 'expired' WHERE id = ? AND status = 'offered'").bind(holdId).run();
+        await offerNextHold(this.db, info.itemId, requestedAt.getTime(), this.baseUrl);
+      }
+      throw libraryError('request-expired', 'This hold offer has expired.');
+    }
+    if (info.itemStatus !== 'held') throw libraryError('conflict', 'This book is no longer reserved for this hold.');
+
+    const requestId = id('request');
+    const expiresAt = borrowRequestExpiresAt(requestedAt);
+    const payload: OutboxPayloadByType['borrow_requested'] = {
+      bookTitle: info.bookTitle,
+      recipientName: localizedName({ locale: info.ownerLocale, displayName: info.ownerDisplayName, displayNameKo: info.ownerDisplayNameKo }),
+      actorName: info.ownerLocale === 'ko' ? info.actorDisplayNameKo : info.actorDisplayName,
+      expiresAt: expiresAt.toISOString(),
+      decisionUrl: `${this.baseUrl}/borrowing?request=${encodeURIComponent(requestId)}`,
+      bookUrl: `${this.baseUrl}/?book=${encodeURIComponent(info.itemId)}`,
+      ...(info.coverSourceUrl ? { coverUrl: info.coverSourceUrl } : {}),
+    };
+    const now = requestedAt.getTime();
+    const results = await this.db.batch([
+      this.db.prepare(`
+        INSERT INTO loan_requests (
+          id, community_id, catalog_item_id, requester_id, status, requested_at,
+          expires_at, sms_actionable_at, idempotency_key
+        )
+        SELECT ?, h.community_id, h.catalog_item_id, h.member_id, 'pending', ?, ?, ?, ?
+        FROM holds h
+        WHERE h.id = ? AND h.community_id = ? AND h.member_id = ?
+          AND h.status = 'offered' AND h.expires_at > ?
+      `).bind(
+        requestId,
+        now,
+        expiresAt.getTime(),
+        now,
+        operationKey,
+        holdId,
+        context.communityId,
+        context.actorId,
+        now,
+      ),
+      this.db.prepare(`
+        UPDATE holds
+        SET status = 'converted', borrow_request_id = ?
+        WHERE id = ? AND community_id = ? AND member_id = ? AND status = 'offered' AND expires_at > ?
+          AND EXISTS (SELECT 1 FROM loan_requests WHERE id = ? AND status = 'pending')
+      `).bind(requestId, holdId, context.communityId, context.actorId, now, requestId),
+      this.db.prepare(`
+        INSERT INTO outbox_events (
+          id, event_type, aggregate_type, aggregate_id, recipient_id, locale,
+          payload_json, available_at, attempt_count
+        )
+        SELECT ?, 'borrow_requested', 'loan_request', lr.id, ?, ?, ?, ?, 0
+        FROM loan_requests lr
+        WHERE lr.id = ? AND lr.status = 'pending'
+      `).bind(
+        id('event'),
+        info.ownerId,
+        locale(info.ownerLocale),
+        JSON.stringify(payload),
+        now,
+        requestId,
+      ),
+    ]);
+    if (affected(results[0]) !== 1 || affected(results[1]) !== 1 || affected(results[2]) !== 1) {
+      throw libraryError('conflict', 'The hold could not be claimed.');
+    }
+    const request = await this.request(requestId, context.communityId);
+    if (!request) throw libraryError('not-found', 'The borrow request could not be loaded.');
+    return mapRequest(request);
+  }
+
   async cancelBorrowRequest(
     context: Pick<RequestContext, 'actorId' | 'communityId'>,
     requestId: string,
@@ -822,6 +1223,12 @@ export class D1LibraryRepository implements LibraryRepository {
     const existing = await this.request(requestId, context.communityId);
     if (!existing || existing.requesterId !== context.actorId) throw libraryError('not-found', 'Borrow request not found.');
     if (existing.status === 'canceled') return mapRequest(existing);
+    const convertedHold = await this.db.prepare(`
+      SELECT catalog_item_id AS catalogItemId
+      FROM holds
+      WHERE borrow_request_id = ? AND status = 'converted'
+      LIMIT 1
+    `).bind(requestId).first<{ catalogItemId: string }>();
     const now = this.now().getTime();
     if (existing.status === 'pending' && existing.expiresAt <= now) {
       await this.db.prepare("UPDATE loan_requests SET status = 'expired' WHERE id = ? AND status = 'pending'")
@@ -834,6 +1241,9 @@ export class D1LibraryRepository implements LibraryRepository {
       WHERE id = ? AND community_id = ? AND requester_id = ? AND status = 'pending' AND expires_at > ?
     `).bind(now, context.actorId, requestId, context.communityId, context.actorId, now).run();
     if (affected(result) !== 1) throw libraryError('conflict', 'Only a pending request can be canceled.');
+    if (convertedHold) {
+      await offerNextHold(this.db, convertedHold.catalogItemId, now, this.baseUrl);
+    }
     const request = await this.request(requestId, context.communityId);
     if (!request) throw libraryError('not-found', 'Borrow request not found.');
     return mapRequest(request);
@@ -916,12 +1326,21 @@ export class D1LibraryRepository implements LibraryRepository {
         `).bind(id('event'), locale(info.requesterLocale), JSON.stringify(payload), now.getTime(), requestId, now.getTime()),
       ]);
       if (affected(results[0]) !== 1 || affected(results[1]) !== 1) throw libraryError('conflict', 'The request could not be declined.');
+      const convertedHold = await this.db.prepare(`
+        SELECT catalog_item_id AS catalogItemId
+        FROM holds
+        WHERE borrow_request_id = ? AND status = 'converted'
+        LIMIT 1
+      `).bind(requestId).first<{ catalogItemId: string }>();
+      if (convertedHold) {
+        await offerNextHold(this.db, convertedHold.catalogItemId, now.getTime(), this.baseUrl);
+      }
       const request = await this.request(requestId, context.communityId);
       if (!request) throw libraryError('not-found', 'Borrow request not found.');
       return { request: mapRequest(request) };
     }
 
-    if (info.itemStatus !== 'available') throw libraryError('conflict', 'The book is no longer available.');
+    if (info.itemStatus !== 'available' && info.itemStatus !== 'held') throw libraryError('conflict', 'The book is no longer available.');
     const loanId = id('loan');
     const checkinId = id('checkin');
     const nextCheckAt = firstReturnCheckAt(now);
@@ -946,13 +1365,13 @@ export class D1LibraryRepository implements LibraryRepository {
           AND EXISTS (
             SELECT 1 FROM catalog_items ci
             WHERE ci.id = loan_requests.catalog_item_id AND ci.owner_id = ?
-              AND ci.status = 'available' AND ci.archived_at IS NULL
+              AND ci.status IN ('available', 'held') AND ci.archived_at IS NULL
           )
       `).bind(now.getTime(), context.actorId, requestId, context.communityId, now.getTime(), context.actorId),
       this.db.prepare(`
         UPDATE catalog_items
         SET status = 'borrowed', version = version + 1, updated_at = ?
-        WHERE id = ? AND community_id = ? AND owner_id = ? AND status = 'available'
+        WHERE id = ? AND community_id = ? AND owner_id = ? AND status IN ('available', 'held')
           AND EXISTS (
             SELECT 1 FROM loan_requests lr
             WHERE lr.id = ? AND lr.status = 'accepted' AND lr.responded_at = ?
@@ -1038,7 +1457,55 @@ export class D1LibraryRepository implements LibraryRepository {
     if (affected(results[0]) !== 1 || affected(results[1]) !== 1) throw libraryError('conflict', 'The return could not be recorded.');
     const loan = await this.loan(loanId, context.communityId);
     if (!loan) throw libraryError('not-found', 'Loan not found.');
+    await offerNextHold(this.db, existing.catalogItemId, now, this.baseUrl);
     return mapLoan(loan);
+  }
+
+  async respondToReturnCheck(context: RequestContext, checkId: string, returned: boolean) {
+    await this.assertActiveMember(context);
+    requireIdempotency(context, 'return-check-response');
+    const check = await this.db.prepare(`
+      SELECT
+        rc.id,
+        rc.loan_id AS loanId,
+        rc.scheduled_for AS scheduledFor,
+        rc.sent_at AS sentAt,
+        rc.response,
+        l.owner_id AS ownerId,
+        l.borrower_id AS borrowerId,
+        l.status AS loanStatus
+      FROM return_checkins rc
+      INNER JOIN loans l ON l.id = rc.loan_id
+      WHERE rc.id = ? AND l.community_id = ?
+      LIMIT 1
+    `).bind(checkId, context.communityId).first<ReturnCheckRow & {
+      response: string | null;
+      ownerId: string;
+      borrowerId: string;
+      loanStatus: string;
+    }>();
+    if (!check || (check.ownerId !== context.actorId && check.borrowerId !== context.actorId)) {
+      throw libraryError('not-found', 'Return check not found.');
+    }
+    if (check.response) return mapReturnCheck(check);
+    if (check.loanStatus !== 'active') throw libraryError('conflict', 'This loan is no longer active.');
+    if (returned) {
+      await this.markReturned(context, check.loanId);
+      return mapReturnCheck(check);
+    }
+    const now = this.now().getTime();
+    const result = await this.db.prepare(`
+      UPDATE return_checkins
+      SET response = 'not_returned', responded_at = ?
+      WHERE id = ? AND response IS NULL
+        AND EXISTS (
+          SELECT 1 FROM loans l
+          WHERE l.id = return_checkins.loan_id AND l.status = 'active'
+            AND (l.owner_id = ? OR l.borrower_id = ?)
+        )
+    `).bind(now, checkId, context.actorId, context.actorId).run();
+    if (affected(result) !== 1) throw libraryError('conflict', 'This return check has already been answered.');
+    return mapReturnCheck(check);
   }
 
   async updateProfile(

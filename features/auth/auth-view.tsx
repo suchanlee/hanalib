@@ -1,6 +1,7 @@
 'use client';
 
 import { Globe2, MessageCircle } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -41,7 +42,7 @@ export function AuthView() {
     window.location.assign(oauthStartUrl('kakao', `${window.location.pathname}${window.location.search}${window.location.hash}`));
   }
 
-  async function demoSignIn(persona: 'owner' | 'borrower') {
+  async function demoSignIn(persona: 'owner' | 'borrower' | 'holder' | 'holder-2') {
     const response = await fetch('/api/auth/demo', {
       method: 'POST',
       credentials: 'same-origin',
@@ -59,8 +60,8 @@ export function AuthView() {
       <div className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-md flex-col gap-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 font-semibold tracking-tight">
-            <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
-            <span>{ko ? '씨앗책장' : 'Hana Seed Books'}</span>
+            <Image src="/seed-logo.svg" alt="" aria-hidden="true" width={36} height={36} className="size-9 shrink-0" />
+            <span>{ko ? '도서관' : 'Books'}</span>
           </div>
           <Button
             aria-label={ko ? 'English로 변경' : '한국어로 변경'}
@@ -78,19 +79,19 @@ export function AuthView() {
         <section className="my-auto space-y-7">
           <div className="space-y-3">
             <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
-              {ko ? '우리 동네 책장' : 'Our neighborhood shelf'}
+              {ko ? '우리 교회 책장' : 'Our neighborhood shelf'}
             </p>
             <h1 className="max-w-sm break-keep text-4xl leading-[1.08] font-semibold tracking-[-0.04em] text-balance sm:text-5xl">
-              {ko ? '함께 읽고, 가볍게 나눠요' : 'Read together, share simply'}
+              {ko ? '함께 읽고 나눠요' : 'Read together, share simply'}
             </h1>
             <p className="max-w-sm text-base leading-7 text-muted-foreground">
               {ko
-                ? '가까운 이웃의 책을 발견하고, 바코드 한 번으로 내 책도 나눠 보세요.'
+                ? '가까운 교인의 책을 발견하고, 바코드 한 번으로 내 책도 나눠 보세요.'
                 : 'Discover books from nearby members and share your own with one quick scan.'}
             </p>
           </div>
 
-          <div aria-label={ko ? '로그인' : 'Sign in'} className="space-y-3" role="region">
+          <section aria-label={ko ? '로그인' : 'Sign in'} className="space-y-3">
             <Button
               className="h-12 w-full rounded-xl bg-[#FEE500] text-base font-semibold text-[#191919] hover:bg-[#F5DC00]"
               data-testid="auth-kakao"
@@ -121,6 +122,12 @@ export function AuthView() {
                   <Button data-testid="auth-demo-borrower" onClick={() => void demoSignIn('borrower')} size="sm" variant="outline">
                     {ko ? '대여자로 계속' : 'Continue as borrower'}
                   </Button>
+                  <Button data-testid="auth-demo-holder" onClick={() => void demoSignIn('holder')} size="sm" variant="outline">
+                    {ko ? '대기자로 계속' : 'Continue as waitlist member'}
+                  </Button>
+                  <Button data-testid="auth-demo-holder-2" onClick={() => void demoSignIn('holder-2')} size="sm" variant="outline">
+                    {ko ? '두 번째 대기자로 계속' : 'Continue as second waitlist member'}
+                  </Button>
                 </div>
               </div>
             )}
@@ -135,7 +142,7 @@ export function AuthView() {
               </Link>
               {ko ? '에 동의합니다.' : '.'}
             </p>
-          </div>
+          </section>
         </section>
       </div>
     </main>

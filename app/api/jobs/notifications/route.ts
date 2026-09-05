@@ -1,5 +1,6 @@
 import { getD1Database } from '@/db';
 import { expireStaleBorrowRequests, processReadyOutbox } from '@/lib/notifications/outbox-worker';
+import { expireHoldOffers, remindHoldOffers } from '@/lib/persistence/hold-queue';
 import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '@/lib/observability/log';
 
 function authorized(request: Request) {
@@ -13,7 +14,11 @@ export async function POST(request: Request) {
   if (!authorized(request)) return withRequestId(Response.json({ error: 'unauthorized' }, { status: 401 }), logContext);
   try {
     const db = getD1Database();
-    const expired = await expireStaleBorrowRequests(db);
+    const now = Date.now();
+    const baseUrl = process.env.PUBLIC_APP_URL ?? 'https://hanalib.app';
+    const expired = await expireStaleBorrowRequests(db, now, baseUrl);
+    const holdOffersExpired = await expireHoldOffers(db, now, baseUrl);
+    const holdReminders = await remindHoldOffers(db, now, baseUrl);
     const delivery = await processReadyOutbox(db, {
       contactEncryptionKey: process.env.CONTACT_ENCRYPTION_KEY,
       contactHashKey: process.env.CONTACT_HASH_KEY,
@@ -39,7 +44,7 @@ export async function POST(request: Request) {
       }));
     }
     return withRequestId(Response.json(
-      { data: { expired, delivery } },
+      { data: { expired, holdOffersExpired, holdReminders, delivery } },
       { headers: { 'cache-control': 'no-store' } },
     ), logContext);
   } catch (error) {

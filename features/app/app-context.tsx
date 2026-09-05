@@ -15,6 +15,7 @@ import type {
   AddBookInput,
   BorrowRequest,
   CatalogItem,
+  Hold,
   HanaAppActions,
   HanaAppState,
   AppScreen,
@@ -43,6 +44,9 @@ const emptyState: HanaAppState = {
   items: [],
   requests: [],
   loans: [],
+  holds: [],
+  holdCounts: {},
+  returnChecks: [],
 };
 
 class ApiError extends Error {
@@ -93,6 +97,9 @@ function withBootstrap(current: HanaAppState, bootstrap: LibraryBootstrap): Hana
     items: bootstrap.items,
     requests: bootstrap.requests,
     loans: bootstrap.loans,
+    holds: bootstrap.holds,
+    holdCounts: bootstrap.holdCounts,
+    returnChecks: bootstrap.returnChecks,
   };
 }
 
@@ -148,6 +155,9 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
           items: [],
           requests: [],
           loans: [],
+          holds: [],
+          holdCounts: {},
+          returnChecks: [],
         }));
       } else {
         setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
@@ -185,6 +195,9 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
         items: [],
         requests: [],
         loans: [],
+        holds: [],
+        holdCounts: {},
+        returnChecks: [],
         screen: 'catalog',
         selectedItemId: undefined,
       }));
@@ -323,6 +336,65 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
           announcement: current.locale === 'ko' ? '반납을 기록했어요.' : 'Return recorded.',
         })))
         .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
+    },
+    async joinHold(itemId) {
+      try {
+        const hold = await apiData<Hold>('/api/holds', mutationInit('POST', { itemId }));
+        await refresh();
+        setState((current) => ({
+          ...current,
+          announcement: current.locale === 'ko' ? '대기 목록에 등록했어요.' : 'You joined the waitlist.',
+        }));
+        return hold;
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
+    },
+    async cancelHold(holdId) {
+      try {
+        await apiData<Hold>(`/api/holds/${encodeURIComponent(holdId)}`, mutationInit('DELETE'));
+        await refresh();
+        setState((current) => ({
+          ...current,
+          announcement: current.locale === 'ko' ? '대기 목록에서 나왔어요.' : 'You left the waitlist.',
+        }));
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
+    },
+    async claimHold(holdId) {
+      try {
+        const request = await apiData<BorrowRequest>(
+          `/api/holds/${encodeURIComponent(holdId)}/claim`,
+          mutationInit('POST'),
+        );
+        await refresh();
+        setState((current) => ({
+          ...current,
+          announcement: current.locale === 'ko' ? '소유자에게 대여 요청을 보냈어요.' : 'Borrow request sent to the owner.',
+        }));
+        return request;
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
+    },
+    async respondToReturnCheck(checkId, returned) {
+      try {
+        await apiData(`/api/return-checks/${encodeURIComponent(checkId)}`, mutationInit('POST', { returned }));
+        await refresh();
+        setState((current) => ({
+          ...current,
+          announcement: returned
+            ? current.locale === 'ko' ? '반납을 기록했어요.' : 'Return recorded.'
+            : current.locale === 'ko' ? '아직 대여 중으로 기록했어요.' : 'Recorded as still borrowing.',
+        }));
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
     },
     async updateProfile(changes) {
       try {

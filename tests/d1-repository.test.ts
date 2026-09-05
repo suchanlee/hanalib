@@ -244,6 +244,48 @@ void test('an owner can attach a private cover override without changing the sha
   assert.ok(database.batches[0].some((statement) => statement.sql.includes('SET catalog_item_id = ?')));
 });
 
+void test('an owner can edit book metadata without changing its ISBN', async () => {
+  const database = new RecordedD1((sql) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('SELECT be.id AS editionId')) return { editionId: 'edition-1' };
+    if (sql.includes('FROM catalog_items') && !sql.includes('INNER JOIN book_editions')) return { id: 'item-1' };
+    if (sql.includes('INNER JOIN book_editions')) {
+      return {
+        itemId: 'item-1', ownerId: 'borrower', itemStatus: 'available', itemCondition: 'like-new',
+        ownerNotes: 'Handle with care', itemCreatedAt: fixedNow.getTime(), editionId: 'edition-1', isbn10: null,
+        isbn13: '9788936434267', title: '아몬드 개정판', titleEn: 'Almond Revised',
+        authorsJson: '["손원평"]', authorsEnJson: '["Won-pyung Sohn"]', publisher: '창비',
+        publishedOn: '2026', language: 'ko', pageCount: 280, description: 'Updated description',
+        coverOverrideAssetId: null, coverSourceUrl: null, coverStoragePath: null,
+        coverTone: 'rose', provenanceJson: '{}',
+      };
+    }
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  const item = await repository.updateCatalogItem(context, 'item-1', {
+    title: '아몬드 개정판',
+    titleEn: 'Almond Revised',
+    authors: ['손원평'],
+    authorsEn: ['Won-pyung Sohn'],
+    publisher: '창비',
+    publishedYear: 2026,
+    language: 'ko',
+    pageCount: 280,
+    description: 'Updated description',
+    condition: 'like-new',
+    ownerNotes: 'Handle with care',
+  });
+
+  assert.equal(item.edition.title, '아몬드 개정판');
+  assert.equal(item.edition.isbn13, '9788936434267');
+  const editionUpdate = database.batches[0].find((statement) => statement.sql.includes('UPDATE book_editions'));
+  assert.ok(editionUpdate);
+  assert.doesNotMatch(editionUpdate.sql, /isbn1[03]/u);
+  assert.equal(database.batches[0].length, 2);
+});
+
 void test('an owner cannot attach another member’s uploaded cover', async () => {
   const database = new RecordedD1((sql) => {
     if (sql.includes('SELECT 1 AS active')) return { active: 1 };

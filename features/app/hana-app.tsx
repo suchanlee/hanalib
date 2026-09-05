@@ -1,6 +1,7 @@
 'use client';
 
 import { BookOpen, Handshake, ScanLine, UserRound } from 'lucide-react';
+import Image from 'next/image';
 import { AuthView } from '@/features/auth';
 import { BookDetailView, CatalogView } from '@/features/catalog';
 import { CirculationView } from '@/features/circulation';
@@ -23,6 +24,13 @@ function LibraryShell() {
   const { state, actions } = useHanaApp();
   const currentMember = state.members.find((member) => member.id === state.currentUserId);
   const activeScreen = state.screen === 'detail' ? 'catalog' : state.screen;
+  const itemById = new Map(state.items.map((item) => [item.id, item]));
+  const actionableCount = state.requests.filter((request) => (
+    request.status === 'pending' && itemById.get(request.catalogItemId)?.ownerId === state.currentUserId
+  )).length
+    + state.holds.filter((hold) => hold.status === 'offered').length
+    + state.returnChecks.length;
+  const actionableLabel = actionableCount > 9 ? '9+' : String(actionableCount);
 
   if (!state.isAuthenticated) {
     return (
@@ -39,13 +47,16 @@ function LibraryShell() {
       <div className="mx-auto flex min-h-dvh w-full max-w-7xl">
         <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r bg-card px-4 py-6 lg:flex">
           <button className="mb-8 flex items-center gap-3 px-2 text-left" onClick={() => actions.setScreen('catalog')}>
-            <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
-            <span><span className="block font-semibold tracking-tight">씨앗책장</span><span className="block text-xs text-muted-foreground">Hana Seed Books</span></span>
+            <Image src="/seed-logo.svg" alt="" aria-hidden="true" width={36} height={36} className="size-9 shrink-0" />
+            <span className="font-semibold tracking-tight">{state.locale === 'ko' ? '도서관' : 'Books'}</span>
           </button>
           <nav aria-label={state.locale === 'ko' ? '주요 메뉴' : 'Main navigation'} className="space-y-1.5">
             {navItems.map(({ screen, icon: Icon, ko, en, testId }) => (
               <Button key={screen} data-testid={`${testId}-desktop`} variant={activeScreen === screen ? 'secondary' : 'ghost'} className="h-11 w-full justify-start gap-3 px-3" onClick={() => actions.setScreen(screen)}>
                 <Icon className="size-5" /> {state.locale === 'ko' ? ko : en}
+                {screen === 'borrowing' && actionableCount > 0 ? (
+                  <span className="ml-auto grid min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-semibold text-primary-foreground" data-testid="borrowing-action-count-desktop">{actionableLabel}</span>
+                ) : null}
               </Button>
             ))}
           </nav>
@@ -61,8 +72,8 @@ function LibraryShell() {
           <header className="sticky top-0 z-30 border-b bg-background/92 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
               <button className="flex items-center gap-2 text-left lg:hidden" onClick={() => actions.setScreen('catalog')} aria-label="Hana Seed Books catalog">
-                <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
-                <span className="font-semibold tracking-tight">{state.locale === 'ko' ? '씨앗책장' : 'Hana Seed Books'}</span>
+                <Image src="/seed-logo.svg" alt="" aria-hidden="true" width={32} height={32} className="size-8 shrink-0" />
+                <span className="font-semibold tracking-tight">{state.locale === 'ko' ? '도서관' : 'Books'}</span>
               </button>
               <div className="hidden lg:block">
                 <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{state.locale === 'ko' ? '함께 읽는 우리 동네' : 'Read together locally'}</p>
@@ -91,10 +102,15 @@ function LibraryShell() {
               key={screen}
               data-testid={testId}
               aria-current={activeScreen === screen ? 'page' : undefined}
-              className={cn('flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-medium transition-colors', activeScreen === screen ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground')}
+              className={cn('flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-medium transition-colors', activeScreen === screen ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground')}
               onClick={() => actions.setScreen(screen)}
             >
-              <Icon className="size-5" />
+              <span className="relative">
+                <Icon className="size-5" />
+                {screen === 'borrowing' && actionableCount > 0 ? (
+                  <span className="absolute -right-3 -top-2 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[9px] font-bold leading-4 text-primary-foreground" data-testid="borrowing-action-count">{actionableLabel}</span>
+                ) : null}
+              </span>
               <span>{state.locale === 'ko' ? ko : en}</span>
             </button>
           ))}

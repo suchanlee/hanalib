@@ -46,4 +46,7 @@ export const initialAppState: HanaAppState = {
     { id: 'loan-light', catalogItemId: 'item-ed-light', requestId: 'request-light', ownerId: 'minji', borrowerId: 'jiwoo', status: 'active', startedAt: daysAgo(6), nextCheckAt: daysFromNow(1) },
     { id: 'loan-tomorrow', catalogItemId: 'item-ed-tomorrow', requestId: 'request-tomorrow', ownerId: 'alex', borrowerId: 'seoyeon', status: 'active', startedAt: daysAgo(9), nextCheckAt: daysAgo(2) },
   ],
+  holds: [],
+  holdCounts: {},
+  returnChecks: [],
 };

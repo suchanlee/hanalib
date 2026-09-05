@@ -1,9 +1,10 @@
 export type AppLocale = 'ko' | 'en';
 export type AuthProvider = 'kakao';
 export type AppScreen = 'catalog' | 'intake' | 'detail' | 'borrowing' | 'settings';
-export type CatalogStatus = 'available' | 'borrowed' | 'archived';
+export type CatalogStatus = 'available' | 'held' | 'borrowed' | 'archived';
 export type RequestStatus = 'pending' | 'accepted' | 'declined' | 'canceled' | 'expired' | 'superseded';
 export type LoanStatus = 'active' | 'returned';
+export type HoldStatus = 'queued' | 'offered' | 'converted' | 'canceled' | 'expired';
 export type NotificationChannel = 'email' | 'sms' | 'both' | 'kakao';
 
 export interface Member {
@@ -68,6 +69,25 @@ export interface Loan {
   returnedBy?: string;
 }
 
+export interface Hold {
+  id: string;
+  catalogItemId: string;
+  memberId: string;
+  status: HoldStatus;
+  createdAt: string;
+  offeredAt?: string;
+  expiresAt?: string;
+  borrowRequestId?: string;
+  position: number;
+}
+
+export interface ReturnCheck {
+  id: string;
+  loanId: string;
+  scheduledFor: string;
+  sentAt: string;
+}
+
 export interface CatalogFilters {
   ownerId: string;
   status: 'all' | 'available' | 'borrowed';
@@ -90,6 +110,15 @@ export interface AddBookInput {
 }
 
 export interface UpdateCatalogItemInput extends Pick<CatalogItem, 'condition' | 'ownerNotes'> {
+  title?: string;
+  titleEn?: string | null;
+  authors?: string[];
+  authorsEn?: string[];
+  publisher?: string;
+  publishedYear?: number;
+  language?: BookEdition['language'];
+  pageCount?: number | null;
+  description?: string | null;
   coverAssetId?: string;
 }
 
@@ -109,6 +138,10 @@ export interface HanaAppActions {
   cancelRequest(requestId: string): void;
   respondToRequest(requestId: string, decision: 'accepted' | 'declined'): void;
   markReturned(loanId: string): void;
+  joinHold(itemId: string): Promise<Hold>;
+  cancelHold(holdId: string): Promise<void>;
+  claimHold(holdId: string): Promise<BorrowRequest>;
+  respondToReturnCheck(checkId: string, returned: boolean): Promise<void>;
   updateProfile(changes: Partial<Pick<Member, 'displayName' | 'displayNameKo' | 'locale' | 'notificationChannel' | 'phone'>>): Promise<Member>;
 }
 
@@ -125,5 +158,8 @@ export interface HanaAppState {
   items: CatalogItem[];
   requests: BorrowRequest[];
   loans: Loan[];
+  holds: Hold[];
+  holdCounts: Record<string, number>;
+  returnChecks: ReturnCheck[];
   announcement?: string;
 }

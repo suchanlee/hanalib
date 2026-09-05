@@ -1,6 +1,6 @@
 # Local/production integration contract. Never commit real values.
 DEPLOYMENT_REGION=us-west
-PUBLIC_APP_URL=http://localhost:3000
+PUBLIC_APP_URL=http://localhost:4173
 APP_RUNTIME_MODE=development
 LAUNCH_COMMUNITY_ID=
 LAUNCH_COMMUNITY_NAME=
@@ -42,4 +42,4 @@ CONTACT_HASH_KEY=
 # Standards-based Web Push (VAPID). The subject must be an https: or mailto: URI.
 WEB_PUSH_PUBLIC_KEY=
 WEB_PUSH_PRIVATE_KEY=
-WEB_PUSH_SUBJECT=http://localhost:3000
+WEB_PUSH_SUBJECT=http://localhost:4173

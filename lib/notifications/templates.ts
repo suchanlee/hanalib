@@ -26,6 +26,16 @@ interface ReturnCheckTemplateInput {
   returnUrl: string;
 }
 
+interface HoldOfferTemplateInput {
+  locale: AppLocale;
+  memberName: string;
+  bookTitle: string;
+  expiresAt: Date;
+  offerUrl: string;
+  coverUrl?: string;
+  reminder?: boolean;
+}
+
 export interface NotificationTemplate {
   subject: string;
   text: string;
@@ -106,4 +116,24 @@ export function returnCheckTemplate(
         text: `${input.borrowerName}, have you returned “${input.bookTitle}”? If so, confirm it in the app.`,
         actions: [{ label: 'Confirm return', url: input.returnUrl }],
       };
+}
+
+export function holdOfferTemplate(input: HoldOfferTemplateInput): NotificationTemplate {
+  const expiry = date(input.locale, input.expiresAt);
+  if (input.locale === 'ko') {
+    return {
+      subject: input.reminder ? `${input.bookTitle} 대기 순서 알림` : `${input.bookTitle}, 이제 빌릴 수 있어요`,
+      text: `${input.memberName}님, 기다리던 『${input.bookTitle}』을 빌릴 차례예요. ${expiry}까지 요청하거나 다음 분에게 넘겨주세요.`,
+      primaryUrl: input.offerUrl,
+      imageUrl: input.coverUrl,
+      actions: [{ label: '내 차례 확인', url: input.offerUrl }],
+    };
+  }
+  return {
+    subject: input.reminder ? `Reminder: ${input.bookTitle} is waiting` : `${input.bookTitle} is ready for you`,
+    text: `${input.memberName}, it is your turn to borrow “${input.bookTitle}.” Request it or pass by ${expiry}.`,
+    primaryUrl: input.offerUrl,
+    imageUrl: input.coverUrl,
+    actions: [{ label: 'View my offer', url: input.offerUrl }],
+  };
 }
