@@ -2,7 +2,6 @@
 
 import { Globe2, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHanaApp } from '@/features/app/app-context';
@@ -78,7 +77,7 @@ export function AuthView() {
 
         <section className="my-auto space-y-7">
           <div className="space-y-3">
-            <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
+            <p className="text-xs font-semibold tracking-[0.08em] text-primary uppercase">
               {ko ? '우리 교회 책장' : 'Our neighborhood shelf'}
             </p>
             <h1 className="max-w-sm break-keep text-4xl leading-[1.08] font-semibold tracking-[-0.04em] text-balance sm:text-5xl">
@@ -131,17 +130,6 @@ export function AuthView() {
                 </div>
               </div>
             )}
-            <p className="px-2 text-center text-xs leading-5 text-muted-foreground">
-              {ko ? '계속하면 ' : 'By continuing, you agree to the '}
-              <Link className="underline underline-offset-4 hover:text-foreground" href="/terms">
-                {ko ? '이용약관' : 'Terms'}
-              </Link>
-              {ko ? '과 ' : ' and acknowledge the '}
-              <Link className="underline underline-offset-4 hover:text-foreground" href="/privacy">
-                {ko ? '개인정보 처리방침' : 'Privacy Policy'}
-              </Link>
-              {ko ? '에 동의합니다.' : '.'}
-            </p>
           </section>
         </section>
       </div>
