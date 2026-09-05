@@ -22,13 +22,15 @@ self.addEventListener('push', (event) => {
   const title = typeof message.title === 'string' ? message.title : 'Hana Seed Books';
   const body = typeof message.body === 'string' ? message.body : undefined;
   const tag = typeof message.tag === 'string' ? message.tag : undefined;
-  event.waitUntil(self.registration.showNotification(title, {
+  event.waitUntil(Promise.all([self.registration.showNotification(title, {
     body,
     tag,
     icon: '/icon-192.png',
     badge: '/icon-192.png',
     data: { url: safeAppUrl(message.url) },
-  }));
+  }), self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+    for (const client of windows) client.postMessage({ type: 'library-updated' });
+  })]));
 });
 
 self.addEventListener('notificationclick', (event) => {

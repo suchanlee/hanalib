@@ -106,6 +106,66 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
+void test('remote declines refresh when returning, navigating, or receiving a push', async (t) => {
+  const serviceWorker = new dom.window.EventTarget();
+  Object.defineProperty(navigator, 'serviceWorker', {
+    configurable: true,
+    value: serviceWorker,
+  });
+  const request = {
+    id: 'request',
+    catalogItemId: 'item',
+    requesterId: profile.id,
+    status: 'pending',
+    requestedAt: '2026-09-05T00:00:00Z',
+    expiresAt: '2026-09-07T00:00:00Z',
+  };
+  const triggers = [
+    () => window.dispatchEvent(new dom.window.Event('focus')),
+    () => document.dispatchEvent(new dom.window.Event('visibilitychange')),
+    () => window.dispatchEvent(new dom.window.Event('online')),
+    () => window.dispatchEvent(new dom.window.Event('pageshow')),
+    () => current.actions.setScreen('borrowing'),
+    () =>
+      serviceWorker.dispatchEvent(
+        new dom.window.MessageEvent('message', {
+          data: { type: 'library-updated' },
+        }),
+      ),
+  ];
+  try {
+    for (const trigger of triggers) {
+      window.history.replaceState({}, '', '/');
+      let status = 'pending';
+      const fetch = t.mock.method(globalThis, 'fetch', async () =>
+        Response.json({
+          data: { ...bootstrap, requests: [{ ...request, status }] },
+        }),
+      );
+      const view = await mount();
+      try {
+        assert.equal(current.state.requests[0].status, 'pending');
+        status = 'declined';
+        await act(async () => {
+          trigger();
+        });
+        assert.equal(
+          current.state.requests.filter((entry) => entry.status === 'pending')
+            .length,
+          0,
+        );
+        assert.equal(current.state.requests[0].status, 'declined');
+      } finally {
+        await view.close();
+        fetch.mock.restore();
+      }
+    }
+  } finally {
+    Reflect.deleteProperty(navigator, 'serviceWorker');
+    window.history.replaceState({}, '', '/');
+  }
+});
+
 void test('bootstrap failure stays visible and retry recovers; initial 401 is a normal sign-in state', async (t) => {
   let response = () =>
     Response.json(
@@ -133,6 +193,131 @@ void test('bootstrap failure stays visible and retry recovers; initial 401 is a 
   assert.equal(current.state.isAuthenticated, false);
   assert.equal(current.state.issue, undefined);
   await signedOut.close();
+});
+
+void test('background polling skips hidden/offline apps, coalesces reads, recovers quietly, and cleans up', async (t) => {
+  let poll!: () => void;
+  t.mock.method(
+    window,
+    'setInterval',
+    (callback: () => void, delay: number) => {
+      assert.equal(delay, 30_000);
+      poll = callback;
+      return 123;
+    },
+  );
+  const clear = t.mock.method(window, 'clearInterval', () => {});
+  let next = async () => Response.json({ data: bootstrap });
+  const fetch = t.mock.method(globalThis, 'fetch', async () => next());
+  const view = await mount();
+  try {
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      value: 'hidden',
+    });
+    await act(async () => poll());
+    assert.equal(fetch.mock.callCount(), 1);
+    Reflect.deleteProperty(document, 'visibilityState');
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      value: false,
+    });
+    await act(async () => poll());
+    assert.equal(fetch.mock.callCount(), 1);
+    Reflect.deleteProperty(navigator, 'onLine');
+
+    const response = deferred<Response>();
+    next = () => response.promise;
+    await act(async () => {
+      poll();
+      window.dispatchEvent(new dom.window.Event('focus'));
+      document.dispatchEvent(new dom.window.Event('visibilitychange'));
+    });
+    assert.equal(fetch.mock.callCount(), 2);
+    await act(async () =>
+      response.resolve(
+        Response.json({ error: 'unavailable' }, { status: 503 }),
+      ),
+    );
+    assert.equal(current.state.loadStatus, 'ready');
+    assert.equal(current.state.issue, undefined);
+    assert.equal(current.state.isAuthenticated, true);
+
+    next = async () =>
+      Response.json({
+        data: {
+          ...bootstrap,
+          members: [{ ...profile, displayName: 'Remote change' }],
+        },
+      });
+    await act(async () => poll());
+    assert.equal(current.state.members[0].displayName, 'Remote change');
+
+    next = async () =>
+      Response.json({ error: 'unauthenticated' }, { status: 401 });
+    await act(async () => poll());
+    assert.equal(current.state.isAuthenticated, false);
+    assert.equal(current.state.members.length, 0);
+    const count = fetch.mock.callCount();
+    await act(async () => window.dispatchEvent(new dom.window.Event('focus')));
+    assert.equal(fetch.mock.callCount(), count);
+    assert.equal(clear.mock.callCount(), 1);
+  } finally {
+    Reflect.deleteProperty(document, 'visibilityState');
+    Reflect.deleteProperty(navigator, 'onLine');
+    await view.close();
+  }
+});
+
+void test('an older background read cannot undo a cancellation or run during a mutation', async (t) => {
+  const request = {
+    id: 'request',
+    catalogItemId: 'item',
+    requesterId: profile.id,
+    status: 'pending',
+    requestedAt: '2026-09-05T00:00:00Z',
+    expiresAt: '2026-09-07T00:00:00Z',
+  };
+  const data = { ...bootstrap, requests: [request] };
+  const stale = deferred<Response>();
+  const mutation = deferred<Response>();
+  let reads = 0;
+  t.mock.method(globalThis, 'fetch', async (url: string) => {
+    if (url !== '/api/app') return mutation.promise;
+    return ++reads === 1 ? Response.json({ data }) : stale.promise;
+  });
+  const view = await mount();
+  try {
+    await act(async () => window.dispatchEvent(new dom.window.Event('focus')));
+    let cancel!: Promise<void>;
+    await act(async () => {
+      cancel = current.actions.cancelRequest('request');
+    });
+    await act(async () => stale.resolve(Response.json({ data })));
+    await act(async () => window.dispatchEvent(new dom.window.Event('focus')));
+    assert.equal(reads, 2);
+    await act(async () => {
+      mutation.resolve(
+        Response.json({ data: { ...request, status: 'canceled' } }),
+      );
+      await cancel;
+    });
+    assert.equal(current.state.requests[0].status, 'canceled');
+
+    // A read started before a later mutation must also be ignored if it finishes last.
+    const late = deferred<Response>();
+    t.mock.method(globalThis, 'fetch', async (url: string) =>
+      url === '/api/app'
+        ? late.promise
+        : Response.json({ data: { ...request, status: 'canceled' } }),
+    );
+    await act(async () => window.dispatchEvent(new dom.window.Event('focus')));
+    await act(() => current.actions.cancelRequest('request'));
+    await act(async () => late.resolve(Response.json({ data })));
+    assert.equal(current.state.requests[0].status, 'canceled');
+  } finally {
+    await view.close();
+  }
 });
 
 void test('return and cancellation promises never announce success while pending or after rejection', async (t) => {

@@ -157,12 +157,17 @@ export function HanaAppProvider({
     };
   }, [reportError]);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (background = false) => {
     const version = ++refreshVersion.current;
     try {
-      const bootstrap = await apiData<LibraryBootstrap>('/api/app');
+      const bootstrap = await apiData<LibraryBootstrap>('/api/app', {
+        cache: 'no-store',
+      });
       if (version === refreshVersion.current)
-        setState((current) => withBootstrap(current, bootstrap));
+        setState((current) => ({
+          ...withBootstrap(current, bootstrap),
+          issue: background ? current.issue : undefined,
+        }));
     } catch (error) {
       if (version !== refreshVersion.current) return;
       if (error instanceof ApiError && error.status === 401) {
@@ -174,6 +179,9 @@ export function HanaAppProvider({
             ? userIssue(error, 'load-library')
             : current.issue,
         }));
+      } else if (background) {
+        // A transient background failure should not interrupt the current task.
+        return;
       } else {
         setState((current) => ({
           ...current,
@@ -185,6 +193,61 @@ export function HanaAppProvider({
       throw error;
     }
   }, []);
+
+  const backgroundRefreshing = useRef(false);
+  const refreshInBackground = useCallback(() => {
+    if (
+      !stateRef.current.isAuthenticated ||
+      document.visibilityState !== 'visible' ||
+      !navigator.onLine ||
+      mutating.current ||
+      backgroundRefreshing.current
+    )
+      return;
+    backgroundRefreshing.current = true;
+    void refresh(true)
+      .catch(() => {
+        /* refresh handles expired sessions */
+      })
+      .finally(() => {
+        backgroundRefreshing.current = false;
+      });
+  }, [refresh]);
+
+  useEffect(() => {
+    if (!state.isAuthenticated) return;
+    const serviceWorker = navigator.serviceWorker;
+    function onMessage(event: MessageEvent) {
+      if (event.data?.type === 'library-updated') refreshInBackground();
+    }
+    window.addEventListener('focus', refreshInBackground);
+    window.addEventListener('pageshow', refreshInBackground);
+    window.addEventListener('online', refreshInBackground);
+    document.addEventListener('visibilitychange', refreshInBackground);
+    serviceWorker?.addEventListener('message', onMessage);
+    const interval = window.setInterval(refreshInBackground, 30_000);
+    return () => {
+      window.removeEventListener('focus', refreshInBackground);
+      window.removeEventListener('pageshow', refreshInBackground);
+      window.removeEventListener('online', refreshInBackground);
+      document.removeEventListener('visibilitychange', refreshInBackground);
+      serviceWorker?.removeEventListener('message', onMessage);
+      window.clearInterval(interval);
+    };
+  }, [state.isAuthenticated, refreshInBackground]);
+
+  const previousRoute = useRef({
+    screen: state.screen,
+    selectedItemId: state.selectedItemId,
+  });
+  useEffect(() => {
+    const route = {
+      screen: state.screen,
+      selectedItemId: state.selectedItemId,
+    };
+    if (!sameAppRoute(previousRoute.current, route)) refreshInBackground();
+    previousRoute.current = route;
+  }, [state.screen, state.selectedItemId, refreshInBackground]);
 
   const syncAfterMutation = useCallback(async () => {
     try {
@@ -202,6 +265,8 @@ export function HanaAppProvider({
     async <T,>(operation: string, work: () => Promise<T>): Promise<T> => {
       if (mutating.current) throw new ApiError(409, 'action-in-progress');
       mutating.current = true;
+      // An older read must not overwrite the result of this mutation.
+      refreshVersion.current += 1;
       setState((current) => ({
         ...current,
         isMutating: true,
@@ -223,7 +288,7 @@ export function HanaAppProvider({
 
   useEffect(() => {
     void Promise.resolve()
-      .then(refresh)
+      .then(() => refresh())
       .catch(() => {
         /* refresh already surfaces the failure */
       });
