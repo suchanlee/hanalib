@@ -18,13 +18,15 @@ Sites applies the immutable `drizzle/*.sql` migrations to D1 and binds R2 as `FI
 
 Open Library is the credential-free baseline. Set `NLK_API_KEY` and `GOOGLE_BOOKS_API_KEY` for Korean and English enrichment; optionally set both `NAVER_CLIENT_ID` and `NAVER_CLIENT_SECRET` for Naver Books enrichment. The resolver queries configured providers plus Open Library in parallel, accepts partial provider failure, rejects non-exact ISBN editions, and stitches fields with per-field provenance. Production fixtures are disabled. Review each provider’s current attribution, caching, and cover-image terms before public launch; retain a provider URL only when permitted and use member-uploaded R2 covers otherwise.
 
-## 4. Web Push notifications
+## 4. Email and Web Push notifications
+
+Verify `library.hanaseed.org` as a sending domain in Resend, then set `RESEND_API_KEY` as a Sites secret. The sender is `EMAIL_FROM="Hana Seed Library <notifications@library.hanaseed.org>"`. Every circulation event sends email when the recipient has a verified email from sign-in, regardless of Web Push availability or their legacy notification-channel preference. Members without an email can still receive Web Push; this does not add an email collection or verification flow. Missing Resend configuration leaves email delivery pending for retry, even if push succeeds.
 
 Generate one VAPID P-256 key pair and set `WEB_PUSH_PUBLIC_KEY`, `WEB_PUSH_PRIVATE_KEY`, and an HTTPS `WEB_PUSH_SUBJECT`. Keep the private key server-only. The browser registers `/sw.js`, requests notification permission only after a member presses the enable button, and stores each subscription as AES-GCM-encrypted JSON plus a keyed endpoint hash in `web_push_subscriptions`. The endpoint is a bearer capability and must never appear in logs.
 
 On iOS/iPadOS, Safari exposes Push only after the member adds the site to the Home Screen and opens the installed app. Android Chrome and supported desktop browsers can subscribe directly; installation is still offered when the browser supports it. The Settings card includes a real test send so members and operators can validate the complete subscription, encryption, push-service, service-worker, and display path.
 
-Borrow requests, decisions, and weekly return checks deep-link to the relevant authenticated screen. Mutations attempt delivery immediately through the transactional outbox, so a delivery failure cannot undo or lose the domain change. Invalid or expired browser subscriptions are disabled automatically. Legacy Kakao, Twilio, and email adapters remain isolated as fallbacks; their credentials are not required for members who have enabled Web Push.
+Borrow requests, decisions, and weekly return checks deep-link to the relevant authenticated screen. Mutations attempt delivery immediately through the transactional outbox, so a delivery failure cannot undo or lose the domain change. Invalid or expired browser subscriptions are disabled automatically. Email and push are attempted independently, and each successful channel is persisted before the event is completed. A failed email is retried without resending successful push delivery, and vice versa. Kakao and Twilio remain fallbacks when no push succeeds. The Settings test button continues to test Web Push only.
 
 ## 5. Return-check scheduler
 
