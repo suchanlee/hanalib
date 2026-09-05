@@ -138,6 +138,13 @@ body {
   textarea {
     -webkit-tap-highlight-color: transparent;
   }
+  button:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  summary,
+  [role='button']:not([aria-disabled='true']):not([data-disabled]) {
+    cursor: pointer;
+  }
 }
 
 @layer utilities {
