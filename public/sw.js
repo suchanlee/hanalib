@@ -19,7 +19,7 @@ self.addEventListener('push', (event) => {
   } catch {
     message = {};
   }
-  const title = typeof message.title === 'string' ? message.title : 'Hana Library';
+  const title = typeof message.title === 'string' ? message.title : 'Hana Seed Books';
   const body = typeof message.body === 'string' ? message.body : undefined;
   const tag = typeof message.tag === 'string' ? message.tag : undefined;
   event.waitUntil(self.registration.showNotification(title, {

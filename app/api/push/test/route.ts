@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       getD1Database(),
       member.id,
       {
-        subject: korean ? '하나의씨앗 도서관 알림 테스트' : 'Hana Library notification test',
+        subject: korean ? '하나의 책장 알림 테스트' : 'Hana Seed Books notification test',
         text: korean
           ? '알림이 잘 연결되었어요. 이제 대여 요청과 반납 알림을 받을 수 있어요.'
           : 'Notifications are connected. You can now receive borrowing and return updates.',

@@ -17,6 +17,6 @@ export async function requireActiveMember(request: Request): Promise<ActiveMembe
 export function unauthorizedResponse() {
   return Response.json(
     { error: 'authentication-required' },
-    { status: 401, headers: { 'cache-control': 'no-store', 'www-authenticate': 'Session realm="Hana Library"' } },
+    { status: 401, headers: { 'cache-control': 'no-store', 'www-authenticate': 'Session realm="Hana Seed Books"' } },
   );
 }

@@ -23,7 +23,7 @@ type EnvSource = Record<string, string | undefined>;
 
 export function readServerConfig(source: EnvSource = process.env): ServerConfig {
   const region = source.DEPLOYMENT_REGION ?? 'us-west';
-  if (region !== 'us-west') throw new Error('Hana Library currently supports DEPLOYMENT_REGION=us-west only.');
+  if (region !== 'us-west') throw new Error('Hana Seed Books currently supports DEPLOYMENT_REGION=us-west only.');
 
   return {
     deploymentRegion: region,

@@ -40,7 +40,7 @@ function LibraryShell() {
         <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r bg-card px-4 py-6 lg:flex">
           <button className="mb-8 flex items-center gap-3 px-2 text-left" onClick={() => actions.setScreen('catalog')}>
             <span className="grid size-10 place-items-center rounded-2xl bg-primary text-primary-foreground"><LibraryBig className="size-5" /></span>
-            <span><span className="block font-semibold tracking-tight">하나의씨앗 도서관</span><span className="block text-xs text-muted-foreground">Hana Library</span></span>
+            <span><span className="block font-semibold tracking-tight">하나의 책장</span><span className="block text-xs text-muted-foreground">Hana Seed Books</span></span>
           </button>
           <nav aria-label={state.locale === 'ko' ? '주요 메뉴' : 'Main navigation'} className="space-y-1.5">
             {navItems.map(({ screen, icon: Icon, ko, en, testId }) => (
@@ -60,9 +60,9 @@ function LibraryShell() {
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-30 border-b bg-background/92 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-              <button className="flex items-center gap-2 text-left lg:hidden" onClick={() => actions.setScreen('catalog')} aria-label="Hana Library catalog">
+              <button className="flex items-center gap-2 text-left lg:hidden" onClick={() => actions.setScreen('catalog')} aria-label="Hana Seed Books catalog">
                 <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground"><LibraryBig className="size-4.5" /></span>
-                <span className="font-semibold tracking-tight">{state.locale === 'ko' ? '하나의씨앗 도서관' : 'Hana Library'}</span>
+                <span className="font-semibold tracking-tight">{state.locale === 'ko' ? '하나의 책장' : 'Hana Seed Books'}</span>
               </button>
               <div className="hidden lg:block">
                 <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{state.locale === 'ko' ? '함께 읽는 우리 동네' : 'Read together locally'}</p>

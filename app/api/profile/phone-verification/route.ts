@@ -75,8 +75,8 @@ export async function POST(request: Request) {
         twilioAuthToken: required('TWILIO_AUTH_TOKEN'),
         twilioFromNumber: required('TWILIO_FROM_NUMBER'),
       }, phone, {
-        subject: 'Hana Library verification',
-        text: `Hana Library verification code: ${code}. It expires in 10 minutes.`,
+        subject: 'Hana Seed Books verification',
+        text: `Hana Seed Books verification code: ${code}. It expires in 10 minutes.`,
       });
     } catch (error) {
       await db.prepare('DELETE FROM phone_verifications WHERE user_id = ?').bind(context.actorId).run();

@@ -54,7 +54,7 @@ export function readAuthBaseConfig(source: AuthEnvSource = process.env): AuthBas
     sessionSecret: signingSecret(source, 'AUTH_SESSION_SECRET'),
     transactionSecret: signingSecret(source, 'AUTH_TRANSACTION_SECRET'),
     launchCommunityId,
-    launchCommunityName: source.LAUNCH_COMMUNITY_NAME?.trim() || 'Hana Library',
+    launchCommunityName: source.LAUNCH_COMMUNITY_NAME?.trim() || 'Hana Seed Books',
     demoMode: source.AUTH_DEMO_MODE === 'true',
   };
 }

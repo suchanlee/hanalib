@@ -1,4 +1,4 @@
-# Hana Library — product, UX, and technical implementation plan
+# Hana Seed Books — product, UX, and technical implementation plan
 
 > **Current implementation decision (September 2026):** Kakao is the sole member-authentication provider. Circulation delivery uses standards-based Web Push so installed iPhone/Android web apps and supported desktop browsers can notify members even while the page is closed. Subscriptions are encrypted in D1, and notification clicks deep-link to the authorization-checked app. This supersedes the Google/Apple authentication, Twilio reply-by-`1`/`2`, and Kakao **Send to me** sections retained below as historical planning context.
 
@@ -6,11 +6,11 @@ Status: planning only
 Primary locale: Korean (`ko`)  
 Secondary locale: English (`en`)  
 Primary device: mobile web / installable PWA  
-Working product name: **Hana Library / 하나의씨앗 도서관**
+Working product name: **Hana Seed Books / 하나의 책장**
 
 ## 1. Product definition
 
-Hana Library is a private, trust-based catalog for a real community. Members add physical books, discover who owns them, request to borrow a specific copy, and keep the catalog accurate through lightweight notifications.
+Hana Seed Books is a private, trust-based catalog for a real community. Members add physical books, discover who owns them, request to borrow a specific copy, and keep the catalog accurate through lightweight notifications.
 
 The product succeeds when adding a book feels like this:
 
@@ -257,7 +257,7 @@ The feasibility basis is current official documentation: the National Library of
 Korean SMS example:
 
 ```text
-[하나도서관] 민지님이 “아몬드” 대여를 요청했어요.
+[하나의 책장] 민지님이 “아몬드” 대여를 요청했어요.
 수락 1 · 거절 2
 앱에서 보기: {short-link}
 ```
@@ -265,7 +265,7 @@ Korean SMS example:
 English SMS example:
 
 ```text
-[Hana Library] Minji requested “Almond.”
+[Hana Seed Books] Minji requested “Almond.”
 Reply 1 to accept or 2 to decline.
 View: {short-link}
 ```

@@ -143,7 +143,7 @@ export async function fetchOpenLibraryMetadata(
   const fetchImpl = options.fetchImpl ?? fetch;
   const headers = {
     accept: 'application/json',
-    'user-agent': 'Hana Community Library/1.0 (https://hana-community-library.lee-suchan.chatgpt.site/)',
+    'user-agent': 'Hana Seed Books/1.0 (https://hana-community-library.lee-suchan.chatgpt.site/)',
   };
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
