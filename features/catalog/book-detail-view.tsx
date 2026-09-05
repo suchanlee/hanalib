@@ -35,6 +35,7 @@ import type { BookEdition, CatalogItem } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
 import { uploadMemberCover, validCoverFile } from '@/lib/storage/client-cover';
 import { BookCover } from './book-cover';
+import { BookDescription } from './book-description';
 import { catalogCopy, conditionLabel, languageLabel, statusLabel } from './catalog-copy';
 
 type Feedback = { tone: 'success' | 'error'; text: string } | null;
@@ -636,7 +637,7 @@ export function BookDetailView() {
 
       <section className="mt-10 border-t pt-7" aria-labelledby="book-metadata-heading">
         <h2 id="book-metadata-heading" className="text-lg font-semibold">{t.details}</h2>
-        {item.edition.description ? <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">{item.edition.description}</p> : null}
+        {item.edition.description ? <BookDescription key={`${item.id}:${item.edition.description}`} description={item.edition.description} locale={state.locale} /> : null}
         <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Metadata icon={<CalendarDays />} label={t.published} value={item.edition.publisher ? `${item.edition.publisher} · ${item.edition.publishedYear}` : String(item.edition.publishedYear)} />
           <Metadata icon={<Hash />} label={t.isbn} value={item.edition.isbn13} />
