@@ -6,8 +6,7 @@ import {
   CheckCircle2,
   Globe2,
   LogOut,
-  Mail,
-  MessageSquare,
+  MessageCircle,
   ShieldCheck,
   UserRoundCog,
 } from 'lucide-react';
@@ -23,12 +22,11 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Separator } from '@/components/ui/separator';
 import { useHanaApp } from '@/features/app/app-context';
-import type { AppLocale, NotificationChannel } from '@/lib/domain/types';
+import { oauthStartUrl } from '@/features/auth/provider-config';
+import type { AppLocale } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
-import { isValidUsPhone, normalizeUsPhone } from './validation';
 
 function t(locale: AppLocale, ko: string, en: string) {
   return locale === 'ko' ? ko : en;
@@ -40,67 +38,30 @@ export function SettingsView() {
   const locale = state.locale;
   const [displayName, setDisplayName] = useState(member.displayName);
   const [displayNameKo, setDisplayNameKo] = useState(member.displayNameKo);
-  const [phone, setPhone] = useState(member.phone);
-  const [channel, setChannel] = useState<NotificationChannel>(member.notificationChannel);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [verificationPending, setVerificationPending] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [verificationError, setVerificationError] = useState('');
-
-  const needsPhone = channel === 'sms' || channel === 'both';
-  const phoneValid = !needsPhone || isValidUsPhone(phone);
+  const [saveError, setSaveError] = useState(false);
+  const notificationsConnected = member.notificationChannel === 'kakao';
   const namesValid = displayName.trim().length > 0 && displayNameKo.trim().length > 0;
 
   function save(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!phoneValid || !namesValid) return;
+    if (!namesValid) return;
     setSaving(true);
-    setVerificationError('');
+    setSaveError(false);
     void actions.updateProfile({
       displayName: displayName.trim(),
       displayNameKo: displayNameKo.trim(),
-      phone: normalizeUsPhone(phone),
-      notificationChannel: channel,
-    }).then(async (updated) => {
-      setSaved(true);
-      if (needsPhone && !updated.phoneVerified) {
-        const response = await fetch('/api/profile/phone-verification', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: { accept: 'application/json', 'idempotency-key': crypto.randomUUID() },
-        });
-        if (!response.ok) throw new Error('verification-send-failed');
-        setVerificationPending(true);
-      } else {
-        setVerificationPending(false);
-      }
-    }).catch(() => {
-      setSaved(false);
-      setVerificationError(t(locale, '저장하거나 인증 문자를 보내지 못했어요.', 'We couldn’t save or send the verification text.'));
-    }).finally(() => setSaving(false));
+    }).then(() => setSaved(true))
+      .catch(() => {
+        setSaved(false);
+        setSaveError(true);
+      })
+      .finally(() => setSaving(false));
   }
 
-  function verifyPhone() {
-    if (!/^\d{6}$/.test(verificationCode)) return;
-    setVerificationError('');
-    void fetch('/api/profile/phone-verification', {
-      method: 'PATCH',
-      credentials: 'same-origin',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-        'idempotency-key': crypto.randomUUID(),
-      },
-      body: JSON.stringify({ code: verificationCode }),
-    }).then(async (response) => {
-      if (!response.ok) throw new Error('verification-failed');
-      setVerificationPending(false);
-      setVerificationCode('');
-      await actions.refresh();
-    }).catch(() => {
-      setVerificationError(t(locale, '인증번호를 확인해 주세요.', 'Check the verification code and try again.'));
-    });
+  function connectNotifications() {
+    window.location.assign(oauthStartUrl('kakao', '/settings'));
   }
 
   async function signOut() {
@@ -138,7 +99,7 @@ export function SettingsView() {
               </Avatar>
               <div className="min-w-0">
                 <CardTitle>{memberName(locale, member)}</CardTitle>
-                <CardDescription className="truncate">{member.email}</CardDescription>
+                <CardDescription>{t(locale, '카카오 계정', 'Kakao account')}</CardDescription>
               </div>
               <Badge className="ml-auto" variant="secondary">
                 <ShieldCheck aria-hidden="true" />
@@ -177,16 +138,6 @@ export function SettingsView() {
                   value={displayName}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="settings-email">{t(locale, '이메일', 'Email')}</Label>
-                <div className="relative">
-                  <Mail aria-hidden="true" className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input className="pl-9" disabled id="settings-email" value={member.email} />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {t(locale, '로그인 제공자가 관리하는 주소예요.', 'Managed by your sign-in provider.')}
-                </p>
-              </div>
             </CardContent>
           </Card>
 
@@ -224,64 +175,45 @@ export function SettingsView() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card data-testid="kakao-notification-card">
             <CardHeader>
-              <CardTitle>{t(locale, '알림', 'Notifications')}</CardTitle>
+              <CardTitle>{t(locale, '카카오톡 알림', 'KakaoTalk notifications')}</CardTitle>
               <CardDescription>
-                {t(locale, '대여 요청, 결과, 반납 확인을 받을 방법을 선택하세요.', 'Choose how to receive requests, decisions, and return checks.')}
+                {t(locale, '대여 요청, 결과, 반납 확인을 나와의 채팅으로 받아요.', 'Receive requests, decisions, and return checks in My Chatroom.')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="settings-channel">{t(locale, '알림 방법', 'Notification channel')}</Label>
-                <NativeSelect className="w-full" id="settings-channel" value={channel} onChange={(event) => { setChannel(event.target.value as NotificationChannel); setSaved(false); }}>
-                  <NativeSelectOption value="email">{t(locale, '이메일', 'Email')}</NativeSelectOption>
-                  <NativeSelectOption value="sms">{t(locale, '문자 메시지', 'Text message')}</NativeSelectOption>
-                  <NativeSelectOption value="both">{t(locale, '이메일 + 문자', 'Email + text')}</NativeSelectOption>
-                </NativeSelect>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="settings-phone">{t(locale, '미국 휴대폰 번호', 'US mobile number')}</Label>
-                <div className="relative">
-                  <MessageSquare aria-hidden="true" className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    aria-describedby="settings-phone-help"
-                    aria-invalid={!phoneValid}
-                    className="pl-9"
-                    data-testid="settings-phone"
-                    id="settings-phone"
-                    inputMode="tel"
-                    onChange={(event) => { setPhone(event.target.value); setSaved(false); }}
-                    placeholder="+14155550123"
-                    value={phone}
-                  />
-                </div>
-                <p className={phoneValid ? 'text-xs text-muted-foreground' : 'text-xs text-destructive'} id="settings-phone-help">
-                  {phoneValid
-                    ? t(locale, '미국 파일럿은 +1로 시작하는 번호를 지원해요.', 'The US pilot supports numbers beginning with +1.')
-                    : t(locale, '+1과 지역 번호를 포함한 미국 번호를 입력하세요.', 'Enter a US number with +1 and area code.')}
-                </p>
-                {member.phone && (
-                  <p className="text-xs font-medium" data-testid="settings-phone-status">
-                    {member.phoneVerified
-                      ? t(locale, '인증된 번호', 'Verified number')
-                      : t(locale, '문자 알림을 받으려면 번호 인증이 필요해요.', 'Verify this number to receive text notifications.')}
+              <div className="flex items-start gap-2.5 rounded-xl bg-muted/60 p-3 text-sm">
+                <Bell aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary" />
+                <div>
+                  <p className="font-medium" data-testid="kakao-notification-status">
+                    {notificationsConnected
+                      ? t(locale, '나와의 채팅에 연결됨', 'Connected to My Chatroom')
+                      : t(locale, '알림 권한이 아직 연결되지 않았어요', 'Notification permission is not connected yet')}
                   </p>
-                )}
+                  <p className="mt-1 text-muted-foreground">
+                    {t(locale, '알림은 다른 사람이 볼 수 없는 개인 채팅으로 오며, 버튼을 눌러 앱에서 처리해요.', 'Notifications are private and include a button to take action in the app.')}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-start gap-2.5 rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">
-                <Bell aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-                <p>
-                  {t(locale, '문자로 받은 요청은 1(수락) 또는 2(거절)로 답장할 수 있어요.', 'For a texted request, reply 1 to accept or 2 to decline.')}
-                </p>
-              </div>
+              {!notificationsConnected && (
+                <Button
+                  className="h-11 w-full bg-[#FEE500] text-[#191919] hover:bg-[#F5DC00]"
+                  data-testid="kakao-notification-connect"
+                  onClick={connectNotifications}
+                  type="button"
+                >
+                  <MessageCircle aria-hidden="true" className="fill-current" />
+                  {t(locale, '카카오톡 알림 연결', 'Connect KakaoTalk notifications')}
+                </Button>
+              )}
             </CardContent>
           </Card>
 
           <Button
             className="h-11 w-full"
             data-testid="settings-save"
-            disabled={!phoneValid || !namesValid || saving}
+            disabled={!namesValid || saving}
             type="submit"
           >
             {saved && <CheckCircle2 aria-hidden="true" />}
@@ -290,40 +222,10 @@ export function SettingsView() {
               : saved ? t(locale, '저장했어요', 'Saved') : t(locale, '설정 저장', 'Save settings')}
           </Button>
 
-          {verificationPending && (
-            <Card data-testid="phone-verification-card">
-              <CardHeader>
-                <CardTitle>{t(locale, '휴대폰 번호 인증', 'Verify your mobile number')}</CardTitle>
-                <CardDescription>
-                  {t(locale, '문자로 받은 6자리 인증번호를 입력하세요. 10분 동안 유효해요.', 'Enter the six-digit code we texted you. It expires in 10 minutes.')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex gap-2">
-                <Label className="sr-only" htmlFor="phone-verification-code">{t(locale, '인증번호', 'Verification code')}</Label>
-                <Input
-                  autoComplete="one-time-code"
-                  data-testid="phone-verification-code"
-                  id="phone-verification-code"
-                  inputMode="numeric"
-                  maxLength={6}
-                  onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="123456"
-                  value={verificationCode}
-                />
-                <Button
-                  data-testid="phone-verification-submit"
-                  disabled={!/^\d{6}$/.test(verificationCode)}
-                  onClick={verifyPhone}
-                  type="button"
-                >
-                  {t(locale, '인증', 'Verify')}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {verificationError && (
-            <p className="text-sm text-destructive" role="alert">{verificationError}</p>
+          {saveError && (
+            <p className="text-sm text-destructive" role="alert">
+              {t(locale, '설정을 저장하지 못했어요.', 'We couldn’t save your settings.')}
+            </p>
           )}
         </form>
 

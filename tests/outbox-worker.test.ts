@@ -14,7 +14,8 @@ void test('renders Korean owner request and English borrower decision messages',
       decisionUrl: 'https://example.com/borrowing',
     }),
   });
-  assert.match(request.text, /수락은 1, 거절은 2/);
+  assert.match(request.text, /앱에서 수락 또는 거절/);
+  assert.deepEqual(request.actions, [{ label: '요청 확인', url: 'https://example.com/borrowing' }]);
 
   const decision = renderOutboxMessage({
     eventType: 'borrow_accepted',
@@ -27,6 +28,7 @@ void test('renders Korean owner request and English borrower decision messages',
     }),
   });
   assert.match(decision.text, /was accepted/);
+  assert.deepEqual(decision.actions, [{ label: 'View loan', url: 'https://example.com/borrowing' }]);
 });
 
 void test('rejects malformed or unsupported outbox events', () => {

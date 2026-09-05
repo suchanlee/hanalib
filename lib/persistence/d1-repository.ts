@@ -162,7 +162,7 @@ function locale(value: string): AppLocale {
 }
 
 function notificationChannel(value: string): NotificationChannel {
-  return value === 'sms' || value === 'both' ? value : 'email';
+  return value === 'sms' || value === 'both' || value === 'kakao' ? value : 'email';
 }
 
 function memberInitials(name: string) {
@@ -959,7 +959,7 @@ export class D1LibraryRepository implements LibraryRepository {
     if (!phoneChanged) next.phoneVerified = Boolean(existing.phoneVerified);
     if (!next.displayName || !next.displayNameKo) throw libraryError('invalid-input', 'Both display names are required.');
     if (next.locale !== 'ko' && next.locale !== 'en') throw libraryError('invalid-input', 'Invalid locale.');
-    if (!['email', 'sms', 'both'].includes(next.notificationChannel)) throw libraryError('invalid-input', 'Invalid notification channel.');
+    if (!['email', 'sms', 'both', 'kakao'].includes(next.notificationChannel)) throw libraryError('invalid-input', 'Invalid notification channel.');
     if (next.phone && !/^\+1[2-9]\d{9}$/.test(next.phone)) throw libraryError('invalid-input', 'Phone numbers must be valid US +1 E.164 numbers.');
 
     const profileStatement = this.db.prepare(`

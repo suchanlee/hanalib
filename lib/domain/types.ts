@@ -4,7 +4,7 @@ export type AppScreen = 'catalog' | 'intake' | 'detail' | 'borrowing' | 'setting
 export type CatalogStatus = 'available' | 'borrowed' | 'archived';
 export type RequestStatus = 'pending' | 'accepted' | 'declined' | 'canceled' | 'expired' | 'superseded';
 export type LoanStatus = 'active' | 'returned';
-export type NotificationChannel = 'email' | 'sms' | 'both';
+export type NotificationChannel = 'email' | 'sms' | 'both' | 'kakao';
 
 export interface Member {
   id: string;

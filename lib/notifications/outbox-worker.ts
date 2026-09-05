@@ -1,6 +1,7 @@
 import type { AppLocale, NotificationChannel } from '../domain/types.ts';
 import type { OutboxPayloadByType, LibraryOutboxEventType } from '../persistence/outbox.ts';
-import { decryptContact } from './contact-crypto.ts';
+import { decryptContact, encryptContact } from './contact-crypto.ts';
+import { parseKakaoCredential, refreshKakaoCredential } from './kakao.ts';
 import { sendNotification, type NotificationSenderConfig } from './sender.ts';
 import { borrowRequestTemplate, decisionTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
 
@@ -24,9 +25,13 @@ interface SmsRow {
   addressEncrypted: string;
 }
 
+interface KakaoRow {
+  id: string;
+  addressEncrypted: string;
+}
+
 export interface OutboxWorkerConfig extends NotificationSenderConfig {
   contactEncryptionKey?: string;
-  publicAppUrl?: string;
 }
 
 export interface OutboxWorkerResult {
@@ -65,12 +70,14 @@ export function renderOutboxMessage(row: Pick<OutboxRow, 'eventType' | 'locale' 
   if (type === 'borrow_requested') {
     const value = payload(fullRow, type);
     if (typeof value.actorName !== 'string' || typeof value.expiresAt !== 'string') throw new Error('invalid-outbox-payload');
+    if (typeof value.decisionUrl !== 'string') throw new Error('invalid-outbox-payload');
     return borrowRequestTemplate({
       locale: language,
       ownerName: value.recipientName,
       borrowerName: value.actorName,
       bookTitle: value.bookTitle,
       expiresAt: new Date(value.expiresAt),
+      decisionUrl: value.decisionUrl,
     });
   }
   if (type === 'return_check_due') {
@@ -89,6 +96,9 @@ export function renderOutboxMessage(row: Pick<OutboxRow, 'eventType' | 'locale' 
     borrowerName: value.recipientName,
     bookTitle: value.bookTitle,
     accepted: type === 'borrow_accepted',
+    returnUrl: type === 'borrow_accepted' && 'returnUrl' in value && typeof value.returnUrl === 'string'
+      ? value.returnUrl
+      : undefined,
   });
 }
 
@@ -128,7 +138,13 @@ async function scheduleNextReturnCheck(db: D1Database, row: OutboxRow, now: numb
   ]);
 }
 
-async function recipient(db: D1Database, row: OutboxRow, config: OutboxWorkerConfig) {
+async function recipient(
+  db: D1Database,
+  row: OutboxRow,
+  config: OutboxWorkerConfig,
+  fetcher: typeof fetch,
+  now: number,
+) {
   const person = await db.prepare(`
     SELECT
       p.notification_channel AS notificationChannel,
@@ -138,6 +154,25 @@ async function recipient(db: D1Database, row: OutboxRow, config: OutboxWorkerCon
     LIMIT 1
   `).bind(row.recipientId).first<RecipientRow>();
   if (!person) throw new Error('recipient-not-found');
+
+  const kakao = await db.prepare(`
+    SELECT id, address_encrypted AS addressEncrypted
+    FROM notification_endpoints
+    WHERE user_id = ? AND kind = 'kakao' AND enabled = 1 AND verified_at IS NOT NULL
+    LIMIT 1
+  `).bind(row.recipientId).first<KakaoRow>();
+  if (person.notificationChannel === 'kakao') {
+    if (!kakao || !config.contactEncryptionKey) throw new Error('recipient-has-no-kakao-credential');
+    let credential = parseKakaoCredential(await decryptContact(kakao.addressEncrypted, config.contactEncryptionKey));
+    if (credential.accessExpiresAt <= now + 5 * 60_000) {
+      credential = await refreshKakaoCredential(config, credential, fetcher, now);
+      const encrypted = await encryptContact(JSON.stringify(credential), config.contactEncryptionKey);
+      await db.prepare('UPDATE notification_endpoints SET address_encrypted = ? WHERE id = ? AND enabled = 1')
+        .bind(encrypted, kakao.id)
+        .run();
+    }
+    return { channel: 'kakao' as const, kakaoAccessToken: credential.accessToken };
+  }
 
   const sms = await db.prepare(`
     SELECT address_encrypted AS addressEncrypted
@@ -182,7 +217,7 @@ export async function processReadyOutbox(
     if (affected(claim) !== 1) continue;
     result.claimed += 1;
     try {
-      const target = await recipient(db, row, config);
+      const target = await recipient(db, row, config, options.fetcher ?? fetch, now);
       const deliveries = await sendNotification(
         config,
         target,

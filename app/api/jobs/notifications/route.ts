@@ -19,6 +19,8 @@ export async function POST(request: Request) {
     twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
     twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
+    kakaoRestApiKey: process.env.KAKAO_REST_API_KEY,
+    kakaoClientSecret: process.env.KAKAO_CLIENT_SECRET,
   });
   return Response.json({ data: { expired, delivery } }, { headers: { 'cache-control': 'no-store' } });
 }

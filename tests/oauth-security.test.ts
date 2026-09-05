@@ -61,7 +61,7 @@ void test('builds Kakao OIDC authorization with nonce and PKCE', async () => {
   assert.equal(url.origin, 'https://kauth.kakao.com');
   assert.equal(url.pathname, '/oauth/authorize');
   assert.equal(url.searchParams.get('response_type'), 'code');
-  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname');
+  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname,talk_message');
   assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
   assert.equal(url.searchParams.get('state'), transaction.state);
   assert.equal(url.searchParams.get('nonce'), transaction.nonce);
@@ -149,7 +149,14 @@ void test('exchanges the Kakao authorization code with client secret and PKCE', 
       assert.equal(body.get('client_secret'), 'kakao-client-secret');
       assert.equal(body.get('code_verifier'), transaction.verifier);
       assert.equal(body.get('redirect_uri'), 'https://library.example/api/auth/kakao/callback');
-      return Response.json({ id_token: token });
+      return Response.json({
+        id_token: token,
+        access_token: 'kakao-access-token',
+        refresh_token: 'kakao-refresh-token',
+        expires_in: 21_600,
+        refresh_token_expires_in: 5_184_000,
+        scope: 'openid profile_nickname talk_message',
+      });
     }
     if (url.pathname === '/.well-known/jwks.json') {
       return Response.json({ keys: [{ ...publicJwk, kid: 'test-key' }] });
@@ -157,7 +164,9 @@ void test('exchanges the Kakao authorization code with client secret and PKCE', 
     throw new Error(`Unexpected URL: ${url}`);
   }) as typeof fetch;
   const result = await exchangeAuthorizationCode(config, 'authorization-code', transaction, fetcher);
-  assert.equal(result.sub, '123456789');
+  assert.equal(result.claims.sub, '123456789');
+  assert.equal(result.tokenSet.accessToken, 'kakao-access-token');
+  assert.deepEqual(result.tokenSet.scopes, ['openid', 'profile_nickname', 'talk_message']);
 });
 
 void test('sanitizes Kakao profile data and ignores unverified email claims', () => {

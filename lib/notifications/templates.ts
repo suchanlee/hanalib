@@ -6,6 +6,7 @@ interface BorrowRequestTemplateInput {
   borrowerName: string;
   bookTitle: string;
   expiresAt: Date;
+  decisionUrl: string;
 }
 
 interface DecisionTemplateInput {
@@ -13,6 +14,7 @@ interface DecisionTemplateInput {
   borrowerName: string;
   bookTitle: string;
   accepted: boolean;
+  returnUrl?: string;
 }
 
 interface ReturnCheckTemplateInput {
@@ -25,6 +27,7 @@ interface ReturnCheckTemplateInput {
 export interface NotificationTemplate {
   subject: string;
   text: string;
+  actions?: Array<{ label: string; url: string }>;
 }
 
 function date(locale: AppLocale, value: Date) {
@@ -44,12 +47,14 @@ export function borrowRequestTemplate(
   if (input.locale === 'ko') {
     return {
       subject: `${input.bookTitle} 대여 요청`,
-      text: `${input.ownerName}님, ${input.borrowerName}님이 『${input.bookTitle}』을 빌리고 싶어 해요. 수락은 1, 거절은 2로 답장해 주세요. ${date(input.locale, input.expiresAt)}까지 유효해요.`,
+      text: `${input.ownerName}님, ${input.borrowerName}님이 『${input.bookTitle}』을 빌리고 싶어 해요. 앱에서 수락 또는 거절해 주세요. ${date(input.locale, input.expiresAt)}까지 유효해요.`,
+      actions: [{ label: '요청 확인', url: input.decisionUrl }],
     };
   }
   return {
     subject: `Request to borrow ${input.bookTitle}`,
-    text: `${input.ownerName}, ${input.borrowerName} would like to borrow “${input.bookTitle}.” Reply 1 to accept or 2 to decline. This request expires ${date(input.locale, input.expiresAt)}.`,
+    text: `${input.ownerName}, ${input.borrowerName} would like to borrow “${input.bookTitle}.” Accept or decline in the app. This request expires ${date(input.locale, input.expiresAt)}.`,
+    actions: [{ label: 'View request', url: input.decisionUrl }],
   };
 }
 
@@ -64,10 +69,12 @@ export function decisionTemplate(
     ? {
         subject: `${input.bookTitle} 요청 ${input.accepted ? '수락' : '거절'}`,
         text: `${input.borrowerName}님, 『${input.bookTitle}』 대여 요청이 ${outcome}.`,
+        actions: input.accepted && input.returnUrl ? [{ label: '대여 보기', url: input.returnUrl }] : undefined,
       }
     : {
         subject: `${input.bookTitle} request ${input.accepted ? 'accepted' : 'declined'}`,
         text: `${input.borrowerName}, your request to borrow “${input.bookTitle}” ${outcome}.`,
+        actions: input.accepted && input.returnUrl ? [{ label: 'View loan', url: input.returnUrl }] : undefined,
       };
 }
 
@@ -77,10 +84,12 @@ export function returnCheckTemplate(
   return input.locale === 'ko'
     ? {
         subject: `${input.bookTitle} 반납 확인`,
-        text: `${input.borrowerName}님, 『${input.bookTitle}』을 반납하셨나요? 반납했다면 여기에서 확인해 주세요: ${input.returnUrl}`,
+        text: `${input.borrowerName}님, 『${input.bookTitle}』을 반납하셨나요? 반납했다면 앱에서 확인해 주세요.`,
+        actions: [{ label: '반납 확인', url: input.returnUrl }],
       }
     : {
         subject: `Return check for ${input.bookTitle}`,
-        text: `${input.borrowerName}, have you returned “${input.bookTitle}”? If so, confirm here: ${input.returnUrl}`,
+        text: `${input.borrowerName}, have you returned “${input.bookTitle}”? If so, confirm it in the app.`,
+        actions: [{ label: 'Confirm return', url: input.returnUrl }],
       };
 }

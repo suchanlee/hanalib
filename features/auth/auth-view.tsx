@@ -38,7 +38,7 @@ export function AuthView() {
   }, []);
 
   function beginSignIn() {
-    window.location.assign(oauthStartUrl('kakao'));
+    window.location.assign(oauthStartUrl('kakao', `${window.location.pathname}${window.location.search}${window.location.hash}`));
   }
 
   async function demoSignIn(persona: 'owner' | 'borrower') {

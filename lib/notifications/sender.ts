@@ -1,5 +1,6 @@
 import type { NotificationChannel } from '@/lib/domain/types';
 import type { NotificationTemplate } from './templates';
+import { sendKakaoSelfMessage } from './kakao.ts';
 
 export interface NotificationSenderConfig {
   resendApiKey?: string;
@@ -7,16 +8,20 @@ export interface NotificationSenderConfig {
   twilioAccountSid?: string;
   twilioAuthToken?: string;
   twilioFromNumber?: string;
+  kakaoRestApiKey?: string;
+  kakaoClientSecret?: string;
+  publicAppUrl?: string;
 }
 
 export interface DeliveryTarget {
   channel: NotificationChannel;
   email?: string;
   phone?: string;
+  kakaoAccessToken?: string;
 }
 
 export interface DeliveryResult {
-  channel: 'email' | 'sms';
+  channel: 'email' | 'sms' | 'kakao';
   providerMessageId: string;
 }
 
@@ -108,6 +113,9 @@ export async function sendNotification(
   }
   if ((target.channel === 'sms' || target.channel === 'both') && target.phone) {
     jobs.push(sendTwilioSms(config, target.phone, message, fetcher));
+  }
+  if (target.channel === 'kakao' && target.kakaoAccessToken && config.publicAppUrl) {
+    jobs.push(sendKakaoSelfMessage(target.kakaoAccessToken, config.publicAppUrl, message, fetcher));
   }
   if (jobs.length === 0) throw new Error('No verified notification destination is available.');
   return Promise.all(jobs);

@@ -122,7 +122,7 @@ export async function authorizationUrl(
   url.searchParams.set('client_id', config.credentials.clientId);
   url.searchParams.set('redirect_uri', redirectUri);
   url.searchParams.set('response_type', 'code');
-  url.searchParams.set('scope', 'openid,profile_nickname');
+  url.searchParams.set('scope', 'openid,profile_nickname,talk_message');
   url.searchParams.set('state', transaction.state);
   url.searchParams.set('nonce', transaction.nonce);
   url.searchParams.set('code_challenge', await pkceChallenge(transaction.verifier));
@@ -132,13 +132,43 @@ export async function authorizationUrl(
 
 interface TokenResponse {
   id_token?: unknown;
+  access_token?: unknown;
+  refresh_token?: unknown;
+  expires_in?: unknown;
+  refresh_token_expires_in?: unknown;
+  scope?: unknown;
 }
 
-async function tokenResponse(response: Response) {
+export interface KakaoOAuthTokenSet {
+  accessToken: string;
+  refreshToken: string;
+  accessExpiresAt: number;
+  refreshExpiresAt: number;
+  scopes: string[];
+}
+
+async function tokenResponse(response: Response, now = Date.now()) {
   if (!response.ok) throw new OAuthProtocolError('token_exchange_failed');
   const payload = await response.json() as TokenResponse;
-  if (typeof payload.id_token !== 'string') throw new OAuthProtocolError('token_exchange_failed');
-  return payload.id_token;
+  if (
+    typeof payload.id_token !== 'string' ||
+    typeof payload.access_token !== 'string' ||
+    typeof payload.refresh_token !== 'string' ||
+    typeof payload.expires_in !== 'number' || !Number.isSafeInteger(payload.expires_in) || payload.expires_in <= 0 ||
+    typeof payload.refresh_token_expires_in !== 'number' || !Number.isSafeInteger(payload.refresh_token_expires_in) || payload.refresh_token_expires_in <= 0
+  ) throw new OAuthProtocolError('token_exchange_failed');
+  return {
+    idToken: payload.id_token,
+    tokenSet: {
+      accessToken: payload.access_token,
+      refreshToken: payload.refresh_token,
+      accessExpiresAt: now + payload.expires_in * 1_000,
+      refreshExpiresAt: now + payload.refresh_token_expires_in * 1_000,
+      scopes: typeof payload.scope === 'string'
+        ? payload.scope.split(/[\s,]+/u).filter(Boolean)
+        : [],
+    } satisfies KakaoOAuthTokenSet,
+  };
 }
 
 export async function exchangeAuthorizationCode(
@@ -163,14 +193,15 @@ export async function exchangeAuthorizationCode(
     body,
     signal: AbortSignal.timeout(10_000),
   });
-  const idToken = await tokenResponse(response);
-  return verifyOidcIdToken(idToken, {
+  const { idToken, tokenSet } = await tokenResponse(response);
+  const claims = await verifyOidcIdToken(idToken, {
     audience: config.credentials.clientId,
     issuers: [KAKAO_ISSUER],
     jwksUrl: KAKAO_JWKS_ENDPOINT,
     nonce: transaction.nonce,
     fetcher,
   });
+  return { claims, tokenSet };
 }
 
 export function identityFromClaims(

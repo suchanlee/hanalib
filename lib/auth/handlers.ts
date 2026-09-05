@@ -14,6 +14,8 @@ import {
   oauthTransactionFromRequest,
 } from './oauth-transaction';
 import { provisionAuthenticatedMember } from './member';
+import { persistKakaoNotificationCredential } from './kakao-notifications';
+import { getD1Database } from '../../db';
 import { demoIdentity } from './demo';
 import { clearSessionCookie, createSessionToken, isSameOriginMutation, sessionCookie } from './session';
 
@@ -81,9 +83,16 @@ export async function handleOAuthCallback(
   if (input.error) return errorRedirect(config.publicAppUrl, 'access_denied', secure);
   if (!input.code) return errorRedirect(config.publicAppUrl, 'missing_code', secure);
   try {
-    const claims = await exchangeAuthorizationCode(config, input.code, transaction, fetcher);
+    const { claims, tokenSet } = await exchangeAuthorizationCode(config, input.code, transaction, fetcher);
     const identity = identityFromClaims(provider, claims);
     const member = await provisionAuthenticatedMember(identity, config);
+    await persistKakaoNotificationCredential(
+      getD1Database(),
+      member.id,
+      identity.providerSubject,
+      tokenSet,
+      source,
+    );
     const token = await createSessionToken({
       profileId: member.id,
       communityId: member.communityId,

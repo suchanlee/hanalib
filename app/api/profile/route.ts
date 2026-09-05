@@ -8,15 +8,15 @@ export async function PATCH(request: Request) {
     if (body.displayName !== undefined && typeof body.displayName !== 'string') throw libraryError('invalid-input', 'displayName must be a string.');
     if (body.displayNameKo !== undefined && typeof body.displayNameKo !== 'string') throw libraryError('invalid-input', 'displayNameKo must be a string.');
     if (body.locale !== undefined && body.locale !== 'ko' && body.locale !== 'en') throw libraryError('invalid-input', 'locale must be ko or en.');
-    if (body.notificationChannel !== undefined && body.notificationChannel !== 'email' && body.notificationChannel !== 'sms' && body.notificationChannel !== 'both') {
-      throw libraryError('invalid-input', 'notificationChannel must be email, sms, or both.');
+    if (body.notificationChannel !== undefined && body.notificationChannel !== 'email' && body.notificationChannel !== 'sms' && body.notificationChannel !== 'both' && body.notificationChannel !== 'kakao') {
+      throw libraryError('invalid-input', 'notificationChannel must be email, sms, both, or kakao.');
     }
     if (body.phone !== undefined && typeof body.phone !== 'string') throw libraryError('invalid-input', 'phone must be a string.');
     const changes: Partial<Member> = {
       displayName: typeof body.displayName === 'string' ? body.displayName : undefined,
       displayNameKo: typeof body.displayNameKo === 'string' ? body.displayNameKo : undefined,
       locale: body.locale === 'ko' || body.locale === 'en' ? body.locale : undefined,
-      notificationChannel: body.notificationChannel === 'email' || body.notificationChannel === 'sms' || body.notificationChannel === 'both'
+      notificationChannel: body.notificationChannel === 'email' || body.notificationChannel === 'sms' || body.notificationChannel === 'both' || body.notificationChannel === 'kakao'
         ? body.notificationChannel
         : undefined,
       phone: typeof body.phone === 'string' ? body.phone : undefined,

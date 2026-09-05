@@ -147,8 +147,8 @@ function RequestCard({
             <span>
               {t(
                 locale,
-                '알림 문자에 1로 답장하면 수락, 2로 답장하면 거절돼요. 앱에서도 바로 선택할 수 있어요.',
-                'Reply 1 to the alert to accept or 2 to decline. You can also decide here.',
+                '카카오톡 알림의 요청 확인 버튼이나 이 화면에서 수락 또는 거절할 수 있어요.',
+                'Use the KakaoTalk alert button or decide directly on this screen.',
               )}
             </span>
           </div>
@@ -269,6 +269,9 @@ export function CirculationView() {
   });
   const borrowed = state.loans.filter((loan) => loan.status === 'active' && loan.borrowerId === state.currentUserId);
   const lent = state.loans.filter((loan) => loan.status === 'active' && loan.ownerId === state.currentUserId);
+  const defaultTab = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('loan')
+    ? 'borrowed'
+    : 'requests';
 
   return (
     <section className="mx-auto w-full max-w-3xl px-4 pt-5 pb-28 sm:px-6" data-testid="circulation-view">
@@ -285,7 +288,7 @@ export function CirculationView() {
         </p>
       </header>
 
-      <Tabs defaultValue="requests">
+      <Tabs defaultValue={defaultTab}>
         <TabsList aria-label={t(locale, '대여 보기', 'Borrowing views')} className="grid h-11 w-full grid-cols-3 rounded-xl p-1">
           <TabsTrigger className="h-full" data-testid="circulation-tab-requests" value="requests">
             {t(locale, '요청', 'Requests')}

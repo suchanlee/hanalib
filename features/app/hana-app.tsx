@@ -106,6 +106,6 @@ function LibraryShell() {
   );
 }
 
-export function HanaApp() {
-  return <HanaAppProvider><LibraryShell /></HanaAppProvider>;
+export function HanaApp({ initialScreen = 'catalog' }: { initialScreen?: AppScreen }) {
+  return <HanaAppProvider initialScreen={initialScreen}><LibraryShell /></HanaAppProvider>;
 }

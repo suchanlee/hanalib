@@ -16,6 +16,7 @@ import type {
   CatalogItem,
   HanaAppActions,
   HanaAppState,
+  AppScreen,
   Loan,
   Member,
 } from '@/lib/domain/types';
@@ -99,8 +100,8 @@ function failureAnnouncement(locale: HanaAppState['locale']) {
     : 'We couldn’t save that. Check your connection and try again.';
 }
 
-export function HanaAppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<HanaAppState>(emptyState);
+export function HanaAppProvider({ children, initialScreen = 'catalog' }: { children: ReactNode; initialScreen?: AppScreen }) {
+  const [state, setState] = useState<HanaAppState>({ ...emptyState, screen: initialScreen });
 
   const refresh = useCallback(async () => {
     try {

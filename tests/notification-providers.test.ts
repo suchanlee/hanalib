@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { sendNotification } from '../lib/notifications/sender.ts';
+import { parseKakaoCredential, refreshKakaoCredential, sendKakaoSelfMessage } from '../lib/notifications/kakao.ts';
 import { computeTwilioSignature, verifyTwilioSignature } from '../lib/notifications/twilio-signature.ts';
 
 void test('email and SMS deliveries use provider APIs without leaking message content into results', async () => {
@@ -41,4 +42,63 @@ void test('Twilio signatures are deterministic and reject tampering', async () =
   const signature = await computeTwilioSignature(input.authToken, input.publicUrl, input.formValues);
   assert.equal(await verifyTwilioSignature({ ...input, signature }), true);
   assert.equal(await verifyTwilioSignature({ ...input, signature: `${signature}x` }), false);
+});
+
+void test('Kakao self messages use a private default template with same-origin action buttons', async () => {
+  let request: Request | undefined;
+  const fetcher: typeof fetch = async (input, init) => {
+    request = new Request(input, init);
+    return Response.json({ result_code: 0 });
+  };
+  const result = await sendKakaoSelfMessage(
+    'kakao-access-token',
+    'https://library.example',
+    {
+      subject: '대여 요청',
+      text: '새로운 대여 요청이 있어요.',
+      actions: [{ label: '요청 확인', url: 'https://library.example/borrowing?request=one' }],
+    },
+    fetcher,
+  );
+  assert.equal(result.channel, 'kakao');
+  assert.ok(request);
+  assert.equal(request.headers.get('authorization'), 'Bearer kakao-access-token');
+  const form = new URLSearchParams(await request.text());
+  const template = JSON.parse(String(form.get('template_object'))) as Record<string, unknown>;
+  assert.equal(template.object_type, 'text');
+  assert.match(JSON.stringify(template), /https:\/\/library\.example\/borrowing\?request=one/u);
+
+  await assert.rejects(sendKakaoSelfMessage(
+    'kakao-access-token',
+    'https://library.example',
+    { subject: 'unsafe', text: 'unsafe', actions: [{ label: 'Open', url: 'https://attacker.example/' }] },
+    fetcher,
+  ), /invalid-kakao-message-action/u);
+});
+
+void test('Kakao tokens refresh without discarding a still-valid refresh token', async () => {
+  const now = Date.parse('2026-09-04T17:00:00.000Z');
+  const credential = parseKakaoCredential(JSON.stringify({
+    version: 1,
+    accessToken: 'old-access-token',
+    refreshToken: 'old-refresh-token',
+    accessExpiresAt: now - 1,
+    refreshExpiresAt: now + 30 * 86_400_000,
+    scopes: ['openid', 'talk_message'],
+  }));
+  let request: Request | undefined;
+  const refreshed = await refreshKakaoCredential(
+    { kakaoRestApiKey: 'rest-api-key', kakaoClientSecret: 'client-secret' },
+    credential,
+    (async (input, init) => {
+      request = new Request(input, init);
+      return Response.json({ access_token: 'new-access-token', expires_in: 21_600 });
+    }) as typeof fetch,
+    now,
+  );
+  assert.equal(refreshed.accessToken, 'new-access-token');
+  assert.equal(refreshed.refreshToken, 'old-refresh-token');
+  assert.equal(refreshed.accessExpiresAt, now + 21_600_000);
+  assert.ok(request);
+  assert.equal(new URLSearchParams(await request.text()).get('client_secret'), 'client-secret');
 });
