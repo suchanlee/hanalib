@@ -5,7 +5,10 @@ import {
   CheckCircle2,
   Globe2,
   LogOut,
+  Monitor,
+  Moon,
   ShieldCheck,
+  Sun,
   UserRoundCog,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -22,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useHanaApp } from '@/features/app/app-context';
+import { useTheme, type ThemePreference } from '@/features/app/theme-context';
 import type { AppLocale } from '@/lib/domain/types';
 import { memberName } from '@/lib/i18n/copy';
 import { PushNotificationCard } from './push-notification-card';
@@ -32,6 +36,7 @@ function t(locale: AppLocale, ko: string, en: string) {
 
 export function SettingsView() {
   const { state, actions } = useHanaApp();
+  const { theme, setTheme } = useTheme();
   const member = state.members.find((candidate) => candidate.id === state.currentUserId) ?? state.members[0];
   const locale = state.locale;
   const [displayName, setDisplayName] = useState(member.displayName);
@@ -164,6 +169,38 @@ export function SettingsView() {
                   <Globe2 aria-hidden="true" />
                   English
                 </Button>
+              </fieldset>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t(locale, '화면 모드', 'Appearance')}</CardTitle>
+              <CardDescription>
+                {t(locale, '기기에 맞추거나 밝고 어두운 화면을 직접 선택하세요.', 'Follow your device or choose light or dark mode.')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <fieldset className="grid grid-cols-3 gap-2">
+                <legend className="sr-only">{t(locale, '화면 모드 선택', 'Choose appearance')}</legend>
+                {([
+                  { value: 'light', icon: Sun, ko: '밝게', en: 'Light' },
+                  { value: 'dark', icon: Moon, ko: '어둡게', en: 'Dark' },
+                  { value: 'system', icon: Monitor, ko: '기기 설정', en: 'System' },
+                ] satisfies Array<{ value: ThemePreference; icon: typeof Sun; ko: string; en: string }>).map(({ value, icon: Icon, ko, en }) => (
+                  <Button
+                    aria-pressed={theme === value}
+                    className="h-11"
+                    data-testid={`settings-theme-${value}`}
+                    key={value}
+                    onClick={() => setTheme(value)}
+                    type="button"
+                    variant={theme === value ? 'default' : 'outline'}
+                  >
+                    <Icon aria-hidden="true" />
+                    {t(locale, ko, en)}
+                  </Button>
+                ))}
               </fieldset>
             </CardContent>
           </Card>
