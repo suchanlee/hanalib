@@ -221,7 +221,7 @@ export function CatalogView() {
 
       {results.length ? (
         <section
-          className="mt-4 grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4 xl:grid-cols-5"
+          className="mt-4 grid grid-cols-2 items-start gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4 xl:grid-cols-5"
           aria-label={state.locale === 'ko' ? '검색 결과' : 'Search results'}
           data-testid="catalog-results"
         >
