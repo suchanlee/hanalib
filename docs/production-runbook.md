@@ -4,7 +4,7 @@ The application runs publicly on OpenAI Sites backed by Cloudflare Workers. Site
 
 ## 1. Identity and membership
 
-Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` consent item. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
+Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` consent item. Convert the application to a Kakao Biz app, complete its business-information review, request the personal-information consent permission, and then enable `account_email` as optional consent. The login request includes both scopes; verified Kakao email claims are stored for notification delivery. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
 `https://library.hanaseed.org/api/auth/kakao/callback`
 

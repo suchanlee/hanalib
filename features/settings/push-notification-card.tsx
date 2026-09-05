@@ -16,7 +16,8 @@ import {
   Download,
   Loader2,
   Send,
-  Share2,
+  SquareArrowUp,
+  SquarePlus,
   Smartphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -211,8 +212,8 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
               <p>{t(locale, 'iPhone에서는 먼저 홈 화면에 앱을 추가해야 알림을 켤 수 있어요.', 'On iPhone, add the app to your Home Screen before enabling notifications.')}</p>
             </div>
             <ol className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2"><span className="font-semibold text-foreground">1.</span><span>{t(locale, 'Safari 아래쪽의 공유 버튼을 누르세요.', 'Tap Safari’s Share button.')}</span><Share2 aria-hidden="true" className="size-4 shrink-0" /></li>
-              <li className="flex gap-2"><span className="font-semibold text-foreground">2.</span><span>{t(locale, '‘홈 화면에 추가’를 선택하세요.', 'Choose “Add to Home Screen.”')}</span></li>
+              <li className="flex gap-2"><span className="font-semibold text-foreground">1.</span><span>{t(locale, 'Safari 아래쪽의 공유 버튼을 누르세요.', 'Tap Safari’s Share button.')}</span><SquareArrowUp aria-hidden="true" className="size-4 shrink-0" /></li>
+              <li className="flex gap-2"><span className="font-semibold text-foreground">2.</span><span>{t(locale, '‘홈 화면에 추가’를 선택하세요.', 'Choose “Add to Home Screen.”')}</span><SquarePlus aria-hidden="true" className="size-4 shrink-0" /></li>
               <li className="flex gap-2"><span className="font-semibold text-foreground">3.</span><span>{t(locale, '홈 화면에서 앱을 열고 여기로 돌아오세요.', 'Open the app from your Home Screen, then return here.')}</span></li>
             </ol>
           </div>

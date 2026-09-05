@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   Download,
   Loader2,
-  Share2,
+  SquareArrowUp,
+  SquarePlus,
   Smartphone,
   X,
 } from 'lucide-react';
@@ -382,7 +383,10 @@ export function PwaOnboarding() {
           {ios ? (
             <ol className="space-y-3 text-sm">
               <li className="flex items-center gap-2">
-                <Share2 aria-hidden="true" className="size-4 text-primary" />
+                <SquareArrowUp
+                  aria-hidden="true"
+                  className="size-4 text-primary"
+                />
                 <span>
                   <strong>1.</strong>{' '}
                   {t(
@@ -393,7 +397,7 @@ export function PwaOnboarding() {
                 </span>
               </li>
               <li className="flex items-center gap-2">
-                <Smartphone
+                <SquarePlus
                   aria-hidden="true"
                   className="size-4 text-primary"
                 />

@@ -61,7 +61,7 @@ void test('builds Kakao OIDC authorization with nonce and PKCE', async () => {
   assert.equal(url.origin, 'https://kauth.kakao.com');
   assert.equal(url.pathname, '/oauth/authorize');
   assert.equal(url.searchParams.get('response_type'), 'code');
-  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname,talk_message');
+  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname,account_email,talk_message');
   assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
   assert.equal(url.searchParams.get('state'), transaction.state);
   assert.equal(url.searchParams.get('nonce'), transaction.nonce);
@@ -186,4 +186,16 @@ void test('sanitizes Kakao profile data and ignores unverified email claims', ()
   assert.equal(identity.displayName, '하나 독자');
   assert.equal(identity.email, '');
   assert.equal(identity.avatarUrl, 'https://k.kakaocdn.net/example.jpg');
+
+  const verifiedIdentity = identityFromClaims('kakao', {
+    iss: 'https://kauth.kakao.com',
+    sub: 'verified-subject',
+    aud: 'client',
+    iat: 1,
+    exp: 2,
+    nonce: 'nonce',
+    email: ' reader@example.com ',
+    email_verified: true,
+  });
+  assert.equal(verifiedIdentity.email, 'reader@example.com');
 });
