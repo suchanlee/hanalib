@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { clearSessionCookie, createSessionToken, isSameOriginMutation, sessionCookie, verifySessionToken } from '../lib/auth/session.ts';
 import { parseCookies } from '../lib/auth/cookies.ts';
+import { signToken } from '../lib/auth/signed-token.ts';
 
 const secret = 'session-secret-with-more-than-32-bytes-for-tests';
 const now = new Date('2026-09-04T17:00:00.000Z');
@@ -43,14 +44,17 @@ void test('issues host-only secure HttpOnly cookies in HTTPS deployments', async
   assert.match(clearSessionCookie(true), /Max-Age=0/u);
 });
 
-void test('honors previously issued Google and Apple sessions during migration', async () => {
-  for (const provider of ['google', 'apple'] as const) {
-    const token = await createSessionToken({
+void test('rejects sessions issued by removed authentication providers', async () => {
+  for (const provider of ['google', 'apple']) {
+    const token = await signToken({
+      version: 1,
       profileId: `profile-${provider}`,
       communityId: 'hana-launch',
       provider,
-    }, { secret, secure: true, now });
-    assert.equal((await verifySessionToken(token, { secret, secure: true, now }))?.provider, provider);
+      issuedAt: Math.floor(now.getTime() / 1_000),
+      expiresAt: Math.floor(now.getTime() / 1_000) + 60,
+    }, secret);
+    assert.equal(await verifySessionToken(token, { secret, secure: true, now }), null);
   }
 });
 

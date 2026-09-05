@@ -71,75 +71,6 @@ async function activeMember(profileId: string, communityId: string) {
     .first<MemberRow>();
 }
 
-async function migrateKakaoIdentity(
-  identity: ProviderIdentity,
-  storedIdentity: IdentityRow,
-  config: AuthBaseConfig,
-) {
-  const migration = config.kakaoIdentityMigration;
-  if (
-    identity.provider !== 'kakao' ||
-    !migration ||
-    identity.providerSubject !== migration.kakaoSubject
-  ) return storedIdentity;
-
-  const target = await database().prepare(`
-    SELECT profile_id AS profileId
-    FROM auth_identities
-    WHERE provider = 'google' AND lower(email) = ?
-      AND (SELECT COUNT(*) FROM auth_identities WHERE provider = 'google' AND lower(email) = ?) = 1
-    LIMIT 1
-  `).bind(migration.googleEmail, migration.googleEmail).first<IdentityRow>();
-  if (!target || target.profileId === storedIdentity.profileId) return storedIdentity;
-
-  const sourceHasMemberData = await database().prepare(`
-    SELECT (
-      EXISTS(SELECT 1 FROM catalog_items WHERE owner_id = ?) OR
-      EXISTS(SELECT 1 FROM loan_requests WHERE requester_id = ? OR responded_by = ?) OR
-      EXISTS(SELECT 1 FROM loans WHERE owner_id = ? OR borrower_id = ? OR returned_by = ?) OR
-      EXISTS(SELECT 1 FROM notification_endpoints WHERE user_id = ?) OR
-      EXISTS(SELECT 1 FROM uploaded_assets WHERE owner_id = ?) OR
-      EXISTS(SELECT 1 FROM outbox_events WHERE recipient_id = ?) OR
-      EXISTS(SELECT 1 FROM notification_deliveries WHERE recipient_id = ?) OR
-      EXISTS(SELECT 1 FROM audit_events WHERE actor_id = ?)
-    ) AS hasMemberData
-  `).bind(
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-    storedIdentity.profileId,
-  ).first<{ hasMemberData: number }>();
-  if (sourceHasMemberData?.hasMemberData) {
-    throw new Error('Refusing to merge a Kakao identity that already owns member data');
-  }
-
-  await database().batch([
-    database().prepare('DELETE FROM community_members WHERE user_id = ?').bind(storedIdentity.profileId),
-    database().prepare(`
-      UPDATE auth_identities
-      SET profile_id = ?
-      WHERE provider = 'kakao' AND provider_subject = ? AND profile_id = ?
-    `).bind(target.profileId, identity.providerSubject, storedIdentity.profileId),
-    database().prepare(`
-      DELETE FROM auth_identities
-      WHERE provider = 'google' AND lower(email) = ? AND profile_id = ?
-    `).bind(migration.googleEmail, target.profileId),
-  ]);
-
-  const migratedIdentity = await identityProfileId(identity.provider, identity.providerSubject);
-  if (migratedIdentity?.profileId !== target.profileId) {
-    throw new Error('Unable to migrate the Kakao identity');
-  }
-  return migratedIdentity;
-}
-
 function toMember(row: MemberRow, provider: SessionProviderId): AuthenticatedMember {
   return {
     id: row.id,
@@ -221,8 +152,6 @@ export async function provisionAuthenticatedMember(identity: ProviderIdentity, c
       `).bind(candidateProfileId, candidateProfileId).run();
     }
   }
-
-  storedIdentity = await migrateKakaoIdentity(identity, storedIdentity, config);
 
   await db.prepare(`
     INSERT OR IGNORE INTO community_members

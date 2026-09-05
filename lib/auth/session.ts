@@ -40,7 +40,7 @@ export async function verifySessionToken(token: string, options: SessionOptions)
     payload.version !== 1 ||
     typeof payload.profileId !== 'string' ||
     typeof payload.communityId !== 'string' ||
-    !['kakao', 'google', 'apple', 'demo'].includes(payload.provider) ||
+    !['kakao', 'demo'].includes(payload.provider) ||
     !Number.isSafeInteger(payload.issuedAt) ||
     !Number.isSafeInteger(payload.expiresAt) ||
     payload.issuedAt > now + 60 ||
