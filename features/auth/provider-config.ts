@@ -10,21 +10,13 @@ export interface OAuthProviderConfig {
 }
 
 export const oauthProviders: Readonly<Record<AuthProvider, OAuthProviderConfig>> = {
-  google: {
-    id: 'google',
-    label: 'Google',
-    startPath: '/api/auth/google/start',
-    callbackPath: '/api/auth/google/callback',
-    clientIdSecretName: 'GOOGLE_CLIENT_ID',
-    serverSecretNames: ['GOOGLE_CLIENT_SECRET'],
-  },
-  apple: {
-    id: 'apple',
-    label: 'Apple',
-    startPath: '/api/auth/apple/start',
-    callbackPath: '/api/auth/apple/callback',
-    clientIdSecretName: 'APPLE_CLIENT_ID',
-    serverSecretNames: ['APPLE_TEAM_ID', 'APPLE_KEY_ID', 'APPLE_PRIVATE_KEY'],
+  kakao: {
+    id: 'kakao',
+    label: 'Kakao',
+    startPath: '/api/auth/kakao/start',
+    callbackPath: '/api/auth/kakao/callback',
+    clientIdSecretName: 'KAKAO_REST_API_KEY',
+    serverSecretNames: ['KAKAO_CLIENT_SECRET'],
   },
 };
 

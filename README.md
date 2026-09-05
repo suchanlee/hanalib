@@ -1,6 +1,6 @@
 # 하나도서관 · Hana Library
 
-Mobile-first community-library application for sharing Korean and English books. The working preview includes a bilingual catalog, owner/status/language filters, book details, barcode-first intake, circulation, weekly return check-ins, profile settings, and deterministic demo identities for end-to-end testing.
+Mobile-first community-library application for sharing Korean and English books. The working preview includes Kakao-only member authentication, a bilingual catalog, owner/status/language filters, book details, barcode-first intake, circulation, weekly return check-ins, profile settings, and deterministic demo identities for end-to-end testing.
 
 The product and implementation blueprint lives in [`docs/community-library-plan.md`](docs/community-library-plan.md).
 

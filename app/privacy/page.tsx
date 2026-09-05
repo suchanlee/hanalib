@@ -10,7 +10,7 @@ const sections = [
   {
     title: '1. What we collect · 수집하는 정보',
     paragraphs: [
-      'Google or Apple sign-in provides your account identifier, verified email address, name, and profile image when available. We request only basic sign-in scopes. Google 또는 Apple 로그인에서 계정 식별자, 인증된 이메일, 이름, 가능한 경우 프로필 이미지를 받으며 기본 로그인 권한만 요청합니다.',
+      'Kakao sign-in provides your service-specific account identifier, nickname, and profile image when available. We request only basic sign-in scopes and do not require your Kakao Account email. 카카오 로그인에서 서비스별 계정 식별자, 닉네임, 가능한 경우 프로필 이미지를 받으며 기본 로그인 권한만 요청하고 카카오계정 이메일은 요구하지 않습니다.',
       'We also store the profile details you choose to provide, optional phone and verification status, book listings and cover images, borrow requests, loan and return history, notification delivery status, and minimal security and operational records. 선택한 프로필 정보, 선택적 전화번호와 인증 상태, 도서와 표지, 대여 요청·대여·반납 기록, 알림 전송 상태 및 최소한의 보안·운영 기록도 저장합니다.',
     ],
   },
@@ -31,7 +31,7 @@ const sections = [
   {
     title: '4. Service providers · 서비스 제공업체',
     paragraphs: [
-      'We use providers that help operate the library, including OpenAI Sites and Cloudflare for hosting and storage, Google or Apple for sign-in, book-metadata sources such as Google Books and the National Library of Korea, and configured email or SMS providers. Each receives only the information needed for its task. 호스팅·저장, 로그인, 도서 정보 조회, 이메일·문자 전송을 위해 필요한 범위에서 관련 제공업체를 사용합니다.',
+      'We use providers that help operate the library, including OpenAI Sites and Cloudflare for hosting and storage, Kakao for sign-in, book-metadata sources such as Google Books and the National Library of Korea, and configured notification providers. Each receives only the information needed for its task. 호스팅·저장, 카카오 로그인, 도서 정보 조회와 알림 전송을 위해 필요한 범위에서 관련 제공업체를 사용합니다.',
     ],
   },
   {

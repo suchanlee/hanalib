@@ -1,4 +1,4 @@
-import type { AuthProviderId } from './config.ts';
+import type { SessionProviderId } from './config.ts';
 import { cookieName, parseCookies, serializeCookie } from './cookies.ts';
 import { signToken, verifyToken } from './signed-token.ts';
 
@@ -8,7 +8,7 @@ export interface SessionPayload {
   version: 1;
   profileId: string;
   communityId: string;
-  provider: AuthProviderId | 'demo';
+  provider: SessionProviderId;
   issuedAt: number;
   expiresAt: number;
 }
@@ -40,7 +40,7 @@ export async function verifySessionToken(token: string, options: SessionOptions)
     payload.version !== 1 ||
     typeof payload.profileId !== 'string' ||
     typeof payload.communityId !== 'string' ||
-    !['google', 'apple', 'demo'].includes(payload.provider) ||
+    !['kakao', 'google', 'apple', 'demo'].includes(payload.provider) ||
     !Number.isSafeInteger(payload.issuedAt) ||
     !Number.isSafeInteger(payload.expiresAt) ||
     payload.issuedAt > now + 60 ||

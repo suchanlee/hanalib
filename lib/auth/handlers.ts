@@ -56,20 +56,6 @@ export interface OAuthCallbackInput {
   code?: string | null;
   state?: string | null;
   error?: string | null;
-  appleUser?: string | null;
-  issuer?: string | null;
-}
-
-function appleName(value: string | null | undefined) {
-  if (!value || value.length > 10_000) return undefined;
-  try {
-    const input = JSON.parse(value) as { name?: { firstName?: unknown; lastName?: unknown } };
-    const pieces = [input.name?.firstName, input.name?.lastName]
-      .filter((piece): piece is string => typeof piece === 'string');
-    return pieces.join(' ');
-  } catch {
-    return undefined;
-  }
 }
 
 export async function handleOAuthCallback(
@@ -94,13 +80,9 @@ export async function handleOAuthCallback(
   ) return errorRedirect(config.publicAppUrl, 'invalid_state', secure);
   if (input.error) return errorRedirect(config.publicAppUrl, 'access_denied', secure);
   if (!input.code) return errorRedirect(config.publicAppUrl, 'missing_code', secure);
-  if (provider === 'google' && input.issuer !== 'https://accounts.google.com') {
-    return errorRedirect(config.publicAppUrl, 'invalid_issuer', secure);
-  }
-
   try {
     const claims = await exchangeAuthorizationCode(config, input.code, transaction, fetcher);
-    const identity = identityFromClaims(provider, claims, appleName(input.appleUser));
+    const identity = identityFromClaims(provider, claims);
     const member = await provisionAuthenticatedMember(identity, config);
     const token = await createSessionToken({
       profileId: member.id,

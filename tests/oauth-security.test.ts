@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { base64UrlEncode, jsonBase64Url, parseJsonBase64Url, utf8 } from '../lib/auth/encoding.ts';
+import { base64UrlEncode, jsonBase64Url, utf8 } from '../lib/auth/encoding.ts';
 import { readProviderAuthConfig, safeReturnTo } from '../lib/auth/config.ts';
 import {
   authorizationUrl,
-  createAppleClientSecret,
+  exchangeAuthorizationCode,
   identityFromClaims,
   sanitizeExternalName,
   verifyOidcIdToken,
@@ -24,12 +24,8 @@ const baseEnv = {
   PUBLIC_APP_URL: 'https://library.example',
   AUTH_SESSION_SECRET: sessionSecret,
   AUTH_TRANSACTION_SECRET: transactionSecret,
-  GOOGLE_CLIENT_ID: 'google-client-id',
-  GOOGLE_CLIENT_SECRET: 'google-client-secret',
-  APPLE_CLIENT_ID: 'com.example.library',
-  APPLE_TEAM_ID: 'TEAM123456',
-  APPLE_KEY_ID: 'KEY1234567',
-  APPLE_PRIVATE_KEY: 'unused-for-authorization-url',
+  KAKAO_REST_API_KEY: 'kakao-rest-api-key',
+  KAKAO_CLIENT_SECRET: 'kakao-client-secret',
 };
 
 void test('uses the standard S256 PKCE transformation', async () => {
@@ -44,50 +40,32 @@ void test('canonicalizes return paths and rejects network-path variants', () => 
   assert.equal(safeReturnTo('https://attacker.example'), '/');
 });
 
-void test('binds OAuth state, nonce, verifier, and return path in a signed short-lived cookie', async () => {
-  const transaction = newOAuthTransaction('google', '/catalog?owner=me', now);
+void test('binds Kakao state, nonce, verifier, and return path in a signed short-lived cookie', async () => {
+  const transaction = newOAuthTransaction('kakao', '/catalog?owner=me', now);
   const setCookie = await oauthTransactionCookie(transaction, transactionSecret, true);
   const cookiePair = setCookie.split(';', 1)[0];
-  const request = new Request('https://library.example/api/auth/google/callback', {
+  const request = new Request('https://library.example/api/auth/kakao/callback', {
     headers: { cookie: cookiePair },
   });
   const recovered = await oauthTransactionFromRequest(request, transactionSecret, true, now);
   assert.deepEqual(recovered, transaction);
   assert.equal(await oauthTransactionFromRequest(request, transactionSecret, true, new Date(now.getTime() + 11 * 60 * 1_000)), null);
-});
-
-void test('allows Apple form_post to return its state cookie only over HTTPS', async () => {
-  const transaction = newOAuthTransaction('apple', '/', now);
-  const setCookie = await oauthTransactionCookie(transaction, transactionSecret, true);
-  assert.match(setCookie, /SameSite=None/u);
+  assert.match(setCookie, /SameSite=Lax/u);
   assert.match(setCookie, /; Secure/u);
-  await assert.rejects(oauthTransactionCookie(transaction, transactionSecret, false));
-  assert.throws(() => readProviderAuthConfig('apple', {
-    ...baseEnv,
-    PUBLIC_APP_URL: 'http://localhost:3000',
-  }));
 });
 
-void test('builds Google code flow with PKCE and Apple form_post flow', async () => {
-  const google = readProviderAuthConfig('google', baseEnv);
-  const googleTransaction = newOAuthTransaction('google', '/', now);
-  const googleUrl = await authorizationUrl(google, googleTransaction);
-  assert.equal(googleUrl.origin, 'https://accounts.google.com');
-  assert.equal(googleUrl.searchParams.get('response_type'), 'code');
-  assert.equal(googleUrl.searchParams.get('code_challenge_method'), 'S256');
-  assert.equal(googleUrl.searchParams.get('state'), googleTransaction.state);
-  assert.equal(googleUrl.searchParams.get('nonce'), googleTransaction.nonce);
-  assert.equal(googleUrl.searchParams.get('redirect_uri'), 'https://library.example/api/auth/google/callback');
-
-  const apple = readProviderAuthConfig('apple', baseEnv);
-  const appleTransaction = newOAuthTransaction('apple', '/', now);
-  const appleUrl = await authorizationUrl(apple, appleTransaction);
-  assert.equal(appleUrl.origin, 'https://appleid.apple.com');
-  assert.equal(appleUrl.searchParams.get('response_type'), 'code');
-  assert.equal(appleUrl.searchParams.get('response_mode'), 'form_post');
-  assert.equal(appleUrl.searchParams.get('scope'), 'name email');
-  assert.equal(appleUrl.searchParams.has('code_challenge'), false);
-  assert.equal(appleUrl.searchParams.get('redirect_uri'), 'https://library.example/api/auth/apple/callback');
+void test('builds Kakao OIDC authorization with nonce and PKCE', async () => {
+  const kakao = readProviderAuthConfig('kakao', baseEnv);
+  const transaction = newOAuthTransaction('kakao', '/', now);
+  const url = await authorizationUrl(kakao, transaction);
+  assert.equal(url.origin, 'https://kauth.kakao.com');
+  assert.equal(url.pathname, '/oauth/authorize');
+  assert.equal(url.searchParams.get('response_type'), 'code');
+  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname,profile_image');
+  assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
+  assert.equal(url.searchParams.get('state'), transaction.state);
+  assert.equal(url.searchParams.get('nonce'), transaction.nonce);
+  assert.equal(url.searchParams.get('redirect_uri'), 'https://library.example/api/auth/kakao/callback');
 });
 
 async function signedIdToken(claims: OidcClaims) {
@@ -106,35 +84,34 @@ async function signedIdToken(claims: OidcClaims) {
   );
   const publicJwk = await crypto.subtle.exportKey('jwk', pair.publicKey);
   const token = `${header}.${payload}.${base64UrlEncode(new Uint8Array(signature))}`;
-  const fetcher = (async () => Response.json({ keys: [{ ...publicJwk, kid: 'test-key' }] })) as typeof fetch;
-  return { token, fetcher };
+  return { token, publicJwk };
 }
 
-void test('verifies the provider signature and all replay-sensitive ID-token claims', async () => {
+void test('verifies the Kakao signature and all replay-sensitive ID-token claims', async () => {
   const claims: OidcClaims = {
-    iss: 'https://accounts.google.com',
-    sub: 'google-subject-1',
-    aud: 'google-client-id',
+    iss: 'https://kauth.kakao.com',
+    sub: 'kakao-subject-1',
+    aud: 'kakao-rest-api-key',
     iat: Math.floor(now.getTime() / 1_000),
     exp: Math.floor(now.getTime() / 1_000) + 300,
     nonce: 'expected-nonce',
-    email: 'reader@example.com',
-    email_verified: true,
+    nickname: '하나 독자',
   };
-  const { token, fetcher } = await signedIdToken(claims);
+  const { token, publicJwk } = await signedIdToken(claims);
+  const fetcher = (async () => Response.json({ keys: [{ ...publicJwk, kid: 'test-key' }] })) as typeof fetch;
   const verified = await verifyOidcIdToken(token, {
-    audience: 'google-client-id',
-    issuers: ['https://accounts.google.com'],
+    audience: 'kakao-rest-api-key',
+    issuers: ['https://kauth.kakao.com'],
     jwksUrl: 'https://issuer.example/keys',
     nonce: 'expected-nonce',
     now,
     fetcher,
   });
-  assert.equal(verified.sub, 'google-subject-1');
+  assert.equal(verified.sub, 'kakao-subject-1');
 
   await assert.rejects(verifyOidcIdToken(token, {
-    audience: 'google-client-id',
-    issuers: ['https://accounts.google.com'],
+    audience: 'kakao-rest-api-key',
+    issuers: ['https://kauth.kakao.com'],
     jwksUrl: 'https://issuer.example/keys',
     nonce: 'wrong-nonce',
     now,
@@ -142,10 +119,9 @@ void test('verifies the provider signature and all replay-sensitive ID-token cla
   }));
   const [tokenHeader, tokenPayload, tokenSignature] = token.split('.');
   const changed = tokenSignature.startsWith('a') ? 'b' : 'a';
-  const tamperedToken = `${tokenHeader}.${tokenPayload}.${changed}${tokenSignature.slice(1)}`;
-  await assert.rejects(verifyOidcIdToken(tamperedToken, {
-    audience: 'google-client-id',
-    issuers: ['https://accounts.google.com'],
+  await assert.rejects(verifyOidcIdToken(`${tokenHeader}.${tokenPayload}.${changed}${tokenSignature.slice(1)}`, {
+    audience: 'kakao-rest-api-key',
+    issuers: ['https://kauth.kakao.com'],
     jwksUrl: 'https://issuer.example/keys',
     nonce: 'expected-nonce',
     now,
@@ -153,43 +129,52 @@ void test('verifies the provider signature and all replay-sensitive ID-token cla
   }));
 });
 
-void test('creates a five-minute ES256 Apple client-secret JWT', async () => {
-  const pair = await crypto.subtle.generateKey(
-    { name: 'ECDSA', namedCurve: 'P-256' },
-    true,
-    ['sign', 'verify'],
-  );
-  const pkcs8 = await crypto.subtle.exportKey('pkcs8', pair.privateKey);
-  const base64 = Buffer.from(pkcs8).toString('base64');
-  const privateKey = `-----BEGIN PRIVATE KEY-----\n${base64}\n-----END PRIVATE KEY-----`;
-  const token = await createAppleClientSecret({
-    clientId: 'com.example.library',
-    teamId: 'TEAM123456',
-    keyId: 'KEY1234567',
-    privateKey,
-  }, now);
-  const [header, payload, signature] = token.split('.');
-  assert.deepEqual(parseJsonBase64Url(header), { alg: 'ES256', kid: 'KEY1234567', typ: 'JWT' });
-  assert.deepEqual(parseJsonBase64Url(payload), {
-    iss: 'TEAM123456',
-    iat: Math.floor(now.getTime() / 1_000),
-    exp: Math.floor(now.getTime() / 1_000) + 300,
-    aud: 'https://appleid.apple.com',
-    sub: 'com.example.library',
-  });
-  assert.ok(signature.length > 20);
+void test('exchanges the Kakao authorization code with client secret and PKCE', async () => {
+  const config = readProviderAuthConfig('kakao', baseEnv);
+  const transaction = newOAuthTransaction('kakao', '/', now);
+  const claims: OidcClaims = {
+    iss: 'https://kauth.kakao.com',
+    sub: '123456789',
+    aud: 'kakao-rest-api-key',
+    iat: Math.floor(Date.now() / 1_000),
+    exp: Math.floor(Date.now() / 1_000) + 300,
+    nonce: transaction.nonce,
+  };
+  const { token, publicJwk } = await signedIdToken(claims);
+  const fetcher = (async (input: string | URL | Request, init?: RequestInit) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === '/oauth/token') {
+      const body = init?.body as URLSearchParams;
+      assert.equal(body.get('client_id'), 'kakao-rest-api-key');
+      assert.equal(body.get('client_secret'), 'kakao-client-secret');
+      assert.equal(body.get('code_verifier'), transaction.verifier);
+      assert.equal(body.get('redirect_uri'), 'https://library.example/api/auth/kakao/callback');
+      return Response.json({ id_token: token });
+    }
+    if (url.pathname === '/.well-known/jwks.json') {
+      return Response.json({ keys: [{ ...publicJwk, kid: 'test-key' }] });
+    }
+    throw new Error(`Unexpected URL: ${url}`);
+  }) as typeof fetch;
+  const result = await exchangeAuthorizationCode(config, 'authorization-code', transaction, fetcher);
+  assert.equal(result.sub, '123456789');
 });
 
-void test('sanitizes provider names and refuses unverified Google email', () => {
+void test('sanitizes Kakao profile data and ignores unverified email claims', () => {
   assert.equal(sanitizeExternalName('  <Jiwoo>\u202e   Reader  '), 'Jiwoo Reader');
-  assert.throws(() => identityFromClaims('google', {
-    iss: 'https://accounts.google.com',
+  const identity = identityFromClaims('kakao', {
+    iss: 'https://kauth.kakao.com',
     sub: 'subject',
     aud: 'client',
     iat: 1,
     exp: 2,
     nonce: 'nonce',
+    nickname: '  하나 독자 ',
+    picture: 'https://k.kakaocdn.net/example.jpg',
     email: 'unverified@example.com',
     email_verified: false,
-  }));
+  });
+  assert.equal(identity.displayName, '하나 독자');
+  assert.equal(identity.email, '');
+  assert.equal(identity.avatarUrl, 'https://k.kakaocdn.net/example.jpg');
 });

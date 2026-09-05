@@ -1,13 +1,11 @@
-import { base64UrlDecode, base64UrlEncode, jsonBase64Url, parseJsonBase64Url, utf8 } from './encoding.ts';
+import { base64UrlDecode, parseJsonBase64Url, utf8 } from './encoding.ts';
 import { callbackUrl, type AuthProviderId, type ProviderAuthConfig } from './config.ts';
 import { pkceChallenge, type OAuthTransaction } from './oauth-transaction.ts';
 
-export const GOOGLE_AUTHORIZATION_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
-export const GOOGLE_TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
-export const GOOGLE_JWKS_ENDPOINT = 'https://www.googleapis.com/oauth2/v3/certs';
-export const APPLE_AUTHORIZATION_ENDPOINT = 'https://appleid.apple.com/auth/authorize';
-export const APPLE_TOKEN_ENDPOINT = 'https://appleid.apple.com/auth/token';
-export const APPLE_JWKS_ENDPOINT = 'https://appleid.apple.com/auth/keys';
+export const KAKAO_AUTHORIZATION_ENDPOINT = 'https://kauth.kakao.com/oauth/authorize';
+export const KAKAO_TOKEN_ENDPOINT = 'https://kauth.kakao.com/oauth/token';
+export const KAKAO_JWKS_ENDPOINT = 'https://kauth.kakao.com/.well-known/jwks.json';
+export const KAKAO_ISSUER = 'https://kauth.kakao.com';
 
 export class OAuthProtocolError extends Error {
   readonly code: 'invalid_authorization' | 'token_exchange_failed' | 'invalid_identity_token';
@@ -38,6 +36,7 @@ export interface OidcClaims {
   given_name?: string;
   family_name?: string;
   picture?: string;
+  nickname?: string;
 }
 
 interface ProviderJsonWebKey extends JsonWebKey {
@@ -119,67 +118,16 @@ export async function authorizationUrl(
   transaction: OAuthTransaction,
 ) {
   const redirectUri = callbackUrl(config, config.provider);
-  if (config.provider === 'google') {
-    const url = new URL(GOOGLE_AUTHORIZATION_ENDPOINT);
-    url.searchParams.set('client_id', config.credentials.clientId);
-    url.searchParams.set('redirect_uri', redirectUri);
-    url.searchParams.set('response_type', 'code');
-    url.searchParams.set('scope', 'openid email profile');
-    url.searchParams.set('state', transaction.state);
-    url.searchParams.set('nonce', transaction.nonce);
-    url.searchParams.set('code_challenge', await pkceChallenge(transaction.verifier));
-    url.searchParams.set('code_challenge_method', 'S256');
-    url.searchParams.set('prompt', 'select_account');
-    return url;
-  }
-
-  const url = new URL(APPLE_AUTHORIZATION_ENDPOINT);
+  const url = new URL(KAKAO_AUTHORIZATION_ENDPOINT);
   url.searchParams.set('client_id', config.credentials.clientId);
   url.searchParams.set('redirect_uri', redirectUri);
   url.searchParams.set('response_type', 'code');
-  url.searchParams.set('response_mode', 'form_post');
-  url.searchParams.set('scope', 'name email');
+  url.searchParams.set('scope', 'openid,profile_nickname,profile_image');
   url.searchParams.set('state', transaction.state);
   url.searchParams.set('nonce', transaction.nonce);
+  url.searchParams.set('code_challenge', await pkceChallenge(transaction.verifier));
+  url.searchParams.set('code_challenge_method', 'S256');
   return url;
-}
-
-function pemBytes(pem: string) {
-  const encoded = pem
-    .replace('-----BEGIN PRIVATE KEY-----', '')
-    .replace('-----END PRIVATE KEY-----', '')
-    .replace(/\s/g, '');
-  if (!encoded) throw new Error('APPLE_PRIVATE_KEY must be a PKCS#8 private key');
-  const binary = atob(encoded);
-  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
-}
-
-export async function createAppleClientSecret(
-  credentials: { clientId: string; teamId: string; keyId: string; privateKey: string },
-  now = new Date(),
-) {
-  const issuedAt = Math.floor(now.getTime() / 1000);
-  const header = jsonBase64Url({ alg: 'ES256', kid: credentials.keyId, typ: 'JWT' });
-  const payload = jsonBase64Url({
-    iss: credentials.teamId,
-    iat: issuedAt,
-    exp: issuedAt + 5 * 60,
-    aud: 'https://appleid.apple.com',
-    sub: credentials.clientId,
-  });
-  const key = await crypto.subtle.importKey(
-    'pkcs8',
-    pemBytes(credentials.privateKey),
-    { name: 'ECDSA', namedCurve: 'P-256' },
-    false,
-    ['sign'],
-  );
-  const signature = await crypto.subtle.sign(
-    { name: 'ECDSA', hash: 'SHA-256' },
-    key,
-    utf8(`${header}.${payload}`),
-  );
-  return `${header}.${payload}.${base64UrlEncode(new Uint8Array(signature))}`;
 }
 
 interface TokenResponse {
@@ -203,32 +151,13 @@ export async function exchangeAuthorizationCode(
   const redirectUri = callbackUrl(config, config.provider);
   const body = new URLSearchParams({
     client_id: config.credentials.clientId,
+    client_secret: config.credentials.clientSecret,
     code,
+    code_verifier: transaction.verifier,
     grant_type: 'authorization_code',
     redirect_uri: redirectUri,
   });
-
-  if (config.provider === 'google') {
-    body.set('client_secret', config.credentials.clientSecret);
-    body.set('code_verifier', transaction.verifier);
-    const response = await fetcher(GOOGLE_TOKEN_ENDPOINT, {
-      method: 'POST',
-      headers: { accept: 'application/json', 'content-type': 'application/x-www-form-urlencoded' },
-      body,
-      signal: AbortSignal.timeout(10_000),
-    });
-    const idToken = await tokenResponse(response);
-    return verifyOidcIdToken(idToken, {
-      audience: config.credentials.clientId,
-      issuers: ['https://accounts.google.com', 'accounts.google.com'],
-      jwksUrl: GOOGLE_JWKS_ENDPOINT,
-      nonce: transaction.nonce,
-      fetcher,
-    });
-  }
-
-  body.set('client_secret', await createAppleClientSecret(config.credentials));
-  const response = await fetcher(APPLE_TOKEN_ENDPOINT, {
+  const response = await fetcher(KAKAO_TOKEN_ENDPOINT, {
     method: 'POST',
     headers: { accept: 'application/json', 'content-type': 'application/x-www-form-urlencoded' },
     body,
@@ -237,8 +166,8 @@ export async function exchangeAuthorizationCode(
   const idToken = await tokenResponse(response);
   return verifyOidcIdToken(idToken, {
     audience: config.credentials.clientId,
-    issuers: ['https://appleid.apple.com'],
-    jwksUrl: APPLE_JWKS_ENDPOINT,
+    issuers: [KAKAO_ISSUER],
+    jwksUrl: KAKAO_JWKS_ENDPOINT,
     nonce: transaction.nonce,
     fetcher,
   });
@@ -247,20 +176,14 @@ export async function exchangeAuthorizationCode(
 export function identityFromClaims(
   provider: AuthProviderId,
   claims: OidcClaims,
-  applePostedName?: string,
 ) {
-  const email = typeof claims.email === 'string' ? claims.email.trim().slice(0, 320) : '';
   const emailVerified = claims.email_verified === true || claims.email_verified === 'true';
-  if (provider === 'google' && (!email || !emailVerified)) {
-    throw new OAuthProtocolError('invalid_identity_token');
-  }
-  if (email && claims.email_verified !== undefined && !emailVerified) {
-    throw new OAuthProtocolError('invalid_identity_token');
-  }
-  const claimedName = provider === 'apple' ? applePostedName : claims.name;
-  const displayName = sanitizeExternalName(claimedName) || (provider === 'apple' ? 'Apple member' : 'Google member');
+  const email = emailVerified && typeof claims.email === 'string'
+    ? claims.email.trim().slice(0, 320)
+    : '';
+  const displayName = sanitizeExternalName(claims.nickname ?? claims.name) || 'Kakao member';
   let avatarUrl: string | undefined;
-  if (provider === 'google' && typeof claims.picture === 'string' && claims.picture.length < 2_048) {
+  if (typeof claims.picture === 'string' && claims.picture.length < 2_048) {
     try {
       const parsed = new URL(claims.picture);
       if (parsed.protocol === 'https:') avatarUrl = parsed.toString();

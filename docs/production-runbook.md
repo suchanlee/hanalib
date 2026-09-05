@@ -1,18 +1,14 @@
 # Production activation runbook
 
-The application runs on OpenAI Sites backed by Cloudflare Workers. Sites owns the production `DB` D1 database and `FILES` R2 bucket declared in `.openai/hosting.json`. The owner-private production deployment is the staging gate; change Sites access to public only after the provider checks below pass. A public Sites page does not require a ChatGPT account, while the application catalog still requires Google or Apple authentication.
+The application runs on OpenAI Sites backed by Cloudflare Workers. Sites owns the production `DB` D1 database and `FILES` R2 bucket declared in `.openai/hosting.json`. The owner-private production deployment is the staging gate; change Sites access to public only after the provider checks below pass. A public Sites page does not require a ChatGPT account, while the application catalog still requires Kakao authentication.
 
 ## 1. Identity and membership
 
-Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, then register:
+Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` and `profile_image` consent items. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
-`https://hana-community-library.lee-suchan.chatgpt.site/api/auth/google/callback`
+`https://hana-community-library.lee-suchan.chatgpt.site/api/auth/kakao/callback`
 
-Set `APPLE_CLIENT_ID`, `APPLE_TEAM_ID`, `APPLE_KEY_ID`, and the PKCS#8 `APPLE_PRIVATE_KEY`, then register:
-
-`https://hana-community-library.lee-suchan.chatgpt.site/api/auth/apple/callback`
-
-Keep every credential server-only. Rotate the Apple signing key before expiry without changing provider subject mappings. Successful first sign-in creates an active member in the open `hana-launch` community; every catalog and mutation endpoint independently checks the session and active membership.
+Keep every credential server-only. Successful first sign-in creates an active member in the open `hana-launch` community; every catalog and mutation endpoint independently checks the session and active membership. Google and Apple identity rows remain in D1 for record continuity, but their sign-in routes are no longer exposed. Existing signed sessions remain valid until their normal expiry so current owners are not abruptly separated from their catalog records.
 
 ## 2. Database and cover storage
 
@@ -49,7 +45,7 @@ Allowlisted analytics contain only an event name, optional anonymous session ID,
 
 ## 7. Public-launch gates
 
-- Validate real Google and Apple first-sign-in and repeat-sign-in flows.
+- Validate real Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
 - Validate Korean and English ISBNs against live NLK and Google Books data.
 - Send and receive Twilio sandbox messages, including signed `1`, `2`, duplicate, expired, and ambiguous replies.
 - Verify the Resend sender and inspect delivery/bounce behavior without logging content.

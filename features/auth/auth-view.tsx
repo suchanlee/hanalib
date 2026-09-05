@@ -1,6 +1,6 @@
 'use client';
 
-import { BookHeart, Globe2, LockKeyhole, UsersRound } from 'lucide-react';
+import { BookHeart, Globe2, LockKeyhole, MessageCircle, UsersRound } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -9,8 +9,7 @@ import { oauthStartUrl } from './provider-config';
 
 interface AuthProviders {
   demo: boolean;
-  google: boolean;
-  apple: boolean;
+  kakao: boolean;
 }
 
 export function AuthView() {
@@ -32,14 +31,14 @@ export function AuthView() {
       .then(setProviders)
       .catch((error: unknown) => {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
-          setProviders({ demo: false, google: false, apple: false });
+          setProviders({ demo: false, kakao: false });
         }
       });
     return () => controller.abort();
   }, []);
 
-  function beginSignIn(provider: 'google' | 'apple') {
-    window.location.assign(oauthStartUrl(provider));
+  function beginSignIn() {
+    window.location.assign(oauthStartUrl('kakao'));
   }
 
   async function demoSignIn(persona: 'owner' | 'borrower') {
@@ -101,7 +100,7 @@ export function AuthView() {
               <div>
                 <p className="font-medium">{ko ? '누구나 가입 가능' : 'Open registration'}</p>
                 <p className="mt-0.5 text-sm leading-5 text-muted-foreground">
-                  {ko ? 'Google 또는 Apple 계정으로 출시 커뮤니티에 바로 가입해요.' : 'Join the launch community with a Google or Apple account.'}
+                  {ko ? '카카오 계정으로 출시 커뮤니티에 바로 가입해요.' : 'Join the launch community with your Kakao account.'}
                 </p>
               </div>
             </div>
@@ -121,25 +120,15 @@ export function AuthView() {
 
         <section aria-label={ko ? '로그인' : 'Sign in'} className="space-y-3">
           <Button
-            className="h-12 w-full rounded-xl bg-foreground text-base text-background hover:bg-foreground/85"
-            data-testid="auth-google"
-            disabled={providers?.google !== true}
-            onClick={() => beginSignIn('google')}
+            className="h-12 w-full rounded-xl bg-[#FEE500] text-base font-semibold text-[#191919] hover:bg-[#F5DC00]"
+            data-testid="auth-kakao"
+            disabled={providers?.kakao !== true}
+            onClick={beginSignIn}
           >
-            <span aria-hidden="true" className="text-base font-bold">G</span>
-            {ko ? 'Google로 계속' : 'Continue with Google'}
+            <MessageCircle aria-hidden="true" className="size-5 fill-current" />
+            {ko ? '카카오로 계속' : 'Continue with Kakao'}
           </Button>
-          <Button
-            className="h-12 w-full rounded-xl text-base"
-            data-testid="auth-apple"
-            disabled={providers?.apple !== true}
-            onClick={() => beginSignIn('apple')}
-            variant="outline"
-          >
-            <span aria-hidden="true" className="text-lg leading-none">●</span>
-            {ko ? 'Apple로 계속' : 'Continue with Apple'}
-          </Button>
-          {providers && (!providers.google || !providers.apple) && (
+          {providers && !providers.kakao && (
             <output className="block px-2 text-center text-xs leading-5 text-muted-foreground" data-testid="auth-provider-status">
               {ko
                 ? '로그인 연결을 준비 중이에요. 운영자가 제공자 설정을 완료한 뒤 이용할 수 있어요.'

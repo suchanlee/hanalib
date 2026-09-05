@@ -11,13 +11,9 @@ AUTH_TRANSACTION_SECRET=
 AUTH_DEMO_MODE=
 NEXT_PUBLIC_AUTH_DEMO_MODE=
 
-# External OAuth. Configure callback URLs in Google Cloud and Apple Developer.
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-APPLE_CLIENT_ID=
-APPLE_TEAM_ID=
-APPLE_KEY_ID=
-APPLE_PRIVATE_KEY=
+# Kakao Login OIDC. Register ${PUBLIC_APP_URL}/api/auth/kakao/callback as the redirect URI.
+KAKAO_REST_API_KEY=
+KAKAO_CLIENT_SECRET=
 
 # ISBN metadata stitching.
 NLK_API_KEY=

@@ -36,14 +36,11 @@ export function newOAuthTransaction(provider: AuthProviderId, returnTo: string, 
 }
 
 export async function oauthTransactionCookie(transaction: OAuthTransaction, secret: string, secure: boolean) {
-  if (transaction.provider === 'apple' && !secure) {
-    throw new Error('Apple OAuth transactions require a secure callback origin');
-  }
   const token = await signToken(transaction, secret);
   return serializeCookie(cookieName('hana_oauth', secure), token, {
     httpOnly: true,
     maxAge: OAUTH_TRANSACTION_TTL_SECONDS,
-    sameSite: transaction.provider === 'apple' ? 'None' : 'Lax',
+    sameSite: 'Lax',
     secure,
   });
 }
@@ -69,7 +66,7 @@ export async function oauthTransactionFromRequest(
   if (
     !value ||
     value.version !== 1 ||
-    !['google', 'apple'].includes(value.provider) ||
+    value.provider !== 'kakao' ||
     typeof value.state !== 'string' || value.state.length < 32 ||
     typeof value.nonce !== 'string' || value.nonce.length < 32 ||
     typeof value.verifier !== 'string' || value.verifier.length < 43 ||

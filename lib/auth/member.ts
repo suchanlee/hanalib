@@ -1,5 +1,5 @@
 import { env } from 'cloudflare:workers';
-import type { AuthBaseConfig, AuthProviderId } from './config';
+import type { AuthBaseConfig, AuthProviderId, SessionProviderId } from './config';
 import { isSecureDeployment, readAuthBaseConfig } from './config';
 import { sessionFromRequest } from './session';
 
@@ -20,7 +20,7 @@ export interface AuthenticatedMember {
   displayNameKo: string;
   avatarUrl?: string;
   locale: 'ko' | 'en';
-  provider: AuthProviderId | 'demo';
+  provider: SessionProviderId;
 }
 
 interface IdentityRow {
@@ -71,7 +71,7 @@ async function activeMember(profileId: string, communityId: string) {
     .first<MemberRow>();
 }
 
-function toMember(row: MemberRow, provider: AuthProviderId | 'demo'): AuthenticatedMember {
+function toMember(row: MemberRow, provider: SessionProviderId): AuthenticatedMember {
   return {
     id: row.id,
     communityId: row.communityId,

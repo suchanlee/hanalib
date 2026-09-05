@@ -1,4 +1,5 @@
-export type AuthProviderId = 'google' | 'apple';
+export type AuthProviderId = 'kakao';
+export type SessionProviderId = AuthProviderId | 'google' | 'apple' | 'demo';
 
 export type AuthEnvSource = Record<string, string | undefined>;
 
@@ -12,13 +13,7 @@ export interface AuthBaseConfig {
 }
 
 export interface AuthServerConfig extends AuthBaseConfig {
-  google: { clientId: string; clientSecret: string };
-  apple: {
-    clientId: string;
-    teamId: string;
-    keyId: string;
-    privateKey: string;
-  };
+  kakao: { clientId: string; clientSecret: string };
 }
 
 function required(source: AuthEnvSource, key: string) {
@@ -67,43 +62,23 @@ export function readAuthBaseConfig(source: AuthEnvSource = process.env): AuthBas
 export function readAuthServerConfig(source: AuthEnvSource = process.env): AuthServerConfig {
   return {
     ...readAuthBaseConfig(source),
-    google: {
-      clientId: required(source, 'GOOGLE_CLIENT_ID'),
-      clientSecret: required(source, 'GOOGLE_CLIENT_SECRET'),
-    },
-    apple: {
-      clientId: required(source, 'APPLE_CLIENT_ID'),
-      teamId: required(source, 'APPLE_TEAM_ID'),
-      keyId: required(source, 'APPLE_KEY_ID'),
-      privateKey: required(source, 'APPLE_PRIVATE_KEY').replace(/\\n/g, '\n'),
+    kakao: {
+      clientId: required(source, 'KAKAO_REST_API_KEY'),
+      clientSecret: required(source, 'KAKAO_CLIENT_SECRET'),
     },
   };
 }
 
 export function readProviderAuthConfig(provider: AuthProviderId, source: AuthEnvSource = process.env) {
   const base = readAuthBaseConfig(source);
-  if (provider === 'apple' && new URL(base.publicAppUrl).protocol !== 'https:') {
-    throw new Error('Sign in with Apple requires PUBLIC_APP_URL to use HTTPS');
-  }
-  return provider === 'google'
-    ? {
-        ...base,
-        provider,
-        credentials: {
-          clientId: required(source, 'GOOGLE_CLIENT_ID'),
-          clientSecret: required(source, 'GOOGLE_CLIENT_SECRET'),
-        },
-      } as const
-    : {
-        ...base,
-        provider,
-        credentials: {
-          clientId: required(source, 'APPLE_CLIENT_ID'),
-          teamId: required(source, 'APPLE_TEAM_ID'),
-          keyId: required(source, 'APPLE_KEY_ID'),
-          privateKey: required(source, 'APPLE_PRIVATE_KEY').replace(/\\n/g, '\n'),
-        },
-      } as const;
+  return {
+    ...base,
+    provider,
+    credentials: {
+      clientId: required(source, 'KAKAO_REST_API_KEY'),
+      clientSecret: required(source, 'KAKAO_CLIENT_SECRET'),
+    },
+  } as const;
 }
 
 export type ProviderAuthConfig = ReturnType<typeof readProviderAuthConfig>;

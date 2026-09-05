@@ -10,13 +10,13 @@ void test('round-trips a signed session and rejects tampering or expiry', async 
   const token = await createSessionToken({
     profileId: 'profile-1',
     communityId: 'hana-launch',
-    provider: 'google',
+    provider: 'kakao',
   }, { secret, secure: true, now });
 
   const session = await verifySessionToken(token, { secret, secure: true, now });
   assert.equal(session?.profileId, 'profile-1');
   assert.equal(session?.communityId, 'hana-launch');
-  assert.equal(session?.provider, 'google');
+  assert.equal(session?.provider, 'kakao');
 
   const [payload, signature] = token.split('.');
   const replacement = signature.startsWith('a') ? 'b' : 'a';
@@ -32,7 +32,7 @@ void test('issues host-only secure HttpOnly cookies in HTTPS deployments', async
   const token = await createSessionToken({
     profileId: 'profile-1',
     communityId: 'hana-launch',
-    provider: 'apple',
+    provider: 'kakao',
   }, { secret, secure: true, now });
   const header = sessionCookie(token, true);
   assert.match(header, /^__Host-hana_session=/u);
@@ -41,6 +41,17 @@ void test('issues host-only secure HttpOnly cookies in HTTPS deployments', async
   assert.match(header, /; Secure/u);
   assert.match(header, /; SameSite=Lax/u);
   assert.match(clearSessionCookie(true), /Max-Age=0/u);
+});
+
+void test('honors previously issued Google and Apple sessions during migration', async () => {
+  for (const provider of ['google', 'apple'] as const) {
+    const token = await createSessionToken({
+      profileId: `profile-${provider}`,
+      communityId: 'hana-launch',
+      provider,
+    }, { secret, secure: true, now });
+    assert.equal((await verifySessionToken(token, { secret, secure: true, now }))?.provider, provider);
+  }
 });
 
 void test('accepts mutation requests only from the configured origin', () => {

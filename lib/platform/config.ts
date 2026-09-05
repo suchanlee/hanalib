@@ -1,11 +1,7 @@
 export interface ServerConfig {
   deploymentRegion: 'us-west';
-  googleClientId?: string;
-  googleClientSecret?: string;
-  appleClientId?: string;
-  appleTeamId?: string;
-  appleKeyId?: string;
-  applePrivateKey?: string;
+  kakaoRestApiKey?: string;
+  kakaoClientSecret?: string;
   publicAppUrl?: string;
   metadata: {
     nlkApiKey?: string;
@@ -30,12 +26,8 @@ export function readServerConfig(source: EnvSource = process.env): ServerConfig 
 
   return {
     deploymentRegion: region,
-    googleClientId: source.GOOGLE_CLIENT_ID,
-    googleClientSecret: source.GOOGLE_CLIENT_SECRET,
-    appleClientId: source.APPLE_CLIENT_ID,
-    appleTeamId: source.APPLE_TEAM_ID,
-    appleKeyId: source.APPLE_KEY_ID,
-    applePrivateKey: source.APPLE_PRIVATE_KEY,
+    kakaoRestApiKey: source.KAKAO_REST_API_KEY,
+    kakaoClientSecret: source.KAKAO_CLIENT_SECRET,
     publicAppUrl: source.PUBLIC_APP_URL,
     metadata: {
       nlkApiKey: source.NLK_API_KEY,
@@ -55,7 +47,6 @@ export function readServerConfig(source: EnvSource = process.env): ServerConfig 
 
 export function configuredAuthProviders(config: ServerConfig) {
   return {
-    google: Boolean(config.googleClientId && config.googleClientSecret),
-    apple: Boolean(config.appleClientId && config.appleTeamId && config.appleKeyId && config.applePrivateKey),
+    kakao: Boolean(config.kakaoRestApiKey && config.kakaoClientSecret),
   };
 }
