@@ -52,7 +52,17 @@ const bootstrap = {
   holdCounts: {},
   returnChecks: [],
 };
-const load = sourceLoader({ 'next/image': () => null });
+const diagnosticReports: unknown[] = [];
+const diagnosticReporter = {
+  reportClientIssue: async (issue: unknown): Promise<'recorded' | 'unavailable'> => {
+    diagnosticReports.push(issue);
+    return 'unavailable';
+  },
+};
+const load = sourceLoader({
+  'next/image': () => null,
+  './report-client-issue': diagnosticReporter,
+});
 const { ApiError } =
   load<typeof import('../lib/http/client.ts')>('lib/http/client.ts');
 const app = load<{
@@ -473,9 +483,49 @@ void test('copy failure exposes selectable diagnostic details and screenshot gui
     )!;
     await act(async () => button.click());
     assert.match(view.element.textContent!, /take a screenshot/);
+    assert.match(view.element.textContent!, /Trace: client-/);
+    assert.match(view.element.textContent!, /Report: could not send/);
     assert.equal(view.element.querySelector('details')?.open, true);
   } finally {
     await view.close();
+  }
+});
+
+void test('copied diagnostics match the current trace and late receipts cannot mark another error recorded', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => Response.json({ data: bootstrap }));
+  const pending = deferred<'recorded' | 'unavailable'>();
+  let calls = 0;
+  t.mock.method(diagnosticReporter, 'reportClientIssue', async () => {
+    calls++;
+    return calls === 1 ? pending.promise : calls === 2 ? 'unavailable' : 'recorded';
+  });
+  const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+  let copied = '';
+  Object.defineProperty(navigator, 'clipboard', { configurable: true, value: {
+    writeText: async (text: string) => { copied = text; },
+  } });
+  const view = await mount();
+  try {
+    await act(async () => current.actions.reportError(new TypeError('first')));
+    const firstTrace = current.state.issue!.traceId;
+    assert.match(view.element.textContent!, /Report: sending/);
+    await act(async () => current.actions.reportError(new TypeError('second')));
+    const secondTrace = current.state.issue!.traceId;
+    await act(async () => pending.resolve('recorded'));
+    assert.match(view.element.textContent!, /Report: could not send/);
+    const button = [...view.element.querySelectorAll('button')].find((item) => item.textContent === 'Copy error details')!;
+    await act(async () => button.click());
+    assert.ok(copied.includes(secondTrace));
+    assert.ok(!copied.includes(firstTrace));
+    assert.match(copied, /Report: could not send/);
+    assert.equal(button.textContent, 'Copied');
+    await act(async () => current.actions.reportError(new TypeError('third')));
+    assert.match(view.element.textContent!, /Report: recorded in server logs/);
+    assert.equal(button.textContent, 'Copy error details');
+  } finally {
+    await view.close();
+    if (originalClipboard) Object.defineProperty(navigator, 'clipboard', originalClipboard);
+    else Reflect.deleteProperty(navigator, 'clipboard');
   }
 });
 
@@ -617,7 +667,9 @@ void test('a render exception has a visible recovery screen and shareable detail
   }>('features/app/app-error-boundary.tsx');
   t.mock.method(console, 'error', () => {});
   function Broken(): ReactNode {
-    throw new Error('private render content');
+    const error = new TypeError('private render content');
+    error.stack = 'TypeError: private render content\n    at Broken (https://library.example/assets/app-abc123.js:12:34)';
+    throw error;
   }
   const view = await mountContent(
     React.createElement(AppErrorBoundary, null, React.createElement(Broken)),
@@ -625,6 +677,9 @@ void test('a render exception has a visible recovery screen and shareable detail
   try {
     assert.match(view.element.textContent!, /Reload page/);
     assert.match(view.element.textContent!, /render-error/);
+    assert.match(view.element.textContent!, /Trace: client-/);
+    assert.match(view.element.textContent!, /Error type: TypeError/);
+    assert.match(view.element.textContent!, /app-abc123.js:12:34/);
     assert.doesNotMatch(view.element.textContent!, /private render content/);
   } finally {
     await view.close();
@@ -644,7 +699,9 @@ void test('unexpected event and promise errors surface safe recovery details', a
     await act(async () => {
       window.dispatchEvent(rejection);
     });
-    assert.equal(current.state.issue?.operation, 'unexpected-action');
+    assert.equal(current.state.issue?.operation, 'unhandled-promise');
+    assert.ok(current.state.issue?.traceId.startsWith('client-'));
+    assert.ok(diagnosticReports.includes(current.state.issue));
     assert.match(view.element.textContent!, /organizer/);
     assert.doesNotMatch(view.element.textContent!, /private exception text/);
     await act(async () => current.actions.dismissIssue());
@@ -655,7 +712,8 @@ void test('unexpected event and promise errors surface safe recovery details', a
         }),
       );
     });
-    assert.equal(current.state.issue?.operation, 'unexpected-action');
+    assert.equal(current.state.issue?.operation, 'browser-event');
+    assert.equal(current.state.issue?.errorType, 'TypeError');
   } finally {
     await view.close();
   }

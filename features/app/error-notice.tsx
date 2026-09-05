@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AppLocale } from '@/lib/domain/types';
 import { issueDetails, issueMessage, type UserIssue } from './user-issue';
+import { reportClientIssue, type ReportStatus } from './report-client-issue';
 
 export function ErrorNotice({
   issue,
@@ -18,16 +19,33 @@ export function ErrorNotice({
   onDismiss?: () => void;
 }) {
   const [busy, setBusy] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [copyFailed, setCopyFailed] = useState(false);
+  const [copiedTrace, setCopiedTrace] = useState<string>();
+  const [copyFailedTrace, setCopyFailedTrace] = useState<string>();
+  const copied = copiedTrace === issue.traceId;
+  const copyFailed = copyFailedTrace === issue.traceId;
+  const [report, setReport] = useState<{
+    traceId: string;
+    status: ReportStatus;
+  }>();
+  useEffect(() => {
+    let active = true;
+    void reportClientIssue(issue).then((status) => {
+      if (active) setReport({ traceId: issue.traceId, status });
+    });
+    return () => {
+      active = false;
+    };
+  }, [issue]);
   const ko = locale === 'ko';
-  const details = issueDetails(issue);
+  const reportStatus =
+    report?.traceId === issue.traceId ? report.status : undefined;
+  const details = `${issueDetails(issue)}\nReport: ${reportStatus === 'recorded' ? 'recorded in server logs' : reportStatus === 'unavailable' ? 'could not send; share these details with the organizer' : 'sending'}`;
   async function copy() {
     try {
       await navigator.clipboard.writeText(details);
-      setCopied(true);
+      setCopiedTrace(issue.traceId);
     } catch {
-      setCopyFailed(true);
+      setCopyFailedTrace(issue.traceId);
     }
   }
   async function retry() {

@@ -143,11 +143,11 @@ export function HanaAppProvider({
 
   useEffect(() => {
     function unexpectedRejection(event: PromiseRejectionEvent) {
-      reportError(event.reason, 'unexpected-action');
+      reportError(event.reason, 'unhandled-promise');
     }
     function unexpectedError(event: ErrorEvent) {
       // Resource errors (for example a cover image fallback) have no exception.
-      if (event.error) reportError(event.error, 'unexpected-action');
+      if (event.error) reportError(event.error, 'browser-event');
     }
     window.addEventListener('unhandledrejection', unexpectedRejection);
     window.addEventListener('error', unexpectedError);

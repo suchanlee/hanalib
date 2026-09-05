@@ -1,10 +1,33 @@
 import type { AppLocale, UserIssue } from '../../lib/domain/types.ts';
 import { ApiError } from '../../lib/http/client.ts';
+import {
+  errorType,
+  sourceLocations,
+} from '../../lib/observability/client-diagnostic.ts';
 
 export type { UserIssue } from '../../lib/domain/types.ts';
 
+const traces = new WeakMap<object, string>();
+
 export function userIssue(error: unknown, operation = 'app'): UserIssue {
+  const object =
+    error !== null && (typeof error === 'object' || typeof error === 'function')
+      ? error
+      : undefined;
+  const traceId =
+    (object && traces.get(object)) || `client-${crypto.randomUUID()}`;
+  if (object) traces.set(object, traceId);
   return {
+    traceId,
+    errorType: errorType(error),
+    sourceLocations: sourceLocations(error),
+    serverDigest:
+      error instanceof Error &&
+      'digest' in error &&
+      typeof error.digest === 'string' &&
+      /^[a-z0-9-]{1,80}$/i.test(error.digest)
+        ? error.digest
+        : undefined,
     code: error instanceof ApiError ? error.code : 'unexpected-error',
     status: error instanceof ApiError ? error.status : 0,
     requestId: error instanceof ApiError ? error.requestId : undefined,
@@ -81,5 +104,16 @@ export function issueMessage(issue: UserIssue, locale: AppLocale) {
 }
 
 export function issueDetails(issue: UserIssue) {
-  return `Hana library\nOperation: ${issue.operation}\nCode: ${issue.code}\nStatus: ${issue.status || 'unavailable'}\nRequest: ${issue.requestId ?? 'unavailable (no server reference)'}\nTime: ${issue.occurredAt}`;
+  return [
+    'Hana library',
+    `Trace: ${issue.traceId}`,
+    `Operation: ${issue.operation}`,
+    `Code: ${issue.code}`,
+    `Error type: ${issue.errorType}`,
+    `Status: ${issue.status || 'no HTTP response'}`,
+    `Request: ${issue.requestId ?? 'none (browser error or no server response)'}`,
+    ...(issue.serverDigest ? [`Server digest: ${issue.serverDigest}`] : []),
+    `Time: ${issue.occurredAt}`,
+    `Source locations: ${issue.sourceLocations.length ? '\n' + issue.sourceLocations.join('\n') : 'not supplied by the browser'}`,
+  ].join('\n');
 }

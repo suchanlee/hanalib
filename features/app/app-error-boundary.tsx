@@ -3,7 +3,6 @@
 import { Component, type ReactNode } from 'react';
 import { ErrorNotice } from './error-notice';
 import { userIssue, type UserIssue } from './user-issue';
-import { ApiError } from '@/lib/http/client';
 
 export class AppErrorBoundary extends Component<
   { children: ReactNode },
@@ -13,10 +12,7 @@ export class AppErrorBoundary extends Component<
 
   static getDerivedStateFromError(error: Error & { digest?: string }) {
     return {
-      issue: userIssue(
-        new ApiError(0, 'render-error', error.digest),
-        'render-app',
-      ),
+      issue: { ...userIssue(error, 'render-app'), code: 'render-error' },
     };
   }
 

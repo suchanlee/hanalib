@@ -49,6 +49,12 @@ Server failures emit one-line JSON records to the Sites-managed Worker log strea
 
 API responses include `x-request-id`; use that value, the route, and the approximate time to correlate a member report with recent Sites Worker logs. Start an investigation with error-only logs, then widen the same time window when successful surrounding requests are needed. Sites logs are a recent operational debugging surface, not permanent audit storage; durable domain history remains in the content-minimal audit tables.
 
+The visible error panel also assigns a `client-<uuid>` trace to browser errors, including unhandled promises, event-handler exceptions, and render failures. Its copied details retain the error class and up to eight same-origin code locations (asset filename, line, column), plus any API request ID or server-render digest. Raw exception text and stacks are not collected: URLs lose their hostnames and query values, and filesystem/extension locations are excluded. Asset hashes identify the compiled code version; locations in minified bundles require the matching build to investigate.
+
+The panel posts these allowlisted details to the same-origin `/api/diagnostics` endpoint. Search recent Worker logs for `schema: hana.client-error.v1`, `event: client-error-reported`, and the exact `traceId` copied by the user. `requestId`, when present, links the original API failure; `reportRequestId` identifies the separate reporting request. Browser console records carry the same trace. Client reports describe browser-supplied observations, not authenticated audit evidence.
+
+The copied `Report` field distinguishes a server acknowledgment from a report that could not be sent. Offline, blocked, timed-out, or rate-limited reports still have local IDs and copyable source locations, but may have no server log record. Reporting has a five-second deadline, no retries, a ten-report/minute browser cap, a 120-request/minute cap per Worker isolate, and a 4 KiB body limit. The endpoint requires a same-origin JSON POST and does not depend on authentication or D1, so sign-in/bootstrap failures can still be diagnosed. Reports copied before this tracing change cannot be reconstructed from their timestamp alone.
+
 ## 8. Public-launch gates
 
 - Validate real Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.

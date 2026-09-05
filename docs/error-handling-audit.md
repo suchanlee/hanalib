@@ -38,3 +38,11 @@ Validation completed:
 Provider failure tests use controlled responses; no production email, SMS, Web Push delivery, or successful live Kakao OAuth exchange was attempted. D1 transaction failure tests execute SQL against in-memory SQLite through a D1-compatible adapter. Existing production data was not inspected or repaired. The package audit reported only the existing Drizzle/esbuild development-tool advisory chain; no advisories were reported for the added DOM-test dependencies.
 
 Regression suites: [React interaction and recovery](../tests/app-errors.test.ts), [client error contracts](../tests/client-errors.test.ts), [server error contracts](../tests/server-errors.test.ts), [outbox transaction recovery](../tests/outbox-recovery.test.ts).
+
+## Follow-up: browser error tracing
+
+A user report exposed a gap in the original diagnostic coverage: `unexpected-action` exceptions had neither server references nor useful exception locations. Browser reports now have a stable per-exception client trace, error class, code locations, and explicit report-delivery state. Render boundaries preserve the original exception's locations and server digest; promise and event errors have separate operation labels. The panel sends a bounded, sanitized report to first-party Worker logs, and failed reporting never interrupts recovery or recursively reports itself. Original HTTP request IDs remain separate from browser IDs and diagnostic-upload request IDs.
+
+The [diagnostics regression suite](../tests/client-diagnostics.test.ts) covers trace uniqueness/stability, source redaction, browser-to-server correlation, deduplication, offline/HTTP/timeout failures, body/origin validation, and reporting limits. React tests verify render/promise/event coverage, clipboard contents, and receipt races. See the [logging runbook](production-runbook.md#7-logging-and-debugging) for lookup instructions and offline/retention limitations.
+
+Follow-up validation: all **163 tests pass**, including eight added tracing/UI tests; typecheck, lint, and production build pass. Stack fixtures cover Chrome and Firefox/Safari formats. No production log delivery was exercised and these changes have not been deployed.

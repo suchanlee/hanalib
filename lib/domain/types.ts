@@ -171,6 +171,10 @@ export interface HanaAppState {
 }
 
 export interface UserIssue {
+  traceId: string;
+  errorType: string;
+  sourceLocations: string[];
+  serverDigest?: string;
   code: string;
   status: number;
   requestId?: string;
