@@ -2,9 +2,8 @@ import type { AppLocale, CatalogItem, CatalogStatus } from '@/lib/domain/types';
 
 export const catalogCopy = {
   ko: {
-    eyebrow: '우리 동네 책장',
     title: '다음 책을 발견해 보세요',
-    subtitle: '이웃이 아끼는 책을 빌리고, 함께 읽는 즐거움을 나눠요.',
+    subtitle: '아끼는 책을 빌리고, 함께 읽는 즐거움을 나눠요.',
     results: (count: number) => `도서 ${count}권`,
     filter: '필터',
     filters: '도서 필터',
@@ -78,7 +77,6 @@ export const catalogCopy = {
     missingHelp: '목록으로 돌아가 다른 책을 선택해 주세요.',
   },
   en: {
-    eyebrow: 'Your neighborhood shelf',
     title: 'Find your next read',
     subtitle: 'Borrow books your neighbors love and make reading a shared habit.',
     results: (count: number) => `${count} ${count === 1 ? 'book' : 'books'}`,
