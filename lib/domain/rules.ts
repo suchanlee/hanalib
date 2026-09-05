@@ -26,6 +26,14 @@ export function followingReturnCheckAt(previousCheckAt: Date | string) {
   return new Date(asDate(previousCheckAt).getTime() + RETURN_CHECK_INTERVAL_DAYS * DAY_MS);
 }
 
+export function nextReturnCheckAt(previousCheckAt: Date | string, now: Date | string = new Date()) {
+  const previous = asDate(previousCheckAt).getTime();
+  const current = asDate(now).getTime();
+  const interval = RETURN_CHECK_INTERVAL_DAYS * DAY_MS;
+  const elapsedIntervals = Math.floor(Math.max(0, current - previous) / interval);
+  return new Date(previous + (elapsedIntervals + 1) * interval);
+}
+
 export function holdOfferExpiresAt(offeredAt: Date | string) {
   return new Date(asDate(offeredAt).getTime() + HOLD_OFFER_HOURS * HOUR_MS);
 }

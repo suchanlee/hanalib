@@ -20,6 +20,7 @@ import type { LibraryBootstrap, LibraryRepository, RequestContext } from './cont
 import { libraryError } from './errors.ts';
 import type { OutboxPayloadByType } from './outbox.ts';
 import { offerNextHold } from './hold-queue.ts';
+import { expireBorrowRequest } from './borrow-request-expiry.ts';
 
 const CATALOG_SELECT = `
   SELECT
@@ -152,6 +153,16 @@ interface RequestInfoRow extends RequestRow {
   ownerDisplayName: string;
   ownerDisplayNameKo: string;
   ownerLocale: string;
+}
+
+interface LoanNotificationInfoRow {
+  ownerId: string;
+  ownerLocale: string;
+  ownerDisplayName: string;
+  ownerDisplayNameKo: string;
+  borrowerDisplayName: string;
+  borrowerDisplayNameKo: string;
+  bookTitle: string;
 }
 
 interface ItemRequestInfoRow {
@@ -426,6 +437,35 @@ export class D1LibraryRepository implements LibraryRepository {
       WHERE lr.id = ? AND lr.community_id = ?
       LIMIT 1
     `).bind(requestId, communityId).first<RequestRow>();
+  }
+
+  private async requestInfo(requestId: string, communityId: string) {
+    return this.db.prepare(`
+      SELECT
+        lr.id,
+        lr.community_id AS communityId,
+        lr.catalog_item_id AS catalogItemId,
+        lr.requester_id AS requesterId,
+        lr.status,
+        lr.requested_at AS requestedAt,
+        lr.expires_at AS expiresAt,
+        ci.owner_id AS ownerId,
+        ci.status AS itemStatus,
+        COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle,
+        requester.display_name AS requesterDisplayName,
+        requester.display_name_ko AS requesterDisplayNameKo,
+        requester.locale AS requesterLocale,
+        owner.display_name AS ownerDisplayName,
+        owner.display_name_ko AS ownerDisplayNameKo,
+        owner.locale AS ownerLocale
+      FROM loan_requests lr
+      INNER JOIN catalog_items ci ON ci.id = lr.catalog_item_id
+      INNER JOIN book_editions be ON be.id = ci.edition_id
+      INNER JOIN profiles requester ON requester.id = lr.requester_id
+      INNER JOIN profiles owner ON owner.id = ci.owner_id
+      WHERE lr.id = ? AND lr.community_id = ?
+      LIMIT 1
+    `).bind(requestId, communityId).first<RequestInfoRow>();
   }
 
   private async loan(loanId: string, communityId: string) {
@@ -1238,6 +1278,8 @@ export class D1LibraryRepository implements LibraryRepository {
     const existing = await this.request(requestId, context.communityId);
     if (!existing || existing.requesterId !== context.actorId) throw libraryError('not-found', 'Borrow request not found.');
     if (existing.status === 'canceled') return mapRequest(existing);
+    const info = await this.requestInfo(requestId, context.communityId);
+    if (!info) throw libraryError('not-found', 'Borrow request not found.');
     const convertedHold = await this.db.prepare(`
       SELECT catalog_item_id AS catalogItemId
       FROM holds
@@ -1246,16 +1288,34 @@ export class D1LibraryRepository implements LibraryRepository {
     `).bind(requestId).first<{ catalogItemId: string }>();
     const now = this.now().getTime();
     if (existing.status === 'pending' && existing.expiresAt <= now) {
-      await this.db.prepare("UPDATE loan_requests SET status = 'expired' WHERE id = ? AND status = 'pending'")
-        .bind(requestId).run();
+      await expireBorrowRequest(this.db, requestId, now, this.baseUrl);
       throw libraryError('request-expired', 'This borrow request has expired.');
     }
-    const result = await this.db.prepare(`
-      UPDATE loan_requests
-      SET status = 'canceled', responded_at = ?, responded_by = ?
-      WHERE id = ? AND community_id = ? AND requester_id = ? AND status = 'pending' AND expires_at > ?
-    `).bind(now, context.actorId, requestId, context.communityId, context.actorId, now).run();
-    if (affected(result) !== 1) throw libraryError('conflict', 'Only a pending request can be canceled.');
+    const payload: OutboxPayloadByType['borrow_canceled'] = {
+      bookTitle: info.bookTitle,
+      recipientName: localizedName({ locale: info.ownerLocale, displayName: info.ownerDisplayName, displayNameKo: info.ownerDisplayNameKo }),
+      actorName: info.ownerLocale === 'ko' ? info.requesterDisplayNameKo : info.requesterDisplayName,
+      bookUrl: `${this.baseUrl}/?book=${encodeURIComponent(info.catalogItemId)}`,
+    };
+    const results = await this.db.batch([
+      this.db.prepare(`
+        UPDATE loan_requests
+        SET status = 'canceled', responded_at = ?, responded_by = ?
+        WHERE id = ? AND community_id = ? AND requester_id = ? AND status = 'pending' AND expires_at > ?
+      `).bind(now, context.actorId, requestId, context.communityId, context.actorId, now),
+      this.db.prepare(`
+        INSERT INTO outbox_events (
+          id, event_type, aggregate_type, aggregate_id, recipient_id, locale,
+          payload_json, available_at, attempt_count
+        )
+        SELECT ?, 'borrow_canceled', 'loan_request', lr.id, ?, ?, ?, ?, 0
+        FROM loan_requests lr
+        WHERE lr.id = ? AND lr.status = 'canceled' AND lr.responded_at = ?
+      `).bind(id('event'), info.ownerId, locale(info.ownerLocale), JSON.stringify(payload), now, requestId, now),
+    ]);
+    if (affected(results[0]) !== 1 || affected(results[1]) !== 1) {
+      throw libraryError('conflict', 'Only a pending request can be canceled.');
+    }
     if (convertedHold) {
       await offerNextHold(this.db, convertedHold.catalogItemId, now, this.baseUrl);
     }
@@ -1271,32 +1331,7 @@ export class D1LibraryRepository implements LibraryRepository {
   ) {
     await this.assertActiveMember(context);
     requireIdempotency(context, 'borrow-response');
-    const info = await this.db.prepare(`
-      SELECT
-        lr.id,
-        lr.community_id AS communityId,
-        lr.catalog_item_id AS catalogItemId,
-        lr.requester_id AS requesterId,
-        lr.status,
-        lr.requested_at AS requestedAt,
-        lr.expires_at AS expiresAt,
-        ci.owner_id AS ownerId,
-        ci.status AS itemStatus,
-        COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle,
-        requester.display_name AS requesterDisplayName,
-        requester.display_name_ko AS requesterDisplayNameKo,
-        requester.locale AS requesterLocale,
-        owner.display_name AS ownerDisplayName,
-        owner.display_name_ko AS ownerDisplayNameKo,
-        owner.locale AS ownerLocale
-      FROM loan_requests lr
-      INNER JOIN catalog_items ci ON ci.id = lr.catalog_item_id
-      INNER JOIN book_editions be ON be.id = ci.edition_id
-      INNER JOIN profiles requester ON requester.id = lr.requester_id
-      INNER JOIN profiles owner ON owner.id = ci.owner_id
-      WHERE lr.id = ? AND lr.community_id = ?
-      LIMIT 1
-    `).bind(requestId, context.communityId).first<RequestInfoRow>();
+    const info = await this.requestInfo(requestId, context.communityId);
     if (!info || info.ownerId !== context.actorId) throw libraryError('not-found', 'Only the book owner can respond to this request.');
 
     if (info.status === decision) {
@@ -1311,8 +1346,7 @@ export class D1LibraryRepository implements LibraryRepository {
 
     const now = this.now();
     if (info.expiresAt <= now.getTime()) {
-      await this.db.prepare("UPDATE loan_requests SET status = 'expired' WHERE id = ? AND status = 'pending'")
-        .bind(requestId).run();
+      await expireBorrowRequest(this.db, requestId, now.getTime(), this.baseUrl);
       throw libraryError('request-expired', 'This borrow request has expired.');
     }
 
@@ -1467,7 +1501,41 @@ export class D1LibraryRepository implements LibraryRepository {
     }
     if (existing.status === 'returned') return mapLoan(existing);
     const now = this.now().getTime();
-    const results = await this.db.batch([
+    const notificationInfo = existing.borrowerId === context.actorId
+      ? await this.db.prepare(`
+          SELECT
+            l.owner_id AS ownerId,
+            owner.locale AS ownerLocale,
+            owner.display_name AS ownerDisplayName,
+            owner.display_name_ko AS ownerDisplayNameKo,
+            borrower.display_name AS borrowerDisplayName,
+            borrower.display_name_ko AS borrowerDisplayNameKo,
+            COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle
+          FROM loans l
+          INNER JOIN catalog_items ci ON ci.id = l.catalog_item_id
+          INNER JOIN book_editions be ON be.id = ci.edition_id
+          INNER JOIN profiles owner ON owner.id = l.owner_id
+          INNER JOIN profiles borrower ON borrower.id = l.borrower_id
+          WHERE l.id = ? AND l.community_id = ? AND l.status = 'active'
+          LIMIT 1
+        `).bind(loanId, context.communityId).first<LoanNotificationInfoRow>()
+      : null;
+    if (existing.borrowerId === context.actorId && !notificationInfo) {
+      throw libraryError('not-found', 'Loan notification details could not be loaded.');
+    }
+    const returnedPayload: OutboxPayloadByType['book_returned'] | null = notificationInfo ? {
+      bookTitle: notificationInfo.bookTitle,
+      recipientName: localizedName({
+        locale: notificationInfo.ownerLocale,
+        displayName: notificationInfo.ownerDisplayName,
+        displayNameKo: notificationInfo.ownerDisplayNameKo,
+      }),
+      actorName: notificationInfo.ownerLocale === 'ko'
+        ? notificationInfo.borrowerDisplayNameKo
+        : notificationInfo.borrowerDisplayName,
+      bookUrl: `${this.baseUrl}/?book=${encodeURIComponent(existing.catalogItemId)}`,
+    } : null;
+    const statements = [
       this.db.prepare(`
         UPDATE loans
         SET status = 'returned', returned_at = ?, returned_by = ?, version = version + 1
@@ -1488,8 +1556,35 @@ export class D1LibraryRepository implements LibraryRepository {
         SET response = 'returned', responded_at = ?, next_scheduled_for = NULL
         WHERE loan_id = ? AND response IS NULL
       `).bind(now, loanId),
-    ]);
+      this.db.prepare(`
+        UPDATE outbox_events
+        SET processed_at = ?
+        WHERE event_type = 'return_check_due' AND aggregate_type = 'loan'
+          AND aggregate_id = ? AND processed_at IS NULL
+      `).bind(now, loanId),
+    ];
+    if (notificationInfo && returnedPayload) {
+      statements.push(this.db.prepare(`
+        INSERT INTO outbox_events (
+          id, event_type, aggregate_type, aggregate_id, recipient_id, locale,
+          payload_json, available_at, attempt_count
+        )
+        SELECT ?, 'book_returned', 'loan', l.id, l.owner_id, ?, ?, ?, 0
+        FROM loans l
+        WHERE l.id = ? AND l.status = 'returned' AND l.returned_at = ? AND l.returned_by = ?
+      `).bind(
+        id('event'),
+        locale(notificationInfo.ownerLocale),
+        JSON.stringify(returnedPayload),
+        now,
+        loanId,
+        now,
+        context.actorId,
+      ));
+    }
+    const results = await this.db.batch(statements);
     if (affected(results[0]) !== 1 || affected(results[1]) !== 1) throw libraryError('conflict', 'The return could not be recorded.');
+    if (notificationInfo && affected(results[4]) !== 1) throw libraryError('conflict', 'The return notification could not be queued.');
     const loan = await this.loan(loanId, context.communityId);
     if (!loan) throw libraryError('not-found', 'Loan not found.');
     await offerNextHold(this.db, existing.catalogItemId, now, this.baseUrl);

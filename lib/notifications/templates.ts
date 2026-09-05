@@ -26,6 +26,23 @@ interface ReturnCheckTemplateInput {
   returnUrl: string;
 }
 
+interface RequestClosedTemplateInput {
+  locale: AppLocale;
+  ownerName: string;
+  borrowerName: string;
+  bookTitle: string;
+  bookUrl: string;
+  reason: 'canceled' | 'expired';
+}
+
+interface BookReturnedTemplateInput {
+  locale: AppLocale;
+  ownerName: string;
+  borrowerName: string;
+  bookTitle: string;
+  bookUrl: string;
+}
+
 interface HoldOfferTemplateInput {
   locale: AppLocale;
   memberName: string;
@@ -116,6 +133,45 @@ export function returnCheckTemplate(
         text: `${input.borrowerName}, have you returned “${input.bookTitle}”? If so, confirm it in the app.`,
         actions: [{ label: 'Confirm return', url: input.returnUrl }],
       };
+}
+
+export function requestClosedTemplate(input: RequestClosedTemplateInput): NotificationTemplate {
+  const canceled = input.reason === 'canceled';
+  if (input.locale === 'ko') {
+    return {
+      subject: `${input.bookTitle} 대여 요청 ${canceled ? '취소' : '만료'}`,
+      text: canceled
+        ? `${input.ownerName}님, ${input.borrowerName}님이 『${input.bookTitle}』 대여 요청을 취소했어요.`
+        : `${input.ownerName}님, ${input.borrowerName}님의 『${input.bookTitle}』 대여 요청이 48시간이 지나 만료되었어요.`,
+      primaryUrl: input.bookUrl,
+      actions: [{ label: '도서 보기', url: input.bookUrl }],
+    };
+  }
+  return {
+    subject: `${input.bookTitle} request ${canceled ? 'canceled' : 'expired'}`,
+    text: canceled
+      ? `${input.ownerName}, ${input.borrowerName} canceled their request to borrow “${input.bookTitle}.”`
+      : `${input.ownerName}, ${input.borrowerName}’s request to borrow “${input.bookTitle}” expired after 48 hours.`,
+    primaryUrl: input.bookUrl,
+    actions: [{ label: 'View book', url: input.bookUrl }],
+  };
+}
+
+export function bookReturnedTemplate(input: BookReturnedTemplateInput): NotificationTemplate {
+  if (input.locale === 'ko') {
+    return {
+      subject: `${input.bookTitle} 반납 완료`,
+      text: `${input.ownerName}님, ${input.borrowerName}님이 『${input.bookTitle}』을 반납 완료로 표시했어요.`,
+      primaryUrl: input.bookUrl,
+      actions: [{ label: '도서 보기', url: input.bookUrl }],
+    };
+  }
+  return {
+    subject: `${input.bookTitle} returned`,
+    text: `${input.ownerName}, ${input.borrowerName} marked “${input.bookTitle}” as returned.`,
+    primaryUrl: input.bookUrl,
+    actions: [{ label: 'View book', url: input.bookUrl }],
+  };
 }
 
 export function holdOfferTemplate(input: HoldOfferTemplateInput): NotificationTemplate {

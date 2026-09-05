@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { borrowRequestExpiresAt, canArchiveItem, canMarkLoanReturned, firstReturnCheckAt, followingReturnCheckAt, holdOfferExpiresAt, isBorrowRequestExpired, normalizeCatalogSearch } from '../lib/domain/rules.ts';
+import { borrowRequestExpiresAt, canArchiveItem, canMarkLoanReturned, firstReturnCheckAt, followingReturnCheckAt, holdOfferExpiresAt, isBorrowRequestExpired, nextReturnCheckAt, normalizeCatalogSearch } from '../lib/domain/rules.ts';
 import type { CatalogItem, Loan } from '../lib/domain/types.ts';
 
 void test('borrow requests expire exactly 48 hours after creation', () => {
@@ -17,6 +17,8 @@ void test('return checks begin after day seven and repeat weekly', () => {
   const first = firstReturnCheckAt('2026-09-04T12:00:00.000Z');
   assert.equal(first.toISOString(), '2026-09-11T12:00:00.000Z');
   assert.equal(followingReturnCheckAt(first).toISOString(), '2026-09-18T12:00:00.000Z');
+  assert.equal(nextReturnCheckAt(first, '2026-09-11T12:05:00.000Z').toISOString(), '2026-09-18T12:00:00.000Z');
+  assert.equal(nextReturnCheckAt(first, '2026-09-19T12:00:00.000Z').toISOString(), '2026-09-25T12:00:00.000Z');
 });
 
 void test('only an owner can archive and a borrowed copy cannot be archived', () => {

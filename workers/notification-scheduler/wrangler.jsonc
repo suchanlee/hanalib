@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "hana-library-notification-scheduler",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-05",
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "vars": {
+    "NOTIFICATION_JOB_URL": "https://library.hanaseed.org/api/jobs/notifications"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

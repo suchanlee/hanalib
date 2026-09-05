@@ -1,5 +1,6 @@
 import { getD1Database } from '@/db';
-import { expireStaleBorrowRequests, processReadyOutbox } from '@/lib/notifications/outbox-worker';
+import { processReadyOutbox } from '@/lib/notifications/outbox-worker';
+import { expireStaleBorrowRequests } from '@/lib/persistence/borrow-request-expiry';
 import { expireHoldOffers, remindHoldOffers } from '@/lib/persistence/hold-queue';
 import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '@/lib/observability/log';
 

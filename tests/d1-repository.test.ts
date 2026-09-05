@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { D1LibraryRepository } from '../lib/persistence/d1-repository.ts';
+import { expireStaleBorrowRequests } from '../lib/persistence/borrow-request-expiry.ts';
 import { LibraryError } from '../lib/persistence/errors.ts';
 
 class RecordedStatement {
@@ -110,6 +111,67 @@ void test('borrow creation atomically queues only the rendering fields needed by
     decisionUrl: `https://library.example/borrowing?request=${request.id}`,
     bookUrl: 'https://library.example/?book=item-1',
     coverUrl: 'https://covers.example/almond.jpg',
+  });
+});
+
+void test('canceling a live request immediately queues an owner notification', async () => {
+  let requestReads = 0;
+  const database = new RecordedD1((sql) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('INNER JOIN catalog_items ci ON ci.id = lr.catalog_item_id')) {
+      return {
+        id: 'request-1', communityId: 'hana', catalogItemId: 'item-1', requesterId: 'borrower',
+        status: 'pending', requestedAt: fixedNow.getTime(), expiresAt: fixedNow.getTime() + 3_600_000,
+        ownerId: 'owner', itemStatus: 'available', bookTitle: '아몬드', requesterDisplayName: 'Borrower',
+        requesterDisplayNameKo: '대여자', requesterLocale: 'ko', ownerDisplayName: 'Owner',
+        ownerDisplayNameKo: '소유자', ownerLocale: 'ko',
+      };
+    }
+    if (sql.includes('FROM loan_requests lr')) {
+      requestReads += 1;
+      return {
+        id: 'request-1', catalogItemId: 'item-1', requesterId: 'borrower',
+        status: requestReads === 1 ? 'pending' : 'canceled', requestedAt: fixedNow.getTime(),
+        expiresAt: fixedNow.getTime() + 3_600_000,
+      };
+    }
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, {
+    now: () => fixedNow,
+    baseUrl: 'https://library.example',
+  });
+
+  const request = await repository.cancelBorrowRequest(context, 'request-1');
+  assert.equal(request.status, 'canceled');
+  const batch = database.batches[0];
+  const notification = batch.find((statement) => statement.sql.includes("'borrow_canceled'"));
+  assert.ok(notification);
+  assert.deepEqual(JSON.parse(String(notification.values[3])), {
+    bookTitle: '아몬드', recipientName: '소유자', actorName: '대여자',
+    bookUrl: 'https://library.example/?book=item-1',
+  });
+});
+
+void test('expiring a request queues an owner notification', async () => {
+  const database = new RecordedD1((sql) => {
+    if (sql.includes("lr.expires_at <= ?")) {
+      return {
+        id: 'request-1', catalogItemId: 'item-1', ownerId: 'owner', ownerLocale: 'en',
+        ownerDisplayName: 'Owner', ownerDisplayNameKo: '소유자', requesterDisplayName: 'Borrower',
+        requesterDisplayNameKo: '대여자', bookTitle: 'Tomorrow', convertedCatalogItemId: null,
+      };
+    }
+    return null;
+  }, (sql) => sql.includes('FROM loan_requests') ? [{ id: 'request-1' }] : []);
+
+  const expired = await expireStaleBorrowRequests(database as unknown as D1Database, fixedNow.getTime(), 'https://library.example');
+  assert.equal(expired, 1);
+  const notification = database.batches[0].find((statement) => statement.sql.includes("'borrow_expired'"));
+  assert.ok(notification);
+  assert.deepEqual(JSON.parse(String(notification.values[3])), {
+    bookTitle: 'Tomorrow', recipientName: 'Owner', actorName: 'Borrower',
+    bookUrl: 'https://library.example/?book=item-1',
   });
 });
 
@@ -465,6 +527,12 @@ void test('returning a queued book keeps it held until the queue offer is create
   let loanReads = 0;
   const database = new RecordedD1((sql) => {
     if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('INNER JOIN profiles borrower')) {
+      return {
+        ownerId: 'owner', ownerLocale: 'ko', ownerDisplayName: 'Owner', ownerDisplayNameKo: '소유자',
+        borrowerDisplayName: 'Borrower', borrowerDisplayNameKo: '대여자', bookTitle: '아몬드',
+      };
+    }
     if (sql.includes('FROM loans') && sql.includes('WHERE id = ?')) {
       loanReads += 1;
       return {
@@ -480,4 +548,6 @@ void test('returning a queued book keeps it held until the queue offer is create
 
   assert.match(database.batches[0][1].sql, /CASE WHEN EXISTS/);
   assert.match(database.batches[0][1].sql, /h\.status IN \('queued', 'offered'\)/);
+  assert.match(database.batches[0][3].sql, /event_type = 'return_check_due'/);
+  assert.ok(database.batches[0][4].sql.includes("'book_returned'"));
 });

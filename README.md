@@ -45,14 +45,17 @@ Immediate events are queued transactionally and delivery is attempted before the
 | Immediate | Borrow request created | Book owner | Once, immediately after the request is submitted. The request expires after 48 hours. |
 | Immediate | Borrow request accepted | Borrower | Once, immediately after the owner accepts. |
 | Immediate | Borrow request declined | Borrower | Once, immediately after the owner declines. |
+| Immediate | Borrow request canceled | Book owner | Once, immediately after the borrower cancels a pending request. |
+| Scheduled | Borrow request expired | Book owner | Once when the 48-hour request window expires. |
 | Immediate | Held book becomes available | First eligible member on the waitlist | Once when a return, pass, cancellation, or decline advances the queue. Advancing an expired offer requires the scheduled job. |
 | Scheduled | Hold-offer reminder | Member whose turn it is | Once, 24 hours after the offer. The offer expires after 48 hours. |
-| Scheduled | Return check | Borrower | First at day 7 of an active loan, then every 7 days after the previous check is successfully sent until the book is returned. |
+| Immediate | Book marked returned by borrower | Book owner | Once, immediately after the borrower records the return. |
+| Scheduled | Return check | Borrower | First at day 7 of an active loan, then on the original seven-day schedule until the book is returned. A late run skips missed intervals instead of shifting future checks. |
 | Manual | Test notification | Signed-in member | On demand from Settings; Web Push only. |
 
 Web Push is attempted first for subscribed devices. If none is delivered, the worker falls back to the member's configured Kakao, email, SMS, or combined email/SMS channel. Failed outbox deliveries use exponential backoff from one minute up to six hours.
 
-The external five-minute scheduler is not connected in production yet. Until the item in [`docs/TODO.md`](docs/TODO.md) is completed, hold reminders, automatic offer expiration, weekly return checks, and unattended delivery retries do not run automatically. Joining a waitlist, canceling or expiring a borrow request, and marking a book returned do not themselves notify the other party; a return can still notify the next eligible holder.
+The five-minute scheduler Worker is checked in at [`workers/notification-scheduler`](workers/notification-scheduler) and production activation is tracked in [`docs/TODO.md`](docs/TODO.md). Scheduled processing expires stale requests and offers, sends reminders and weekly return checks, and retries failed deliveries. Before delivery, the worker suppresses events that are no longer actionable, including return checks for already-returned books. Joining a waitlist does not itself notify another member; the first notification is sent when that member reaches the front of the queue and the book becomes available.
 
 ## Operational invariants
 

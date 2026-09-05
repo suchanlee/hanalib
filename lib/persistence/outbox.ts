@@ -19,6 +19,24 @@ export interface OutboxPayloadByType {
     recipientName: string;
     actorName: string;
   };
+  borrow_canceled: {
+    bookTitle: string;
+    recipientName: string;
+    actorName: string;
+    bookUrl: string;
+  };
+  borrow_expired: {
+    bookTitle: string;
+    recipientName: string;
+    actorName: string;
+    bookUrl: string;
+  };
+  book_returned: {
+    bookTitle: string;
+    recipientName: string;
+    actorName: string;
+    bookUrl: string;
+  };
   return_check_due: {
     bookTitle: string;
     recipientName: string;

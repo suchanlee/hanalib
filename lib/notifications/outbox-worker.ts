@@ -1,11 +1,11 @@
 import type { AppLocale, NotificationChannel } from '../domain/types.ts';
+import { nextReturnCheckAt } from '../domain/rules.ts';
 import type { OutboxPayloadByType, LibraryOutboxEventType } from '../persistence/outbox.ts';
 import { operationalLog, safeErrorCode } from '../observability/log.ts';
 import { decryptContact, encryptContact } from './contact-crypto.ts';
 import { parseKakaoCredential, refreshKakaoCredential } from './kakao.ts';
 import { sendNotification, type DeliveryResult, type NotificationSenderConfig } from './sender.ts';
-import { borrowRequestTemplate, decisionTemplate, holdOfferTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
-import { offerNextHold } from '../persistence/hold-queue.ts';
+import { bookReturnedTemplate, borrowRequestTemplate, decisionTemplate, holdOfferTemplate, requestClosedTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
 import {
   isWebPushConfigured,
   sendWebPushToUser,
@@ -45,6 +45,7 @@ export interface OutboxWorkerResult {
   claimed: number;
   sent: number;
   failed: number;
+  skipped: number;
 }
 
 function affected(result: D1Result<unknown>) {
@@ -56,7 +57,7 @@ function locale(value: string): AppLocale {
 }
 
 function eventType(value: string): LibraryOutboxEventType | undefined {
-  return ['borrow_requested', 'borrow_accepted', 'borrow_declined', 'return_check_due', 'hold_available', 'hold_offer_reminder'].includes(value)
+  return ['borrow_requested', 'borrow_accepted', 'borrow_declined', 'borrow_canceled', 'borrow_expired', 'book_returned', 'return_check_due', 'hold_available', 'hold_offer_reminder'].includes(value)
     ? value as LibraryOutboxEventType
     : undefined;
 }
@@ -112,6 +113,29 @@ export function renderOutboxMessage(row: Pick<OutboxRow, 'eventType' | 'locale' 
       reminder: type === 'hold_offer_reminder',
     });
   }
+  if (type === 'borrow_canceled' || type === 'borrow_expired') {
+    const value = payload(fullRow, type);
+    if (typeof value.actorName !== 'string' || typeof value.bookUrl !== 'string') throw new Error('invalid-outbox-payload');
+    return requestClosedTemplate({
+      locale: language,
+      ownerName: value.recipientName,
+      borrowerName: value.actorName,
+      bookTitle: value.bookTitle,
+      bookUrl: value.bookUrl,
+      reason: type === 'borrow_canceled' ? 'canceled' : 'expired',
+    });
+  }
+  if (type === 'book_returned') {
+    const value = payload(fullRow, type);
+    if (typeof value.actorName !== 'string' || typeof value.bookUrl !== 'string') throw new Error('invalid-outbox-payload');
+    return bookReturnedTemplate({
+      locale: language,
+      ownerName: value.recipientName,
+      borrowerName: value.actorName,
+      bookTitle: value.bookTitle,
+      bookUrl: value.bookUrl,
+    });
+  }
   const value = payload(fullRow, type);
   return decisionTemplate({
     locale: language,
@@ -136,7 +160,7 @@ async function scheduleNextReturnCheck(db: D1Database, row: OutboxRow, now: numb
     .bind(row.aggregateId)
     .first<{ status: string }>();
   if (loan?.status !== 'active') return;
-  const next = now + 7 * 86_400_000;
+  const next = nextReturnCheckAt(new Date(row.availableAt), new Date(now)).getTime();
   await db.batch([
     db.prepare("UPDATE loans SET last_check_at = ?, next_check_at = ? WHERE id = ? AND status = 'active'")
       .bind(now, next, row.aggregateId),
@@ -158,6 +182,28 @@ async function scheduleNextReturnCheck(db: D1Database, row: OutboxRow, now: numb
       next,
     ),
   ]);
+}
+
+async function eventIsActionable(db: D1Database, row: OutboxRow, now: number) {
+  if (row.eventType === 'borrow_requested') {
+    const request = await db.prepare("SELECT 1 AS active FROM loan_requests WHERE id = ? AND status = 'pending' AND expires_at > ? LIMIT 1")
+      .bind(row.aggregateId, now)
+      .first<{ active: number }>();
+    return Boolean(request?.active);
+  }
+  if (row.eventType === 'return_check_due') {
+    const loan = await db.prepare("SELECT 1 AS active FROM loans WHERE id = ? AND status = 'active' LIMIT 1")
+      .bind(row.aggregateId)
+      .first<{ active: number }>();
+    return Boolean(loan?.active);
+  }
+  if (row.eventType === 'hold_available' || row.eventType === 'hold_offer_reminder') {
+    const hold = await db.prepare("SELECT 1 AS active FROM holds WHERE id = ? AND status = 'offered' AND expires_at > ? LIMIT 1")
+      .bind(row.aggregateId, now)
+      .first<{ active: number }>();
+    return Boolean(hold?.active);
+  }
+  return true;
 }
 
 async function recipient(
@@ -227,7 +273,7 @@ export async function processReadyOutbox(
     ORDER BY available_at ASC
     LIMIT ?
   `).bind(now, limit).all<OutboxRow>();
-  const result: OutboxWorkerResult = { claimed: 0, sent: 0, failed: 0 };
+  const result: OutboxWorkerResult = { claimed: 0, sent: 0, failed: 0, skipped: 0 };
 
   for (const row of rows.results) {
     const leaseUntil = now + 5 * 60_000;
@@ -239,6 +285,13 @@ export async function processReadyOutbox(
     if (affected(claim) !== 1) continue;
     result.claimed += 1;
     try {
+      if (!await eventIsActionable(db, row, now)) {
+        await db.prepare('UPDATE outbox_events SET processed_at = ? WHERE id = ? AND processed_at IS NULL')
+          .bind(now, row.id)
+          .run();
+        result.skipped += 1;
+        continue;
+      }
       const message = renderOutboxMessage(row);
       let deliveries: DeliveryResult[] = [];
       if (isWebPushConfigured(config)) {
@@ -295,24 +348,4 @@ export async function processReadyOutbox(
     }
   }
   return result;
-}
-
-export async function expireStaleBorrowRequests(
-  db: D1Database,
-  now = Date.now(),
-  baseUrl = 'https://hanalib.app',
-) {
-  const converted = await db.prepare(`
-    SELECT DISTINCT h.catalog_item_id AS catalogItemId
-    FROM holds h
-    INNER JOIN loan_requests lr ON lr.id = h.borrow_request_id
-    WHERE h.status = 'converted' AND lr.status = 'pending' AND lr.expires_at <= ?
-  `).bind(now).all<{ catalogItemId: string }>();
-  const result = await db.prepare("UPDATE loan_requests SET status = 'expired' WHERE status = 'pending' AND expires_at <= ?")
-    .bind(now)
-    .run();
-  for (const hold of converted.results) {
-    await offerNextHold(db, hold.catalogItemId, now, baseUrl);
-  }
-  return affected(result);
 }
