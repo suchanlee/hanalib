@@ -1,4 +1,3 @@
-import { BookHeart } from 'lucide-react';
 import Link from 'next/link';
 
 interface LegalSection {
@@ -21,9 +20,7 @@ export function LegalPage({
     <main className="min-h-dvh bg-background px-5 py-8 text-foreground sm:px-8 sm:py-12">
       <article className="mx-auto w-full max-w-2xl">
         <Link className="inline-flex items-center gap-2.5 font-semibold tracking-tight" href="/">
-          <span className="grid size-9 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-            <BookHeart aria-hidden="true" className="size-5" />
-          </span>
+          <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
           <span>씨앗책장 · Hana Seed Books</span>
         </Link>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Handshake, LibraryBig, ScanLine, UserRound } from 'lucide-react';
+import { BookOpen, Handshake, ScanLine, UserRound } from 'lucide-react';
 import { AuthView } from '@/features/auth';
 import { BookDetailView, CatalogView } from '@/features/catalog';
 import { CirculationView } from '@/features/circulation';
@@ -39,7 +39,7 @@ function LibraryShell() {
       <div className="mx-auto flex min-h-dvh w-full max-w-7xl">
         <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r bg-card px-4 py-6 lg:flex">
           <button className="mb-8 flex items-center gap-3 px-2 text-left" onClick={() => actions.setScreen('catalog')}>
-            <span className="grid size-10 place-items-center rounded-2xl bg-primary text-primary-foreground"><LibraryBig className="size-5" /></span>
+            <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
             <span><span className="block font-semibold tracking-tight">씨앗책장</span><span className="block text-xs text-muted-foreground">Hana Seed Books</span></span>
           </button>
           <nav aria-label={state.locale === 'ko' ? '주요 메뉴' : 'Main navigation'} className="space-y-1.5">
@@ -61,7 +61,7 @@ function LibraryShell() {
           <header className="sticky top-0 z-30 border-b bg-background/92 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
               <button className="flex items-center gap-2 text-left lg:hidden" onClick={() => actions.setScreen('catalog')} aria-label="Hana Seed Books catalog">
-                <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground"><LibraryBig className="size-4.5" /></span>
+                <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
                 <span className="font-semibold tracking-tight">{state.locale === 'ko' ? '씨앗책장' : 'Hana Seed Books'}</span>
               </button>
               <div className="hidden lg:block">

@@ -1,6 +1,6 @@
 'use client';
 
-import { BookHeart, Globe2, LockKeyhole, MessageCircle, UsersRound } from 'lucide-react';
+import { Globe2, LockKeyhole, MessageCircle, UsersRound } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -59,9 +59,7 @@ export function AuthView() {
       <div className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-md flex-col justify-between gap-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 font-semibold tracking-tight">
-            <span className="grid size-9 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-              <BookHeart aria-hidden="true" className="size-5" />
-            </span>
+            <img src="/seed-logo.svg" alt="" aria-hidden="true" width={44} height={44} className="size-11 shrink-0" />
             <span>{ko ? '씨앗책장' : 'Hana Seed Books'}</span>
           </div>
           <Button
