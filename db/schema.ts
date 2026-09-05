@@ -87,6 +87,8 @@ export const catalogItems = sqliteTable(
     status: text('status').notNull().default('available'),
     condition: text('condition').notNull().default('good'),
     ownerNotes: text('owner_notes'),
+    metadataOverridesJson: text('metadata_overrides_json'),
+    coverSourceOverrideUrl: text('cover_source_override_url'),
     idempotencyKey: text('idempotency_key'),
     archivedAt: integer('archived_at', { mode: 'timestamp_ms' }),
     version: integer('version').notNull().default(1),
@@ -321,4 +323,14 @@ export const analyticsEvents = sqliteTable(
     occurredAt: integer('occurred_at', { mode: 'timestamp_ms' }).notNull(),
   },
   (table) => [index('analytics_events_name_time_idx').on(table.eventName, table.occurredAt)],
+);
+
+export const rateLimits = sqliteTable(
+  'rate_limits',
+  {
+    key: text('key').primaryKey(),
+    count: integer('count').notNull().default(0),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [index('rate_limits_expires_idx').on(table.expiresAt)],
 );

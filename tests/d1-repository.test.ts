@@ -184,6 +184,8 @@ void test('accepting a request creates the loan, day-7 check, and both outbox ev
   assert.ok(due);
   assert.match(due.sql, /l\.next_check_at/);
   assert.deepEqual(Object.keys(JSON.parse(String(due.values[2]))).sort(), ['actorName', 'bookTitle', 'recipientName', 'returnUrl']);
+  assert.match(batch[0].sql, /h\.borrow_request_id = loan_requests\.id/);
+  assert.match(batch[1].sql, /h\.borrow_request_id = \?/);
 });
 
 void test('claiming an offered hold inserts the request before attaching its foreign key', async () => {
@@ -326,16 +328,26 @@ void test('an owner can edit book metadata without changing its ISBN', async () 
 
   assert.equal(item.edition.title, '아몬드 개정판');
   assert.equal(item.edition.isbn13, '9788936434267');
-  const editionUpdate = database.batches[0].find((statement) => statement.sql.includes('UPDATE book_editions'));
-  assert.ok(editionUpdate);
-  assert.doesNotMatch(editionUpdate.sql, /isbn1[03]/u);
-  assert.equal(database.batches[0].length, 2);
+  const itemUpdate = database.batches[0].find((statement) => statement.sql.includes('UPDATE catalog_items'));
+  assert.ok(itemUpdate);
+  assert.equal(JSON.parse(String(itemUpdate.values[2])).title, '아몬드 개정판');
+  assert.equal(database.batches[0].some((statement) => statement.sql.includes('UPDATE book_editions')), false);
+  assert.equal(database.batches[0].length, 1);
 });
 
 void test('an owner cannot attach another member’s uploaded cover', async () => {
   const database = new RecordedD1((sql) => {
     if (sql.includes('SELECT 1 AS active')) return { active: 1 };
-    if (sql.includes('FROM catalog_items')) return { id: 'item-1' };
+    if (sql.includes('INNER JOIN book_editions')) {
+      return {
+        itemId: 'item-1', ownerId: 'borrower', itemStatus: 'available', itemCondition: 'good',
+        ownerNotes: null, itemCreatedAt: fixedNow.getTime(), editionId: 'edition-1', isbn10: null,
+        isbn13: '9788936434267', title: '아몬드', titleEn: null, authorsJson: '["손원평"]', authorsEnJson: '[]',
+        publisher: '창비', publishedOn: '2017', language: 'ko', pageCount: 263, description: null,
+        coverOverrideAssetId: null, coverSourceUrl: null, coverStoragePath: null,
+        coverTone: 'amber', provenanceJson: '{}',
+      };
+    }
     if (sql.includes('FROM uploaded_assets')) return null;
     return null;
   });
@@ -377,8 +389,37 @@ void test('an owner can refresh a provider cover and clear their uploaded overri
   assert.equal(item.edition.coverUrl, 'https://t1.daumcdn.net/lbook/image/1467038');
   assert.equal(database.batches.length, 1);
   assert.match(database.batches[0][0].sql, /owner_id = \?/);
-  assert.match(database.batches[0][0].sql, /json_set/);
+  assert.match(database.batches[0][0].sql, /cover_source_override_url/);
+  assert.doesNotMatch(database.batches[0][0].sql, /book_editions/);
   assert.match(database.batches[0][1].sql, /SET catalog_item_id = NULL/);
+});
+
+void test('catalog intake never overwrites a shared ISBN edition', async () => {
+  const database = new RecordedD1((sql, values) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('idempotency_key = ?')) return null;
+    if (sql.includes('COUNT(*) AS count')) return { count: 0 };
+    if (sql.includes('FROM catalog_items ci')) {
+      return {
+        itemId: String(values[0]), ownerId: 'borrower', itemStatus: 'available', itemCondition: 'good',
+        ownerNotes: null, itemCreatedAt: fixedNow.getTime(), editionId: 'shared-edition', isbn10: null,
+        isbn13: '9788936434267', title: 'My copy title', titleEn: null, authorsJson: '["손원평"]', authorsEnJson: '[]',
+        publisher: '창비', publishedOn: '2017', language: 'ko', pageCount: 263, description: null,
+        coverOverrideAssetId: null, coverSourceUrl: null, coverStoragePath: null,
+        coverTone: 'amber', provenanceJson: '{}',
+      };
+    }
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+  await repository.createCatalogItem(context, {
+    isbn13: '9788936434267', title: 'My copy title', authors: ['손원평'], publisher: '창비',
+    publishedYear: 2017, language: 'ko', condition: 'good', provenance: { title: 'manual' },
+  });
+
+  assert.match(database.batches[0][0].sql, /ON CONFLICT\(isbn13\) DO NOTHING/);
+  assert.doesNotMatch(database.batches[0][0].sql, /DO UPDATE/);
+  assert.match(database.batches[0][1].sql, /metadata_overrides_json/);
 });
 
 void test('provider cover refresh rejects non-HTTPS URLs before writing', async () => {
@@ -402,4 +443,41 @@ void test('all repository operations reject inactive community actors before pre
   );
   assert.equal(database.batches.length, 0);
   assert.equal(database.prepared.length, 1);
+});
+
+void test('bootstrap exposes requests and loans only to their participants', async () => {
+  const database = new RecordedD1((sql) => sql.includes('SELECT 1 AS active') ? { active: 1 } : null);
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+
+  await assert.rejects(repository.getBootstrap(context),
+    (error: unknown) => error instanceof LibraryError && error.code === 'forbidden');
+  const requestQuery = database.prepared.find((statement) => statement.sql.includes('FROM loan_requests lr') && statement.sql.includes('ci.owner_id'));
+  const loanQuery = database.prepared.find((statement) => statement.sql.includes('FROM loans') && statement.sql.includes('borrower_id = ?'));
+  assert.ok(requestQuery);
+  assert.match(requestQuery.sql, /lr\.requester_id = \? OR ci\.owner_id = \?/);
+  assert.deepEqual(requestQuery.values, ['hana', 'borrower', 'borrower']);
+  assert.ok(loanQuery);
+  assert.match(loanQuery.sql, /owner_id = \? OR borrower_id = \?/);
+  assert.deepEqual(loanQuery.values, ['hana', 'borrower', 'borrower']);
+});
+
+void test('returning a queued book keeps it held until the queue offer is created', async () => {
+  let loanReads = 0;
+  const database = new RecordedD1((sql) => {
+    if (sql.includes('SELECT 1 AS active')) return { active: 1 };
+    if (sql.includes('FROM loans') && sql.includes('WHERE id = ?')) {
+      loanReads += 1;
+      return {
+        id: 'loan-1', catalogItemId: 'item-1', requestId: 'request-1', ownerId: 'owner', borrowerId: 'borrower',
+        status: loanReads === 1 ? 'active' : 'returned', startedAt: fixedNow.getTime(),
+        nextCheckAt: fixedNow.getTime(), returnedAt: loanReads === 1 ? null : fixedNow.getTime(), returnedBy: 'borrower',
+      };
+    }
+    return null;
+  });
+  const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
+  await repository.markReturned(context, 'loan-1');
+
+  assert.match(database.batches[0][1].sql, /CASE WHEN EXISTS/);
+  assert.match(database.batches[0][1].sql, /h\.status IN \('queued', 'offered'\)/);
 });

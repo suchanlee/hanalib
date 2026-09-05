@@ -1,11 +1,14 @@
 import { getD1Database } from '@/db';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '@/lib/auth/member';
 import { isSameOriginMutation } from '@/lib/auth/session';
+import { readJsonObject } from '@/lib/http/json';
 import {
   removeWebPushSubscription,
   saveWebPushSubscription,
   webPushConfig,
 } from '@/lib/notifications/web-push';
+import { LibraryError } from '@/lib/persistence/errors';
+import { enforceRateLimit } from '@/lib/persistence/rate-limit';
 
 function sameOrigin(request: Request) {
   const configured = process.env.PUBLIC_APP_URL;
@@ -14,6 +17,7 @@ function sameOrigin(request: Request) {
 
 function status(error: unknown) {
   if (error instanceof AuthenticationRequiredError) return 401;
+  if (error instanceof LibraryError) return error.status;
   const code = error instanceof Error ? error.message : '';
   if (code === 'invalid-web-push-subscription') return 400;
   if (code === 'web-push-storage-not-configured') return 503;
@@ -24,7 +28,8 @@ export async function POST(request: Request) {
   try {
     if (!sameOrigin(request)) return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
     const member = await requireAuthenticatedMember(request);
-    const body = await request.json() as unknown;
+    await enforceRateLimit(getD1Database(), member.id, { name: 'push-subscription', limit: 30, windowMs: 60 * 60 * 1_000 });
+    const body = await readJsonObject(request);
     const data = await saveWebPushSubscription(getD1Database(), member.id, body, webPushConfig());
     return Response.json({ data }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
@@ -40,7 +45,8 @@ export async function DELETE(request: Request) {
   try {
     if (!sameOrigin(request)) return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
     const member = await requireAuthenticatedMember(request);
-    const body = await request.json() as { endpoint?: unknown };
+    await enforceRateLimit(getD1Database(), member.id, { name: 'push-subscription', limit: 30, windowMs: 60 * 60 * 1_000 });
+    const body = await readJsonObject(request);
     if (typeof body.endpoint !== 'string') {
       return Response.json({ error: { code: 'invalid-subscription' } }, { status: 400 });
     }

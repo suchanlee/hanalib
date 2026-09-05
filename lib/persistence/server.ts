@@ -1,6 +1,7 @@
 import { getD1Database } from '../../db/index';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '../auth/member.ts';
 import { isSameOriginMutation } from '../auth/session.ts';
+import { readJsonObject } from '../http/json.ts';
 import { processReadyOutbox } from '../notifications/outbox-worker.ts';
 import {
   operationalLog,
@@ -12,10 +13,12 @@ import {
 import type { RequestContext } from './contracts.ts';
 import { D1LibraryRepository } from './d1-repository.ts';
 import { LibraryError, libraryError } from './errors.ts';
+import { enforceRateLimit, type RateLimit } from './rate-limit.ts';
 
 interface HandlerOptions {
   dispatchNotifications?: boolean;
   mutation?: boolean;
+  rateLimit?: RateLimit;
   status?: number;
 }
 
@@ -28,16 +31,7 @@ function environment() {
 }
 
 export async function jsonObject(request: Request) {
-  let value: unknown;
-  try {
-    value = await request.json();
-  } catch {
-    throw libraryError('invalid-input', 'A JSON request body is required.');
-  }
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw libraryError('invalid-input', 'The request body must be a JSON object.');
-  }
-  return value as Record<string, unknown>;
+  return readJsonObject(request);
 }
 
 export async function withLibraryApi<T>(
@@ -57,14 +51,20 @@ export async function withLibraryApi<T>(
       throw libraryError('missing-idempotency-key', 'An Idempotency-Key header is required for mutations.');
     }
     const context: RequestContext = { actorId: member.id, communityId: member.communityId, idempotencyKey };
-    const repository = new D1LibraryRepository(getD1Database(), {
+    const database = getD1Database();
+    if (options.mutation) {
+      await enforceRateLimit(database, member.id, options.rateLimit ?? {
+        name: 'library-mutation', limit: 120, windowMs: 60 * 60 * 1_000,
+      });
+    }
+    const repository = new D1LibraryRepository(database, {
       baseUrl: config.baseUrl,
       contactEncryptionKey: config.contactEncryptionKey,
       contactHashKey: config.contactHashKey,
     });
     const data = await handler(repository, context);
     if (options.dispatchNotifications) {
-      await processReadyOutbox(getD1Database(), {
+      await processReadyOutbox(database, {
         contactEncryptionKey: process.env.CONTACT_ENCRYPTION_KEY,
         contactHashKey: process.env.CONTACT_HASH_KEY,
         vapidPublicKey: process.env.WEB_PUSH_PUBLIC_KEY,

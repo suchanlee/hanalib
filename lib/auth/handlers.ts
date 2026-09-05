@@ -19,6 +19,8 @@ import { getD1Database } from '../../db';
 import { demoIdentity } from './demo';
 import { clearSessionCookie, createSessionToken, isSameOriginMutation, sessionCookie } from './session';
 import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '../observability/log.ts';
+import { readJsonObject } from '../http/json.ts';
+import { LibraryError } from '../persistence/errors.ts';
 
 const noStoreHeaders = {
   'cache-control': 'no-store',
@@ -132,8 +134,11 @@ export async function handleDemoSignIn(request: Request, source: AuthEnvSource =
   }
   let requestedPersona: unknown;
   try {
-    requestedPersona = (await request.json() as { persona?: unknown }).persona;
-  } catch {
+    requestedPersona = (await readJsonObject(request, 1_024)).persona;
+  } catch (error) {
+    if (error instanceof LibraryError && error.code === 'payload-too-large') {
+      return Response.json({ error: 'payload-too-large' }, { status: 413, headers: noStoreHeaders });
+    }
     // Existing clients send no body and continue to use the owner persona.
   }
   const member = await provisionAuthenticatedMember(demoIdentity(requestedPersona), config);

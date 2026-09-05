@@ -57,6 +57,13 @@
       "when": 1788595797410,
       "tag": "0007_zippy_wendell_rand",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1788597290064,
+      "tag": "0008_dashing_wildside",
+      "breakpoints": true
     }
   ]
 }

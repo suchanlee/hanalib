@@ -32,15 +32,15 @@ const CATALOG_SELECT = `
     be.id AS editionId,
     be.isbn10 AS isbn10,
     be.isbn13 AS isbn13,
-    be.title AS title,
-    be.title_en AS titleEn,
-    be.authors_json AS authorsJson,
-    be.authors_en_json AS authorsEnJson,
-    be.publisher AS publisher,
-    be.published_on AS publishedOn,
-    be.language AS language,
-    be.page_count AS pageCount,
-    be.description AS description,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS title,
+    CASE WHEN ci.metadata_overrides_json IS NULL THEN be.title_en ELSE json_extract(ci.metadata_overrides_json, '$.titleEn') END AS titleEn,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.authors'), be.authors_json) AS authorsJson,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.authorsEn'), be.authors_en_json) AS authorsEnJson,
+    CASE WHEN ci.metadata_overrides_json IS NULL THEN be.publisher ELSE json_extract(ci.metadata_overrides_json, '$.publisher') END AS publisher,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.publishedOn'), be.published_on) AS publishedOn,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.language'), be.language) AS language,
+    CASE WHEN ci.metadata_overrides_json IS NULL THEN be.page_count ELSE json_extract(ci.metadata_overrides_json, '$.pageCount') END AS pageCount,
+    CASE WHEN ci.metadata_overrides_json IS NULL THEN be.description ELSE json_extract(ci.metadata_overrides_json, '$.description') END AS description,
     (
       SELECT ua.id
       FROM uploaded_assets ua
@@ -48,9 +48,9 @@ const CATALOG_SELECT = `
       ORDER BY ua.created_at DESC
       LIMIT 1
     ) AS coverOverrideAssetId,
-    be.cover_source_url AS coverSourceUrl,
+    COALESCE(ci.cover_source_override_url, be.cover_source_url) AS coverSourceUrl,
     be.cover_storage_path AS coverStoragePath,
-    be.cover_tone AS coverTone,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.coverTone'), be.cover_tone) AS coverTone,
     be.field_provenance_json AS provenanceJson
   FROM catalog_items ci
   INNER JOIN book_editions be ON be.id = ci.edition_id
@@ -344,6 +344,38 @@ function validCondition(value: unknown): value is CatalogItem['condition'] {
   return value === 'like-new' || value === 'good' || value === 'well-loved';
 }
 
+const MAX_CATALOG_ITEMS_PER_MEMBER = 500;
+
+function boundedText(value: string, maxLength: number) {
+  return value.trim().length <= maxLength;
+}
+
+function validAuthors(value: string[]) {
+  return value.length <= 12 && value.every((author) => Boolean(author.trim()) && boundedText(author, 120));
+}
+
+function validProvenance(value: Record<string, unknown>) {
+  const entries = Object.entries(value);
+  return entries.length <= 24 && entries.every(([key, source]) => (
+    typeof source === 'string' && boundedText(key, 64) && boundedText(source, 200)
+  ));
+}
+
+function metadataOverrides(item: CatalogItem) {
+  return {
+    title: item.edition.title,
+    titleEn: item.edition.titleEn ?? null,
+    authors: item.edition.authors,
+    authorsEn: item.edition.authorsEn,
+    publisher: item.edition.publisher || null,
+    publishedOn: String(item.edition.publishedYear),
+    language: item.edition.language,
+    pageCount: item.edition.pageCount ?? null,
+    description: item.edition.description ?? null,
+    coverTone: item.edition.coverTone,
+  };
+}
+
 function coverToneFor(title: string): CatalogItem['edition']['coverTone'] {
   const tones: CatalogItem['edition']['coverTone'][] = ['amber', 'blue', 'green', 'rose', 'ink', 'violet'];
   const hash = Array.from(title).reduce((total, character) => total + (character.codePointAt(0) ?? 0), 0);
@@ -455,21 +487,24 @@ export class D1LibraryRepository implements LibraryRepository {
         INNER JOIN profiles p ON p.id = cm.user_id
         WHERE cm.community_id = ? AND cm.status = 'active'
         ORDER BY p.display_name
+        LIMIT 500
       `).bind(context.communityId),
-      this.db.prepare(`${CATALOG_SELECT} WHERE ci.community_id = ? AND ci.archived_at IS NULL AND ci.status <> 'archived' ORDER BY ci.created_at DESC`)
+      this.db.prepare(`${CATALOG_SELECT} WHERE ci.community_id = ? AND ci.archived_at IS NULL AND ci.status <> 'archived' ORDER BY ci.created_at DESC LIMIT 500`)
         .bind(context.communityId),
       this.db.prepare(`
         SELECT
-          id,
-          catalog_item_id AS catalogItemId,
-          requester_id AS requesterId,
-          status,
-          requested_at AS requestedAt,
-          expires_at AS expiresAt
-        FROM loan_requests
-        WHERE community_id = ?
-        ORDER BY requested_at DESC
-      `).bind(context.communityId),
+          lr.id,
+          lr.catalog_item_id AS catalogItemId,
+          lr.requester_id AS requesterId,
+          lr.status,
+          lr.requested_at AS requestedAt,
+          lr.expires_at AS expiresAt
+        FROM loan_requests lr
+        INNER JOIN catalog_items ci ON ci.id = lr.catalog_item_id
+        WHERE lr.community_id = ? AND (lr.requester_id = ? OR ci.owner_id = ?)
+        ORDER BY lr.requested_at DESC
+        LIMIT 200
+      `).bind(context.communityId, context.actorId, context.actorId),
       this.db.prepare(`
         SELECT
           id,
@@ -483,9 +518,10 @@ export class D1LibraryRepository implements LibraryRepository {
           returned_at AS returnedAt,
           returned_by AS returnedBy
         FROM loans
-        WHERE community_id = ?
+        WHERE community_id = ? AND (owner_id = ? OR borrower_id = ?)
         ORDER BY started_at DESC
-      `).bind(context.communityId),
+        LIMIT 200
+      `).bind(context.communityId, context.actorId, context.actorId),
       this.db.prepare(`
         SELECT kind, address_encrypted AS addressEncrypted, verified_at AS verifiedAt
         FROM notification_endpoints
@@ -517,12 +553,14 @@ export class D1LibraryRepository implements LibraryRepository {
         FROM holds h
         WHERE h.community_id = ? AND h.member_id = ? AND h.status IN ('queued', 'offered')
         ORDER BY h.created_at ASC
+        LIMIT 100
       `).bind(context.communityId, context.actorId),
       this.db.prepare(`
         SELECT catalog_item_id AS catalogItemId, COUNT(*) AS count
         FROM holds
         WHERE community_id = ? AND status IN ('queued', 'offered')
         GROUP BY catalog_item_id
+        LIMIT 500
       `).bind(context.communityId),
       this.db.prepare(`
         SELECT
@@ -541,6 +579,7 @@ export class D1LibraryRepository implements LibraryRepository {
             WHERE latest.loan_id = rc.loan_id AND latest.sent_at IS NOT NULL AND latest.response IS NULL
           )
         ORDER BY rc.sent_at DESC
+        LIMIT 100
       `).bind(context.communityId, context.actorId, context.actorId),
     ]);
     const members = (results[0].results as unknown as MemberRow[]).map(mapMember);
@@ -570,7 +609,7 @@ export class D1LibraryRepository implements LibraryRepository {
 
   async listCatalog(context: Pick<RequestContext, 'actorId' | 'communityId'>) {
     await this.assertActiveMember(context);
-    const result = await this.db.prepare(`${CATALOG_SELECT} WHERE ci.community_id = ? AND ci.archived_at IS NULL AND ci.status <> 'archived' ORDER BY ci.created_at DESC`)
+    const result = await this.db.prepare(`${CATALOG_SELECT} WHERE ci.community_id = ? AND ci.archived_at IS NULL AND ci.status <> 'archived' ORDER BY ci.created_at DESC LIMIT 500`)
       .bind(context.communityId)
       .all<CatalogRow>();
     return result.results.map(mapCatalogItem);
@@ -609,8 +648,24 @@ export class D1LibraryRepository implements LibraryRepository {
     if (!parsedIsbn || !input.title.trim() || !validCondition(input.condition)) {
       throw libraryError('invalid-input', 'ISBN, title, and condition are required.');
     }
+    if (
+      !boundedText(input.title, 300) ||
+      (input.titleEn !== undefined && !boundedText(input.titleEn, 300)) ||
+      !validAuthors(input.authors) ||
+      !boundedText(input.publisher, 200) ||
+      (input.ownerNotes !== undefined && !boundedText(input.ownerNotes, 1_000)) ||
+      (input.coverUrl !== undefined && input.coverUrl.length > 2_048) ||
+      !validProvenance(input.provenance)
+    ) throw libraryError('invalid-input', 'One or more book details exceed the allowed length.');
     if (!Number.isInteger(input.publishedYear) || input.publishedYear < 1000 || input.publishedYear > 9999) {
       throw libraryError('invalid-input', 'Published year must be a four-digit year.');
+    }
+    const ownedCount = await this.db.prepare(`
+      SELECT COUNT(*) AS count FROM catalog_items
+      WHERE community_id = ? AND owner_id = ? AND archived_at IS NULL
+    `).bind(context.communityId, context.actorId).first<{ count: number }>();
+    if (Number(ownedCount?.count ?? 0) >= MAX_CATALOG_ITEMS_PER_MEMBER) {
+      throw libraryError('rate-limited', 'The maximum number of active book listings has been reached.');
     }
 
     const uploadedCoverId = coverAssetIdFromUrl(input.coverUrl);
@@ -637,17 +692,7 @@ export class D1LibraryRepository implements LibraryRepository {
           published_on, language, page_count, cover_source_url, cover_tone,
           field_provenance_json, resolver_version, resolved_at
         ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, ?, 1, ?)
-        ON CONFLICT(isbn13) DO UPDATE SET
-          title = excluded.title,
-          title_en = excluded.title_en,
-          authors_json = excluded.authors_json,
-          publisher = excluded.publisher,
-          published_on = excluded.published_on,
-          language = excluded.language,
-          page_count = excluded.page_count,
-          cover_source_url = COALESCE(excluded.cover_source_url, book_editions.cover_source_url),
-          field_provenance_json = excluded.field_provenance_json,
-          resolved_at = excluded.resolved_at
+        ON CONFLICT(isbn13) DO NOTHING
       `).bind(
         editionId,
         parsedIsbn.isbn13,
@@ -666,9 +711,10 @@ export class D1LibraryRepository implements LibraryRepository {
       this.db.prepare(`
         INSERT INTO catalog_items (
           id, community_id, edition_id, owner_id, status, condition, owner_notes,
-          idempotency_key, version, created_at, updated_at
+          metadata_overrides_json, cover_source_override_url, idempotency_key,
+          version, created_at, updated_at
         )
-        SELECT ?, ?, be.id, ?, 'available', ?, ?, ?, 1, ?, ?
+        SELECT ?, ?, be.id, ?, 'available', ?, ?, ?, ?, ?, 1, ?, ?
         FROM book_editions be
         WHERE be.isbn13 = ?
       `).bind(
@@ -677,6 +723,14 @@ export class D1LibraryRepository implements LibraryRepository {
         context.actorId,
         input.condition,
         input.ownerNotes?.trim() || null,
+        JSON.stringify({
+          title: input.title.trim(), titleEn: input.titleEn?.trim() || null,
+          authors: input.authors.map((author) => author.trim()), authorsEn: [],
+          publisher: input.publisher.trim() || null, publishedOn: String(input.publishedYear),
+          language: input.language, pageCount: input.pageCount ?? null, description: null,
+          coverTone: coverToneFor(input.title),
+        }),
+        uploadedCoverId ? null : input.coverUrl ?? null,
         operationKey,
         now,
         now,
@@ -718,36 +772,32 @@ export class D1LibraryRepository implements LibraryRepository {
     ) {
       throw libraryError('invalid-input', 'Invalid book details.');
     }
-    const ownedItem = await this.db.prepare(`
-      SELECT id
-      FROM catalog_items
-      WHERE id = ? AND community_id = ? AND owner_id = ? AND archived_at IS NULL
-      LIMIT 1
-    `).bind(itemId, context.communityId, context.actorId).first<{ id: string }>();
-    if (!ownedItem) throw libraryError('not-found', 'Only the owner can edit an active listing.');
-
-    const hasEditionChanges = [
-      changes.title,
-      changes.titleEn,
-      changes.authors,
-      changes.authorsEn,
-      changes.publisher,
-      changes.publishedYear,
-      changes.language,
-      changes.pageCount,
-      changes.description,
-    ].some((value) => value !== undefined);
-    let editionId: string | undefined;
-    if (hasEditionChanges) {
-      editionId = (await this.db.prepare(`
-        SELECT be.id AS editionId
-        FROM catalog_items ci
-        INNER JOIN book_editions be ON be.id = ci.edition_id
-        WHERE ci.id = ? AND ci.community_id = ? AND ci.owner_id = ? AND ci.archived_at IS NULL
-        LIMIT 1
-      `).bind(itemId, context.communityId, context.actorId).first<{ editionId: string }>())?.editionId;
-      if (!editionId) throw libraryError('not-found', 'Book details could not be loaded.');
+    if (
+      (changes.title !== undefined && !boundedText(changes.title, 300)) ||
+      (changes.titleEn != null && !boundedText(changes.titleEn, 300)) ||
+      (changes.authors !== undefined && !validAuthors(changes.authors)) ||
+      (changes.authorsEn !== undefined && !validAuthors(changes.authorsEn)) ||
+      (changes.publisher !== undefined && !boundedText(changes.publisher, 200)) ||
+      (changes.description != null && !boundedText(changes.description, 5_000)) ||
+      (changes.ownerNotes !== undefined && !boundedText(changes.ownerNotes, 1_000))
+    ) throw libraryError('invalid-input', 'One or more book details exceed the allowed length.');
+    const ownedRow = await this.catalogItem(itemId, context.communityId);
+    if (!ownedRow || ownedRow.ownerId !== context.actorId || ownedRow.itemStatus === 'archived') {
+      throw libraryError('not-found', 'Only the owner can edit an active listing.');
     }
+    const overrides = metadataOverrides(mapCatalogItem(ownedRow));
+    if (changes.title !== undefined) {
+      overrides.title = changes.title.trim();
+      overrides.coverTone = coverToneFor(changes.title);
+    }
+    if (changes.titleEn !== undefined) overrides.titleEn = changes.titleEn?.trim() || null;
+    if (changes.authors !== undefined) overrides.authors = changes.authors.map((author) => author.trim());
+    if (changes.authorsEn !== undefined) overrides.authorsEn = changes.authorsEn.map((author) => author.trim());
+    if (changes.publisher !== undefined) overrides.publisher = changes.publisher.trim() || null;
+    if (changes.publishedYear !== undefined) overrides.publishedOn = String(changes.publishedYear);
+    if (changes.language !== undefined) overrides.language = changes.language;
+    if (changes.pageCount !== undefined) overrides.pageCount = changes.pageCount;
+    if (changes.description !== undefined) overrides.description = changes.description?.trim() || null;
 
     if (changes.coverAssetId !== undefined) {
       if (!coverAssetIdPattern.test(changes.coverAssetId)) {
@@ -765,55 +815,17 @@ export class D1LibraryRepository implements LibraryRepository {
 
     const statements = [this.db.prepare(`
       UPDATE catalog_items
-      SET condition = ?, owner_notes = ?, version = version + 1, updated_at = ?
+      SET condition = ?, owner_notes = ?, metadata_overrides_json = ?, version = version + 1, updated_at = ?
       WHERE id = ? AND community_id = ? AND owner_id = ? AND archived_at IS NULL
     `).bind(
       changes.condition,
       changes.ownerNotes?.trim() || null,
+      JSON.stringify(overrides),
       this.now().getTime(),
       itemId,
       context.communityId,
       context.actorId,
     )];
-    if (editionId) {
-      statements.push(this.db.prepare(`
-        UPDATE book_editions
-        SET
-          title = CASE WHEN ? = 1 THEN ? ELSE title END,
-          title_en = CASE WHEN ? = 1 THEN ? ELSE title_en END,
-          authors_json = CASE WHEN ? = 1 THEN ? ELSE authors_json END,
-          authors_en_json = CASE WHEN ? = 1 THEN ? ELSE authors_en_json END,
-          publisher = CASE WHEN ? = 1 THEN ? ELSE publisher END,
-          published_on = CASE WHEN ? = 1 THEN ? ELSE published_on END,
-          language = CASE WHEN ? = 1 THEN ? ELSE language END,
-          page_count = CASE WHEN ? = 1 THEN ? ELSE page_count END,
-          description = CASE WHEN ? = 1 THEN ? ELSE description END,
-          cover_tone = CASE WHEN ? = 1 THEN ? ELSE cover_tone END
-        WHERE id = ?
-      `).bind(
-        changes.title !== undefined ? 1 : 0,
-        changes.title?.trim() ?? null,
-        changes.titleEn !== undefined ? 1 : 0,
-        changes.titleEn?.trim() || null,
-        changes.authors !== undefined ? 1 : 0,
-        changes.authors === undefined ? null : JSON.stringify(changes.authors.map((author) => author.trim()).filter(Boolean)),
-        changes.authorsEn !== undefined ? 1 : 0,
-        changes.authorsEn === undefined ? null : JSON.stringify(changes.authorsEn.map((author) => author.trim()).filter(Boolean)),
-        changes.publisher !== undefined ? 1 : 0,
-        changes.publisher?.trim() ?? null,
-        changes.publishedYear !== undefined ? 1 : 0,
-        changes.publishedYear === undefined ? null : String(changes.publishedYear),
-        changes.language !== undefined ? 1 : 0,
-        changes.language ?? null,
-        changes.pageCount !== undefined ? 1 : 0,
-        changes.pageCount ?? null,
-        changes.description !== undefined ? 1 : 0,
-        changes.description?.trim() || null,
-        changes.title !== undefined ? 1 : 0,
-        changes.title === undefined ? null : coverToneFor(changes.title),
-        editionId,
-      ));
-    }
     if (changes.coverAssetId) {
       statements.push(
         this.db.prepare(`
@@ -831,7 +843,6 @@ export class D1LibraryRepository implements LibraryRepository {
     }
     const results = await this.db.batch(statements);
     if (affected(results[0]) !== 1) throw libraryError('not-found', 'Only the owner can edit an active listing.');
-    if (editionId && affected(results[1]) !== 1) throw libraryError('conflict', 'The book details could not be saved.');
     if (changes.coverAssetId && affected(results[results.length - 1]) !== 1) throw libraryError('conflict', 'The cover could not be attached.');
     const item = await this.catalogItem(itemId, context.communityId);
     if (!item) throw libraryError('not-found', 'Book not found.');
@@ -854,21 +865,17 @@ export class D1LibraryRepository implements LibraryRepository {
     if (parsedCoverUrl.protocol !== 'https:') {
       throw libraryError('invalid-input', 'The provider cover must use HTTPS.');
     }
+    if (coverUrl.length > 2_048 || !boundedText(source, 200)) {
+      throw libraryError('invalid-input', 'The provider cover details are too long.');
+    }
 
     const now = this.now().getTime();
     const results = await this.db.batch([
       this.db.prepare(`
-        UPDATE book_editions
-        SET cover_source_url = ?,
-            field_provenance_json = json_set(COALESCE(field_provenance_json, '{}'), '$.coverUrl', ?),
-            resolved_at = ?
-        WHERE id = (
-          SELECT edition_id
-          FROM catalog_items
-          WHERE id = ? AND community_id = ? AND owner_id = ? AND archived_at IS NULL
-          LIMIT 1
-        )
-      `).bind(coverUrl, source, now, itemId, context.communityId, context.actorId),
+        UPDATE catalog_items
+        SET cover_source_override_url = ?, version = version + 1, updated_at = ?
+        WHERE id = ? AND community_id = ? AND owner_id = ? AND archived_at IS NULL
+      `).bind(coverUrl, now, itemId, context.communityId, context.actorId),
       this.db.prepare(`
         UPDATE uploaded_assets
         SET catalog_item_id = NULL
@@ -917,13 +924,21 @@ export class D1LibraryRepository implements LibraryRepository {
     `).bind(context.communityId, context.actorId, operationKey).first<RequestRow>();
     if (existing) return mapRequest(existing);
 
+    const requestedAt = this.now();
+    const recentRequest = await this.db.prepare(`
+      SELECT 1 AS recent FROM loan_requests
+      WHERE community_id = ? AND catalog_item_id = ? AND requester_id = ? AND requested_at > ?
+      LIMIT 1
+    `).bind(context.communityId, itemId, context.actorId, requestedAt.getTime() - 5 * 60 * 1_000).first<{ recent: number }>();
+    if (recentRequest) throw libraryError('rate-limited', 'Please wait before requesting this book again.');
+
     const info = await this.db.prepare(`
       SELECT
         ci.id AS itemId,
         ci.owner_id AS ownerId,
         ci.status AS itemStatus,
-        be.title AS bookTitle,
-        be.cover_source_url AS coverSourceUrl,
+        COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle,
+        COALESCE(ci.cover_source_override_url, be.cover_source_url) AS coverSourceUrl,
         owner.display_name AS ownerDisplayName,
         owner.display_name_ko AS ownerDisplayNameKo,
         owner.locale AS ownerLocale,
@@ -940,7 +955,6 @@ export class D1LibraryRepository implements LibraryRepository {
     if (info.ownerId === context.actorId) throw libraryError('conflict', 'Owners cannot borrow their own books.');
     if (info.itemStatus !== 'available') throw libraryError('conflict', 'This book is not available.');
 
-    const requestedAt = this.now();
     const expiresAt = borrowRequestExpiresAt(requestedAt);
     const requestId = id('request');
     const outboxId = id('event');
@@ -1068,6 +1082,7 @@ export class D1LibraryRepository implements LibraryRepository {
       context.actorId,
     ).run();
     if (affected(result) !== 1) throw libraryError('conflict', 'You are already waiting for this book.');
+    if (item.status === 'held') await offerNextHold(this.db, itemId, now, this.baseUrl);
     const hold = await this.hold(holdId, context.communityId, context.actorId);
     if (!hold) throw libraryError('not-found', 'The new hold could not be loaded.');
     return mapHold(hold);
@@ -1121,8 +1136,8 @@ export class D1LibraryRepository implements LibraryRepository {
         h.expires_at AS holdExpiresAt,
         ci.owner_id AS ownerId,
         ci.status AS itemStatus,
-        be.title AS bookTitle,
-        be.cover_source_url AS coverSourceUrl,
+        COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle,
+        COALESCE(ci.cover_source_override_url, be.cover_source_url) AS coverSourceUrl,
         owner.display_name AS ownerDisplayName,
         owner.display_name_ko AS ownerDisplayNameKo,
         owner.locale AS ownerLocale,
@@ -1267,7 +1282,7 @@ export class D1LibraryRepository implements LibraryRepository {
         lr.expires_at AS expiresAt,
         ci.owner_id AS ownerId,
         ci.status AS itemStatus,
-        be.title AS bookTitle,
+        COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle,
         requester.display_name AS requesterDisplayName,
         requester.display_name_ko AS requesterDisplayNameKo,
         requester.locale AS requesterLocale,
@@ -1365,18 +1380,30 @@ export class D1LibraryRepository implements LibraryRepository {
           AND EXISTS (
             SELECT 1 FROM catalog_items ci
             WHERE ci.id = loan_requests.catalog_item_id AND ci.owner_id = ?
-              AND ci.status IN ('available', 'held') AND ci.archived_at IS NULL
+              AND ci.archived_at IS NULL
+              AND (ci.status = 'available' OR (ci.status = 'held' AND EXISTS (
+                SELECT 1 FROM holds h
+                WHERE h.catalog_item_id = ci.id
+                  AND h.borrow_request_id = loan_requests.id
+                  AND h.member_id = loan_requests.requester_id
+                  AND h.status = 'converted'
+              )))
           )
       `).bind(now.getTime(), context.actorId, requestId, context.communityId, now.getTime(), context.actorId),
       this.db.prepare(`
         UPDATE catalog_items
         SET status = 'borrowed', version = version + 1, updated_at = ?
-        WHERE id = ? AND community_id = ? AND owner_id = ? AND status IN ('available', 'held')
+        WHERE id = ? AND community_id = ? AND owner_id = ?
+          AND (status = 'available' OR (status = 'held' AND EXISTS (
+            SELECT 1 FROM holds h
+            WHERE h.catalog_item_id = catalog_items.id
+              AND h.borrow_request_id = ? AND h.status = 'converted'
+          )))
           AND EXISTS (
             SELECT 1 FROM loan_requests lr
             WHERE lr.id = ? AND lr.status = 'accepted' AND lr.responded_at = ?
           )
-      `).bind(now.getTime(), info.catalogItemId, context.communityId, context.actorId, requestId, now.getTime()),
+      `).bind(now.getTime(), info.catalogItemId, context.communityId, context.actorId, requestId, requestId, now.getTime()),
       this.db.prepare(`
         UPDATE loan_requests
         SET status = 'superseded', responded_at = ?, responded_by = ?
@@ -1449,7 +1476,10 @@ export class D1LibraryRepository implements LibraryRepository {
       `).bind(now, context.actorId, loanId, context.communityId, context.actorId, context.actorId),
       this.db.prepare(`
         UPDATE catalog_items
-        SET status = 'available', version = version + 1, updated_at = ?
+        SET status = CASE WHEN EXISTS (
+          SELECT 1 FROM holds h
+          WHERE h.catalog_item_id = catalog_items.id AND h.status IN ('queued', 'offered')
+        ) THEN 'held' ELSE 'available' END, version = version + 1, updated_at = ?
         WHERE id = ? AND community_id = ?
           AND EXISTS (SELECT 1 FROM loans l WHERE l.id = ? AND l.status = 'returned' AND l.returned_at = ?)
       `).bind(now, existing.catalogItemId, context.communityId, loanId, now),
@@ -1560,6 +1590,9 @@ export class D1LibraryRepository implements LibraryRepository {
     const phoneChanged = changes.phone !== undefined && next.phone !== currentPhone;
     if (!phoneChanged) next.phoneVerified = Boolean(existing.phoneVerified);
     if (!next.displayName || !next.displayNameKo) throw libraryError('invalid-input', 'Both display names are required.');
+    if (!boundedText(next.displayName, 100) || !boundedText(next.displayNameKo, 100)) {
+      throw libraryError('invalid-input', 'Display names must be 100 characters or fewer.');
+    }
     if (next.locale !== 'ko' && next.locale !== 'en') throw libraryError('invalid-input', 'Invalid locale.');
     if (!['email', 'sms', 'both', 'kakao'].includes(next.notificationChannel)) throw libraryError('invalid-input', 'Invalid notification channel.');
     if (next.phone && !/^\+1[2-9]\d{9}$/.test(next.phone)) throw libraryError('invalid-input', 'Phone numbers must be valid US +1 E.164 numbers.');

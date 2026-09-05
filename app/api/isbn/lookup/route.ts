@@ -1,6 +1,9 @@
 import { parseIsbn } from '@/lib/isbn/isbn';
+import { getD1Database } from '@/db';
 import { fixtureLookupAllowed, resolveBookMetadata } from '@/lib/isbn/server-lookup';
 import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '@/lib/observability/log';
+import { LibraryError } from '@/lib/persistence/errors';
+import { enforceRateLimit } from '@/lib/persistence/rate-limit';
 import { requireActiveMember, unauthorizedResponse } from '@/lib/storage/request-member';
 
 export async function GET(request: Request) {
@@ -17,6 +20,16 @@ export async function GET(request: Request) {
     return respond(Response.json({ error: 'service-unavailable' }, { status: 503, headers: { 'cache-control': 'no-store' } }));
   }
   if (!member) return respond(unauthorizedResponse());
+  try {
+    await enforceRateLimit(getD1Database(), member.memberId, {
+      name: 'isbn-lookup', limit: 60, windowMs: 60 * 60 * 1_000,
+    });
+  } catch (error) {
+    if (error instanceof LibraryError) {
+      return respond(Response.json({ error: error.code }, { status: error.status, headers: { 'cache-control': 'no-store' } }));
+    }
+    throw error;
+  }
   const search = new URL(request.url).searchParams;
   const parsed = parseIsbn(search.get('isbn') ?? '');
   if (!parsed) return respond(Response.json({ error: 'invalid-isbn' }, { status: 400, headers: { 'cache-control': 'no-store' } }));

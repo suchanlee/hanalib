@@ -34,5 +34,8 @@ export async function POST(request: Request, route: RouteContext) {
       result.metadata.coverUrl,
       result.metadata.provenance.coverUrl ?? 'provider',
     );
-  }, { mutation: true });
+  }, {
+    mutation: true,
+    rateLimit: { name: 'cover-refresh', limit: 30, windowMs: 24 * 60 * 60 * 1_000 },
+  });
 }

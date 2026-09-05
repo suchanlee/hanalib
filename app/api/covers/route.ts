@@ -10,6 +10,8 @@ import {
   validateCoverUpload,
 } from '@/lib/storage/covers';
 import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '@/lib/observability/log';
+import { LibraryError, libraryError } from '@/lib/persistence/errors';
+import { enforceRateLimit } from '@/lib/persistence/rate-limit';
 import { requireActiveMember, unauthorizedResponse } from '@/lib/storage/request-member';
 
 export async function POST(request: Request) {
@@ -29,6 +31,22 @@ export async function POST(request: Request) {
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) {
     return respond(Response.json({ error: 'cross-origin-upload-rejected' }, { status: 403, headers: { 'cache-control': 'no-store' } }));
+  }
+  try {
+    await enforceRateLimit(env.DB, member.memberId, {
+      name: 'cover-upload', limit: 20, windowMs: 24 * 60 * 60 * 1_000,
+    });
+    const stored = await env.DB.prepare(`
+      SELECT COUNT(*) AS count FROM uploaded_assets WHERE owner_id = ? AND kind = 'cover'
+    `).bind(member.memberId).first<{ count: number }>();
+    if (Number(stored?.count ?? 0) >= 1_000) {
+      throw libraryError('rate-limited', 'The maximum number of stored covers has been reached.');
+    }
+  } catch (error) {
+    if (error instanceof LibraryError) {
+      return respond(Response.json({ error: error.code }, { status: error.status, headers: { 'cache-control': 'no-store' } }));
+    }
+    throw error;
   }
 
   const declaredType = request.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase() ?? '';

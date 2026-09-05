@@ -44,8 +44,8 @@ async function nextQueuedHold(db: D1Database, catalogItemId: string) {
       p.locale,
       p.display_name AS displayName,
       p.display_name_ko AS displayNameKo,
-      be.title AS bookTitle,
-      be.cover_source_url AS coverUrl
+      COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle,
+      COALESCE(ci.cover_source_override_url, be.cover_source_url) AS coverUrl
     FROM holds h
     INNER JOIN profiles p ON p.id = h.member_id
     INNER JOIN catalog_items ci ON ci.id = h.catalog_item_id
@@ -69,7 +69,7 @@ export async function offerNextHold(
       SET status = 'available', version = version + 1, updated_at = ?
       WHERE id = ? AND status <> 'archived'
         AND NOT EXISTS (SELECT 1 FROM loans WHERE catalog_item_id = ? AND status = 'active')
-        AND NOT EXISTS (SELECT 1 FROM holds WHERE catalog_item_id = ? AND status = 'offered')
+        AND NOT EXISTS (SELECT 1 FROM holds WHERE catalog_item_id = ? AND status IN ('queued', 'offered'))
     `).bind(now, catalogItemId, catalogItemId, catalogItemId).run();
     return null;
   }
@@ -153,8 +153,8 @@ export async function remindHoldOffers(
       p.locale,
       p.display_name AS displayName,
       p.display_name_ko AS displayNameKo,
-      be.title AS bookTitle,
-      be.cover_source_url AS coverUrl,
+      COALESCE(json_extract(ci.metadata_overrides_json, '$.title'), be.title) AS bookTitle,
+      COALESCE(ci.cover_source_override_url, be.cover_source_url) AS coverUrl,
       h.expires_at AS expiresAt
     FROM holds h
     INNER JOIN profiles p ON p.id = h.member_id

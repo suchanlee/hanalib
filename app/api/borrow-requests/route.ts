@@ -6,5 +6,10 @@ export async function POST(request: Request) {
     const body = await jsonObject(request);
     if (typeof body.itemId !== 'string' || !body.itemId) throw libraryError('invalid-input', 'itemId is required.');
     return repository.createBorrowRequest(context, body.itemId);
-  }, { dispatchNotifications: true, mutation: true, status: 201 });
+  }, {
+    dispatchNotifications: true,
+    mutation: true,
+    status: 201,
+    rateLimit: { name: 'borrow-request', limit: 20, windowMs: 60 * 60 * 1_000 },
+  });
 }
