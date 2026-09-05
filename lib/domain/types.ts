@@ -105,7 +105,7 @@ export interface HanaAppActions {
   updateItem(itemId: string, changes: UpdateCatalogItemInput): Promise<CatalogItem>;
   refreshItemCover(itemId: string): Promise<CatalogItem>;
   archiveItem(itemId: string): void;
-  requestBorrow(itemId: string): void;
+  requestBorrow(itemId: string): Promise<BorrowRequest>;
   cancelRequest(requestId: string): void;
   respondToRequest(requestId: string, decision: 'accepted' | 'declined'): void;
   markReturned(loanId: string): void;

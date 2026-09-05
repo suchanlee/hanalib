@@ -84,13 +84,13 @@ export function WebMcpBridge() {
       description: 'Submit a 48-hour borrow request for one available catalog copy.',
       inputSchema: { type: 'object', properties: { itemId: { type: 'string' } }, required: ['itemId'], additionalProperties: false },
       annotations: { readOnlyHint: false, untrustedContentHint: false },
-      execute(input) {
+      async execute(input) {
         if (!state.isAuthenticated) throw new Error('Sign in before requesting a loan.');
         const itemId = objectInput(input).itemId;
         if (typeof itemId !== 'string') throw new Error('itemId must be a string.');
         const item = state.items.find((candidate) => candidate.id === itemId);
         if (!item || item.status !== 'available' || item.ownerId === state.currentUserId) throw new Error('This copy cannot be requested by the current member.');
-        actions.requestBorrow(itemId);
+        await actions.requestBorrow(itemId);
         return { itemId, status: 'pending', expiresInHours: 48 };
       },
     });

@@ -275,16 +275,19 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
         })
         .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
     },
-    requestBorrow(itemId) {
-      void apiData<BorrowRequest>('/api/borrow-requests', mutationInit('POST', { itemId }))
-        .then((request) => {
-          setState((current) => ({
-            ...current,
-            requests: [request, ...current.requests.filter((candidate) => candidate.id !== request.id)],
-            announcement: current.locale === 'ko' ? '소유자에게 대여 요청을 보냈어요.' : 'Borrow request sent to the owner.',
-          }));
-        })
-        .catch(() => setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) })));
+    async requestBorrow(itemId) {
+      try {
+        const request = await apiData<BorrowRequest>('/api/borrow-requests', mutationInit('POST', { itemId }));
+        setState((current) => ({
+          ...current,
+          requests: [request, ...current.requests.filter((candidate) => candidate.id !== request.id)],
+          announcement: current.locale === 'ko' ? '소유자에게 대여 요청을 보냈어요.' : 'Borrow request sent to the owner.',
+        }));
+        return request;
+      } catch (error) {
+        setState((current) => ({ ...current, announcement: failureAnnouncement(current.locale) }));
+        throw error;
+      }
     },
     cancelRequest(requestId) {
       void apiData<BorrowRequest>(`/api/borrow-requests/${encodeURIComponent(requestId)}`, mutationInit('DELETE'))

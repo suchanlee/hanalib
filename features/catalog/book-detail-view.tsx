@@ -49,6 +49,8 @@ export function BookDetailView() {
   const [coverError, setCoverError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isRefreshingCover, setIsRefreshingCover] = useState(false);
+  const [requestDialogOpen, setRequestDialogOpen] = useState(false);
+  const [isRequesting, setIsRequesting] = useState(false);
 
   useEffect(() => () => {
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
@@ -147,7 +149,7 @@ export function BookDetailView() {
     actions.archiveItem(itemId);
   }
 
-  function requestBook() {
+  async function requestBook() {
     if (isOwner) {
       setFeedback({ tone: 'error', text: t.ownBook });
       return;
@@ -156,8 +158,16 @@ export function BookDetailView() {
       setFeedback({ tone: 'error', text: t.unavailable });
       return;
     }
-    actions.requestBorrow(itemId);
-    setFeedback({ tone: 'success', text: t.requested });
+    setIsRequesting(true);
+    try {
+      await actions.requestBorrow(itemId);
+      setRequestDialogOpen(false);
+      setFeedback({ tone: 'success', text: t.requested });
+    } catch {
+      setFeedback({ tone: 'error', text: t.requestFailed });
+    } finally {
+      setIsRequesting(false);
+    }
   }
 
   function cancelRequest() {
@@ -246,7 +256,32 @@ export function BookDetailView() {
                 <Button type="button" variant="outline" className="h-12 sm:col-span-2" onClick={cancelRequest} data-testid="cancel-borrow-request">{t.cancelRequest}</Button>
               </>
             ) : !isOwner && item.status === 'available' ? (
-              <Button type="button" className="h-12 sm:col-span-2" onClick={requestBook} data-testid="request-borrow">{t.request}</Button>
+              <AlertDialog open={requestDialogOpen} onOpenChange={(open) => { if (!isRequesting) setRequestDialogOpen(open); }}>
+                <AlertDialogTrigger
+                  render={<Button type="button" className="h-12 sm:col-span-2" data-testid="request-borrow" />}
+                >
+                  {t.request}
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogMedia><BookMarked /></AlertDialogMedia>
+                    <AlertDialogTitle>{t.requestConfirmTitle}</AlertDialogTitle>
+                    <AlertDialogDescription>{t.requestConfirmHelp(owner ? memberName(state.locale, owner) : '—')}</AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="h-11" disabled={isRequesting} data-testid="cancel-borrow-confirmation">{t.cancel}</AlertDialogCancel>
+                    <AlertDialogAction
+                      type="button"
+                      className="h-11"
+                      disabled={isRequesting}
+                      onClick={() => { void requestBook(); }}
+                      data-testid="confirm-borrow-request"
+                    >
+                      {isRequesting ? t.requesting : t.confirmRequest}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             ) : null}
 
             {canReturn ? (
