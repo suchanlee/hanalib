@@ -1,6 +1,6 @@
 # Hana Library — product, UX, and technical implementation plan
 
-> **Current implementation decision (September 2026):** Kakao is the sole member-authentication provider. Members may grant optional `talk_message` consent, after which circulation alerts are sent privately through KakaoTalk's **Send to me** API with buttons back to the authorization-checked app. This supersedes the Google/Apple authentication and Twilio reply-by-`1`/`2` sections retained below as historical planning context. There is no shared Kakao Channel conversation, and a normal Channel chatbot cannot initiate these alerts.
+> **Current implementation decision (September 2026):** Kakao is the sole member-authentication provider. Kakao sign-in requests `talk_message` consent so circulation alerts can be sent privately through KakaoTalk's **Send to me** API with buttons back to the authorization-checked app. This supersedes the Google/Apple authentication and Twilio reply-by-`1`/`2` sections retained below as historical planning context. There is no shared Kakao Channel conversation, and a normal Channel chatbot cannot initiate these alerts.
 
 Status: planning only  
 Primary locale: Korean (`ko`)  

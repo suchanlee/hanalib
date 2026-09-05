@@ -4,7 +4,7 @@ The application runs on OpenAI Sites backed by Cloudflare Workers. Sites owns th
 
 ## 1. Identity and membership
 
-Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` and `talk_message` consent items. Configure `talk_message` as optional consent. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
+Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` and `talk_message` consent items. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
 `https://hana-community-library.lee-suchan.chatgpt.site/api/auth/kakao/callback`
 
@@ -45,7 +45,7 @@ Allowlisted analytics contain only an event name, optional anonymous session ID,
 
 - Validate real Kakao first-sign-in, repeat-sign-in, denial, state mismatch, and logout flows.
 - Validate Korean and English ISBNs against live NLK and Google Books data.
-- Grant and deny optional `talk_message` consent, then verify the Settings connection state in both cases.
+- Grant `talk_message` consent, then verify the Settings connection state and repeat sign-in behavior.
 - Trigger each circulation event and verify the private My Chatroom card and its in-app action button.
 - Connect the scheduler and observe a retry plus a due return check in staging.
 - Complete physical iOS Safari and Android Chrome camera tests; the automated browser cannot prove camera permission UX on real hardware.

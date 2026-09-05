@@ -26,10 +26,51 @@ function workerConfig() {
 
 export async function POST(request: Request) {
   if (!authorized(request)) return Response.json({ error: 'not-found' }, { status: 404 });
-  const member = await getAuthenticatedMember(request);
-  if (!member) return Response.json({ error: 'unauthenticated' }, { status: 401 });
   const input = await body(request);
   const db = getD1Database();
+
+  if (input.action === 'cleanup') {
+    const itemId = typeof input.itemId === 'string' ? input.itemId : '';
+    const item = await db.prepare(`
+      SELECT ci.id, ci.edition_id AS editionId, ci.owner_id AS ownerId
+      FROM catalog_items ci
+      INNER JOIN auth_identities ai ON ai.profile_id = ci.owner_id AND ai.provider = 'demo'
+      WHERE ci.id = ?
+      LIMIT 1
+    `).bind(itemId).first<{ id: string; editionId: string; ownerId: string }>();
+    if (!item) return Response.json({ error: 'item-not-found' }, { status: 404 });
+    await db.batch([
+      db.prepare(`
+        DELETE FROM notification_deliveries WHERE event_id IN (
+          SELECT id FROM outbox_events WHERE
+            aggregate_id IN (SELECT id FROM loan_requests WHERE catalog_item_id = ?)
+            OR aggregate_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)
+        )
+      `).bind(item.id, item.id),
+      db.prepare(`
+        DELETE FROM outbox_events WHERE
+          aggregate_id IN (SELECT id FROM loan_requests WHERE catalog_item_id = ?)
+          OR aggregate_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)
+      `).bind(item.id, item.id),
+      db.prepare('DELETE FROM return_checkins WHERE loan_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)').bind(item.id),
+      db.prepare(`
+        DELETE FROM audit_events WHERE actor_id = ? OR aggregate_id = ?
+          OR aggregate_id IN (SELECT id FROM loan_requests WHERE catalog_item_id = ?)
+          OR aggregate_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)
+      `).bind(item.ownerId, item.id, item.id, item.id),
+      db.prepare('DELETE FROM loans WHERE catalog_item_id = ?').bind(item.id),
+      db.prepare('DELETE FROM loan_requests WHERE catalog_item_id = ?').bind(item.id),
+      db.prepare('DELETE FROM uploaded_assets WHERE catalog_item_id = ?').bind(item.id),
+      db.prepare('DELETE FROM catalog_items WHERE id = ? AND owner_id = ?').bind(item.id, item.ownerId),
+      db.prepare('DELETE FROM book_editions WHERE id = ? AND NOT EXISTS (SELECT 1 FROM catalog_items WHERE edition_id = ?)')
+        .bind(item.editionId, item.editionId),
+      db.prepare("DELETE FROM notification_endpoints WHERE user_id = ? AND kind = 'kakao'").bind(item.ownerId),
+    ]);
+    return Response.json({ data: { cleaned: true } }, { headers: { 'cache-control': 'no-store' } });
+  }
+
+  const member = await getAuthenticatedMember(request);
+  if (!member) return Response.json({ error: 'unauthenticated' }, { status: 401 });
 
   if (input.action === 'connect-current') {
     if (member.provider !== 'demo') return Response.json({ error: 'demo-required' }, { status: 403 });
@@ -76,43 +117,6 @@ export async function POST(request: Request) {
     `).bind(now, loan.id).run();
     const delivery = await processReadyOutbox(db, workerConfig(), { now, limit: 20 });
     return Response.json({ data: { delivery } }, { headers: { 'cache-control': 'no-store' } });
-  }
-
-  if (input.action === 'cleanup') {
-    if (member.provider !== 'demo') return Response.json({ error: 'demo-required' }, { status: 403 });
-    const itemId = typeof input.itemId === 'string' ? input.itemId : '';
-    const item = await db.prepare('SELECT id, edition_id AS editionId FROM catalog_items WHERE id = ? AND owner_id = ? LIMIT 1')
-      .bind(itemId, member.id)
-      .first<{ id: string; editionId: string }>();
-    if (!item) return Response.json({ error: 'item-not-found' }, { status: 404 });
-    await db.batch([
-      db.prepare(`
-        DELETE FROM notification_deliveries WHERE event_id IN (
-          SELECT id FROM outbox_events WHERE
-            aggregate_id IN (SELECT id FROM loan_requests WHERE catalog_item_id = ?)
-            OR aggregate_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)
-        )
-      `).bind(item.id, item.id),
-      db.prepare(`
-        DELETE FROM outbox_events WHERE
-          aggregate_id IN (SELECT id FROM loan_requests WHERE catalog_item_id = ?)
-          OR aggregate_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)
-      `).bind(item.id, item.id),
-      db.prepare('DELETE FROM return_checkins WHERE loan_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)').bind(item.id),
-      db.prepare(`
-        DELETE FROM audit_events WHERE actor_id = ? OR aggregate_id = ?
-          OR aggregate_id IN (SELECT id FROM loan_requests WHERE catalog_item_id = ?)
-          OR aggregate_id IN (SELECT id FROM loans WHERE catalog_item_id = ?)
-      `).bind(member.id, item.id, item.id, item.id),
-      db.prepare('DELETE FROM loans WHERE catalog_item_id = ?').bind(item.id),
-      db.prepare('DELETE FROM loan_requests WHERE catalog_item_id = ?').bind(item.id),
-      db.prepare('DELETE FROM uploaded_assets WHERE catalog_item_id = ?').bind(item.id),
-      db.prepare('DELETE FROM catalog_items WHERE id = ? AND owner_id = ?').bind(item.id, member.id),
-      db.prepare('DELETE FROM book_editions WHERE id = ? AND NOT EXISTS (SELECT 1 FROM catalog_items WHERE edition_id = ?)')
-        .bind(item.editionId, item.editionId),
-      db.prepare("DELETE FROM notification_endpoints WHERE user_id = ? AND kind = 'kakao'").bind(member.id),
-    ]);
-    return Response.json({ data: { cleaned: true } }, { headers: { 'cache-control': 'no-store' } });
   }
 
   return Response.json({ error: 'invalid-action' }, { status: 400 });
