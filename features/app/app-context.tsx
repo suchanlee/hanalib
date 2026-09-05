@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -21,6 +22,7 @@ import type {
   Member,
 } from '@/lib/domain/types';
 import type { LibraryBootstrap } from '@/lib/persistence/contracts';
+import { APP_HISTORY_STATE_KEY, appHref, appRouteFromLocation, sameAppRoute, type AppRoute } from './app-history';
 
 interface HanaContextValue {
   state: HanaAppState;
@@ -100,8 +102,37 @@ function failureAnnouncement(locale: HanaAppState['locale']) {
     : 'We couldn’t save that. Check your connection and try again.';
 }
 
+function browserRoute() {
+  if (typeof window === 'undefined') return undefined;
+  return appRouteFromLocation(window.location.pathname, window.location.search);
+}
+
+function writeBrowserRoute(route: AppRoute, mode: 'push' | 'replace' = 'push') {
+  if (typeof window === 'undefined' || sameAppRoute(browserRoute(), route)) return;
+  const currentState = window.history.state && typeof window.history.state === 'object'
+    ? window.history.state as Record<string, unknown>
+    : {};
+  window.history[`${mode}State`](
+    { ...currentState, [APP_HISTORY_STATE_KEY]: true },
+    '',
+    appHref(route.screen, route.selectedItemId),
+  );
+}
+
 export function HanaAppProvider({ children, initialScreen = 'catalog' }: { children: ReactNode; initialScreen?: AppScreen }) {
-  const [state, setState] = useState<HanaAppState>({ ...emptyState, screen: initialScreen });
+  const [state, setState] = useState<HanaAppState>(() => {
+    const route = browserRoute();
+    return {
+      ...emptyState,
+      screen: route?.screen ?? initialScreen,
+      selectedItemId: route?.selectedItemId,
+    };
+  });
+  const stateRef = useRef(state);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   const refresh = useCallback(async () => {
     try {
@@ -128,9 +159,23 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
     void Promise.resolve().then(refresh);
   }, [refresh]);
 
+  useEffect(() => {
+    function restoreBrowserRoute() {
+      const route = browserRoute();
+      if (!route) return;
+      setState((current) => sameAppRoute({ screen: current.screen, selectedItemId: current.selectedItemId }, route)
+        ? current
+        : { ...current, screen: route.screen, selectedItemId: route.selectedItemId });
+    }
+
+    window.addEventListener('popstate', restoreBrowserRoute);
+    return () => window.removeEventListener('popstate', restoreBrowserRoute);
+  }, []);
+
   const actions = useMemo<HanaAppActions>(() => ({
     refresh,
     signOut() {
+      writeBrowserRoute({ screen: 'catalog' }, 'replace');
       setState((current) => ({
         ...current,
         isAuthenticated: false,
@@ -155,12 +200,14 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
       });
     },
     setScreen(screen) {
-      setState((current) => ({ ...current, screen }));
+      const selectedItemId = screen === 'detail' ? stateRef.current.selectedItemId : undefined;
+      writeBrowserRoute({ screen, selectedItemId });
+      setState((current) => ({ ...current, screen, selectedItemId }));
     },
     selectItem(itemId) {
-      setState((current) => current.items.some((item) => item.id === itemId)
-        ? { ...current, selectedItemId: itemId, screen: 'detail' }
-        : current);
+      if (!stateRef.current.items.some((item) => item.id === itemId)) return;
+      writeBrowserRoute({ screen: 'detail', selectedItemId: itemId });
+      setState((current) => ({ ...current, selectedItemId: itemId, screen: 'detail' }));
     },
     setSearchQuery(searchQuery) {
       setState((current) => ({ ...current, searchQuery }));
@@ -217,6 +264,7 @@ export function HanaAppProvider({ children, initialScreen = 'catalog' }: { child
     archiveItem(itemId) {
       void apiData<{ id: string; archived: boolean }>(`/api/catalog/${encodeURIComponent(itemId)}`, mutationInit('DELETE'))
         .then(() => {
+          writeBrowserRoute({ screen: 'catalog' }, 'replace');
           setState((current) => ({
             ...current,
             items: current.items.filter((candidate) => candidate.id !== itemId),
