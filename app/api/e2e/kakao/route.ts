@@ -29,6 +29,32 @@ export async function POST(request: Request) {
   const input = await body(request);
   const db = getD1Database();
 
+  if (input.action === 'cleanup-demo-member') {
+    const demo = await db.prepare(`
+      SELECT profile_id AS profileId
+      FROM auth_identities
+      WHERE provider = 'demo' AND provider_subject = 'local-preview-member'
+      LIMIT 1
+    `).first<{ profileId: string }>();
+    if (!demo) return Response.json({ data: { cleaned: true } }, { headers: { 'cache-control': 'no-store' } });
+    const inUse = await db.prepare(`
+      SELECT 1 AS found
+      WHERE EXISTS (SELECT 1 FROM catalog_items WHERE owner_id = ?)
+         OR EXISTS (SELECT 1 FROM loan_requests WHERE owner_id = ? OR borrower_id = ?)
+         OR EXISTS (SELECT 1 FROM loans WHERE owner_id = ? OR borrower_id = ?)
+    `).bind(demo.profileId, demo.profileId, demo.profileId, demo.profileId, demo.profileId)
+      .first<{ found: number }>();
+    if (inUse) return Response.json({ error: 'demo-member-in-use' }, { status: 409 });
+    await db.batch([
+      db.prepare('DELETE FROM audit_events WHERE actor_id = ?').bind(demo.profileId),
+      db.prepare('DELETE FROM notification_endpoints WHERE user_id = ?').bind(demo.profileId),
+      db.prepare('DELETE FROM community_members WHERE profile_id = ?').bind(demo.profileId),
+      db.prepare("DELETE FROM auth_identities WHERE profile_id = ? AND provider = 'demo'").bind(demo.profileId),
+      db.prepare('DELETE FROM profiles WHERE id = ?').bind(demo.profileId),
+    ]);
+    return Response.json({ data: { cleaned: true } }, { headers: { 'cache-control': 'no-store' } });
+  }
+
   if (input.action === 'cleanup') {
     const itemId = typeof input.itemId === 'string' ? input.itemId : '';
     const item = await db.prepare(`
