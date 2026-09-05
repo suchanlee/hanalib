@@ -62,7 +62,7 @@ export function AuthView() {
             <span className="grid size-9 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
               <BookHeart aria-hidden="true" className="size-5" />
             </span>
-            <span>{ko ? '하나의씨앗 도서관' : 'Hana Library'}</span>
+            <span>{ko ? '하나북' : 'Hana Seed Book'}</span>
           </div>
           <Button
             aria-label={ko ? 'English로 변경' : '한국어로 변경'}
@@ -82,7 +82,7 @@ export function AuthView() {
             <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
               {ko ? '우리 동네 책장' : 'Our neighborhood shelf'}
             </p>
-            <h1 className="max-w-sm text-4xl leading-[1.08] font-semibold tracking-[-0.04em] text-balance sm:text-5xl">
+            <h1 className="max-w-sm break-keep text-4xl leading-[1.08] font-semibold tracking-[-0.04em] text-balance sm:text-5xl">
               {ko ? '함께 읽고, 가볍게 나눠요' : 'Read together, share simply'}
             </h1>
             <p className="max-w-sm text-base leading-7 text-muted-foreground">

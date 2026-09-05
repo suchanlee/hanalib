@@ -121,7 +121,7 @@ export async function POST(request: Request) {
       await recordInbound(db, { messageSid, senderHash, command: parsed.decision, outcome });
       return twiml(actionable.results.length === 0
         ? 'There is no active request for this number.'
-        : 'You have multiple active requests. Please respond in Hana Library.');
+        : 'You have multiple active requests. Please respond in Hana Seed Book.');
     }
 
     const match = actionable.results[0];

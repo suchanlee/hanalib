@@ -2,15 +2,15 @@ import type { Metadata } from 'next';
 import { LegalPage } from '../legal-page';
 
 export const metadata: Metadata = {
-  title: '이용약관 · Terms of Service · Hana Library',
-  description: 'Terms for participating in Hana Community Library.',
+  title: '이용약관 · Terms of Service · Hana Seed Book',
+  description: 'Terms for participating in Hana Seed Book.',
 };
 
 const sections = [
   {
     title: '1. The service · 서비스',
     paragraphs: [
-      'Hana Community Library helps members in the United States list, discover, borrow, and return books shared by their community. 하나의씨앗 도서관은 미국 내 커뮤니티 회원이 책을 등록하고 발견하며 빌리고 반납하도록 돕는 서비스입니다.',
+      'Hana Seed Book helps members in the United States list, discover, borrow, and return books shared by their community. 하나북은 미국 내 커뮤니티 회원이 책을 등록하고 발견하며 빌리고 반납하도록 돕는 서비스입니다.',
       'The service coordinates introductions and records; it does not own, inspect, insure, deliver, or guarantee the condition or availability of member books. 서비스는 연결과 기록을 제공하며 회원 도서의 소유·검수·보험·배송 또는 상태와 이용 가능성을 보장하지 않습니다.',
     ],
   },
@@ -39,7 +39,7 @@ const sections = [
   {
     title: '5. Availability and responsibility · 서비스 제공과 책임',
     paragraphs: [
-      'The service is provided on an “as available” basis and may change or experience interruptions. To the extent permitted by law, Hana Community Library is not responsible for indirect losses or for disputes, injury, loss, or damage arising from member-to-member exchanges. 서비스는 이용 가능한 상태로 제공되며 변경되거나 중단될 수 있습니다. 법이 허용하는 범위에서 회원 간 교환에서 발생한 분쟁·상해·분실·손상 또는 간접 손실에 책임지지 않습니다.',
+      'The service is provided on an “as available” basis and may change or experience interruptions. To the extent permitted by law, Hana Seed Book is not responsible for indirect losses or for disputes, injury, loss, or damage arising from member-to-member exchanges. 서비스는 이용 가능한 상태로 제공되며 변경되거나 중단될 수 있습니다. 법이 허용하는 범위에서 회원 간 교환에서 발생한 분쟁·상해·분실·손상 또는 간접 손실에 책임지지 않습니다.',
       'Nothing in these terms limits rights or responsibilities that cannot legally be limited. 본 약관은 법적으로 제한할 수 없는 권리나 책임을 제한하지 않습니다.',
     ],
   },
@@ -56,7 +56,7 @@ export default function TermsPage() {
   return (
     <LegalPage
       eyebrow="Terms · 이용약관"
-      intro="These terms set expectations for using Hana Community Library and sharing books with other members. 하나의씨앗 도서관 이용과 회원 간 도서 공유에 필요한 기본 원칙입니다."
+      intro="These terms set expectations for using Hana Seed Book and sharing books with other members. 하나북 이용과 회원 간 도서 공유에 필요한 기본 원칙입니다."
       sections={sections}
       title="Terms of Service · 이용약관"
     />
