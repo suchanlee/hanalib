@@ -6,7 +6,7 @@ The application runs publicly on OpenAI Sites backed by Cloudflare Workers. Site
 
 Create a Kakao Developers application and enable Kakao Login, OpenID Connect, the REST API key client secret, and the `profile_nickname` consent item. Set `KAKAO_REST_API_KEY` and `KAKAO_CLIENT_SECRET`, then register this redirect URI on the REST API key:
 
-`https://hana-community-library.lee-suchan.chatgpt.site/api/auth/kakao/callback`
+`https://library.hanaseed.org/api/auth/kakao/callback`
 
 Keep every credential server-only. Successful first sign-in creates an active member in the open `hana-launch` community; every catalog and mutation endpoint independently checks the session and active membership. Production accepts Kakao sessions only; Google and Apple sign-in routes and session providers are removed.
 
@@ -31,7 +31,7 @@ Borrow requests, decisions, and weekly return checks deep-link to the relevant a
 Run an HTTPS scheduler at least every five minutes:
 
 ```text
-POST https://hana-community-library.lee-suchan.chatgpt.site/api/jobs/notifications
+POST https://library.hanaseed.org/api/jobs/notifications
 Authorization: Bearer <INTERNAL_JOB_SECRET>
 ```
 
