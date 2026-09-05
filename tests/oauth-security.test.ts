@@ -26,6 +26,8 @@ const baseEnv = {
   AUTH_TRANSACTION_SECRET: transactionSecret,
   KAKAO_REST_API_KEY: 'kakao-rest-api-key',
   KAKAO_CLIENT_SECRET: 'kakao-client-secret',
+  GOOGLE_CLIENT_ID: 'google-client-id',
+  GOOGLE_CLIENT_SECRET: 'google-client-secret',
 };
 
 void test('uses the standard S256 PKCE transformation', async () => {
@@ -61,11 +63,23 @@ void test('builds Kakao OIDC authorization with nonce and PKCE', async () => {
   assert.equal(url.origin, 'https://kauth.kakao.com');
   assert.equal(url.pathname, '/oauth/authorize');
   assert.equal(url.searchParams.get('response_type'), 'code');
-  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname,account_email,talk_message');
+  assert.equal(url.searchParams.get('scope'), 'openid,profile_nickname,talk_message');
   assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
   assert.equal(url.searchParams.get('state'), transaction.state);
   assert.equal(url.searchParams.get('nonce'), transaction.nonce);
   assert.equal(url.searchParams.get('redirect_uri'), 'https://library.example/api/auth/kakao/callback');
+});
+
+void test('builds Google OIDC authorization with verified-email scope, nonce, and PKCE', async () => {
+  const google = readProviderAuthConfig('google', baseEnv);
+  const transaction = newOAuthTransaction('google', '/', now);
+  const url = await authorizationUrl(google, transaction);
+  assert.equal(url.origin, 'https://accounts.google.com');
+  assert.equal(url.pathname, '/o/oauth2/v2/auth');
+  assert.equal(url.searchParams.get('scope'), 'openid email profile');
+  assert.equal(url.searchParams.get('prompt'), 'select_account');
+  assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
+  assert.equal(url.searchParams.get('redirect_uri'), 'https://library.example/api/auth/google/callback');
 });
 
 async function signedIdToken(claims: OidcClaims) {
@@ -165,8 +179,43 @@ void test('exchanges the Kakao authorization code with client secret and PKCE', 
   }) as typeof fetch;
   const result = await exchangeAuthorizationCode(config, 'authorization-code', transaction, fetcher);
   assert.equal(result.claims.sub, '123456789');
-  assert.equal(result.tokenSet.accessToken, 'kakao-access-token');
-  assert.deepEqual(result.tokenSet.scopes, ['openid', 'profile_nickname', 'talk_message']);
+  assert.equal(result.tokenSet?.accessToken, 'kakao-access-token');
+  assert.deepEqual(result.tokenSet?.scopes, ['openid', 'profile_nickname', 'talk_message']);
+});
+
+void test('exchanges a Google authorization code and requires a verified email identity', async () => {
+  const config = readProviderAuthConfig('google', baseEnv);
+  const transaction = newOAuthTransaction('google', '/', now);
+  const claims: OidcClaims = {
+    iss: 'https://accounts.google.com',
+    sub: 'google-subject',
+    aud: 'google-client-id',
+    iat: Math.floor(Date.now() / 1_000),
+    exp: Math.floor(Date.now() / 1_000) + 300,
+    nonce: transaction.nonce,
+    email: 'reader@gmail.com',
+    email_verified: true,
+    name: 'Reader Kim',
+  };
+  const { token, publicJwk } = await signedIdToken(claims);
+  const fetcher = (async (input: string | URL | Request, init?: RequestInit) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.hostname === 'oauth2.googleapis.com') {
+      const body = init?.body as URLSearchParams;
+      assert.equal(body.get('client_secret'), 'google-client-secret');
+      assert.equal(body.get('code_verifier'), transaction.verifier);
+      return Response.json({ id_token: token });
+    }
+    if (url.hostname === 'www.googleapis.com') {
+      return Response.json({ keys: [{ ...publicJwk, kid: 'test-key' }] });
+    }
+    throw new Error(`Unexpected URL: ${url}`);
+  }) as typeof fetch;
+  const result = await exchangeAuthorizationCode(config, 'authorization-code', transaction, fetcher);
+  assert.equal(identityFromClaims('google', result.claims).email, 'reader@gmail.com');
+  assert.equal(result.tokenSet, undefined);
+
+  assert.throws(() => identityFromClaims('google', { ...claims, email_verified: false }));
 });
 
 void test('sanitizes Kakao profile data and ignores unverified email claims', () => {

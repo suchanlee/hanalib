@@ -91,13 +91,15 @@ export async function handleOAuthCallback(
     const { claims, tokenSet } = await exchangeAuthorizationCode(config, input.code, transaction, fetcher);
     const identity = identityFromClaims(provider, claims);
     const member = await provisionAuthenticatedMember(identity, config);
-    await persistKakaoNotificationCredential(
-      getD1Database(),
-      member.id,
-      identity.providerSubject,
-      tokenSet,
-      source,
-    );
+    if (provider === 'kakao' && tokenSet) {
+      await persistKakaoNotificationCredential(
+        getD1Database(),
+        member.id,
+        identity.providerSubject,
+        tokenSet,
+        source,
+      );
+    }
     const token = await createSessionToken({
       profileId: member.id,
       communityId: member.communityId,

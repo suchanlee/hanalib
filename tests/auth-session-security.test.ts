@@ -45,7 +45,7 @@ void test('issues host-only secure HttpOnly cookies in HTTPS deployments', async
 });
 
 void test('rejects sessions issued by removed authentication providers', async () => {
-  for (const provider of ['google', 'apple']) {
+  for (const provider of ['apple']) {
     const token = await signToken({
       version: 1,
       profileId: `profile-${provider}`,
@@ -56,6 +56,15 @@ void test('rejects sessions issued by removed authentication providers', async (
     }, secret);
     assert.equal(await verifySessionToken(token, { secret, secure: true, now }), null);
   }
+});
+
+void test('accepts Google sessions', async () => {
+  const token = await createSessionToken({
+    profileId: 'profile-google',
+    communityId: 'hana-launch',
+    provider: 'google',
+  }, { secret, secure: true, now });
+  assert.equal((await verifySessionToken(token, { secret, secure: true, now }))?.provider, 'google');
 });
 
 void test('accepts mutation requests only from the configured origin', () => {

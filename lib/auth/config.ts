@@ -1,4 +1,4 @@
-export type AuthProviderId = 'kakao';
+export type AuthProviderId = 'google' | 'kakao';
 export type SessionProviderId = AuthProviderId | 'demo';
 
 export type AuthEnvSource = Record<string, string | undefined>;
@@ -13,6 +13,7 @@ export interface AuthBaseConfig {
 }
 
 export interface AuthServerConfig extends AuthBaseConfig {
+  google: { clientId: string; clientSecret: string };
   kakao: { clientId: string; clientSecret: string };
 }
 
@@ -62,6 +63,10 @@ export function readAuthBaseConfig(source: AuthEnvSource = process.env): AuthBas
 export function readAuthServerConfig(source: AuthEnvSource = process.env): AuthServerConfig {
   return {
     ...readAuthBaseConfig(source),
+    google: {
+      clientId: required(source, 'GOOGLE_CLIENT_ID'),
+      clientSecret: required(source, 'GOOGLE_CLIENT_SECRET'),
+    },
     kakao: {
       clientId: required(source, 'KAKAO_REST_API_KEY'),
       clientSecret: required(source, 'KAKAO_CLIENT_SECRET'),
@@ -75,8 +80,8 @@ export function readProviderAuthConfig(provider: AuthProviderId, source: AuthEnv
     ...base,
     provider,
     credentials: {
-      clientId: required(source, 'KAKAO_REST_API_KEY'),
-      clientSecret: required(source, 'KAKAO_CLIENT_SECRET'),
+      clientId: required(source, provider === 'google' ? 'GOOGLE_CLIENT_ID' : 'KAKAO_REST_API_KEY'),
+      clientSecret: required(source, provider === 'google' ? 'GOOGLE_CLIENT_SECRET' : 'KAKAO_CLIENT_SECRET'),
     },
   } as const;
 }

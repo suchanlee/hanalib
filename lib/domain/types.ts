@@ -1,5 +1,5 @@
 export type AppLocale = 'ko' | 'en';
-export type AuthProvider = 'kakao';
+export type AuthProvider = 'google' | 'kakao';
 export type AppScreen = 'catalog' | 'intake' | 'detail' | 'borrowing' | 'settings';
 export type CatalogStatus = 'available' | 'held' | 'borrowed' | 'archived';
 export type RequestStatus = 'pending' | 'accepted' | 'declined' | 'canceled' | 'expired' | 'superseded';

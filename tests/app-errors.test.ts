@@ -635,7 +635,7 @@ void test('OAuth callback failures are shown with their reference, and provider 
             { error: 'unavailable' },
             { status: 503, headers: { 'x-request-id': 'providers-123' } },
           )
-        : Response.json({ kakao: true, demo: false }),
+        : Response.json({ google: true, kakao: true, demo: false }),
   );
   const view = await mountContent(
     React.createElement(

@@ -6,6 +6,9 @@ export const KAKAO_AUTHORIZATION_ENDPOINT = 'https://kauth.kakao.com/oauth/autho
 export const KAKAO_TOKEN_ENDPOINT = 'https://kauth.kakao.com/oauth/token';
 export const KAKAO_JWKS_ENDPOINT = 'https://kauth.kakao.com/.well-known/jwks.json';
 export const KAKAO_ISSUER = 'https://kauth.kakao.com';
+export const GOOGLE_AUTHORIZATION_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
+export const GOOGLE_TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
+export const GOOGLE_JWKS_ENDPOINT = 'https://www.googleapis.com/oauth2/v3/certs';
 
 export class OAuthProtocolError extends Error {
   readonly code: 'invalid_authorization' | 'token_exchange_failed' | 'invalid_identity_token';
@@ -118,15 +121,16 @@ export async function authorizationUrl(
   transaction: OAuthTransaction,
 ) {
   const redirectUri = callbackUrl(config, config.provider);
-  const url = new URL(KAKAO_AUTHORIZATION_ENDPOINT);
+  const url = new URL(config.provider === 'google' ? GOOGLE_AUTHORIZATION_ENDPOINT : KAKAO_AUTHORIZATION_ENDPOINT);
   url.searchParams.set('client_id', config.credentials.clientId);
   url.searchParams.set('redirect_uri', redirectUri);
   url.searchParams.set('response_type', 'code');
-  url.searchParams.set('scope', 'openid,profile_nickname,account_email,talk_message');
+  url.searchParams.set('scope', config.provider === 'google' ? 'openid email profile' : 'openid,profile_nickname,talk_message');
   url.searchParams.set('state', transaction.state);
   url.searchParams.set('nonce', transaction.nonce);
   url.searchParams.set('code_challenge', await pkceChallenge(transaction.verifier));
   url.searchParams.set('code_challenge_method', 'S256');
+  if (config.provider === 'google') url.searchParams.set('prompt', 'select_account');
   return url;
 }
 
@@ -171,6 +175,13 @@ async function tokenResponse(response: Response, now = Date.now()) {
   };
 }
 
+async function googleIdToken(response: Response) {
+  if (!response.ok) throw new OAuthProtocolError('token_exchange_failed');
+  const payload = await response.json() as { id_token?: unknown };
+  if (typeof payload.id_token !== 'string') throw new OAuthProtocolError('token_exchange_failed');
+  return payload.id_token;
+}
+
 export async function exchangeAuthorizationCode(
   config: ProviderAuthConfig,
   code: string,
@@ -187,6 +198,22 @@ export async function exchangeAuthorizationCode(
     grant_type: 'authorization_code',
     redirect_uri: redirectUri,
   });
+  if (config.provider === 'google') {
+    const response = await fetcher(GOOGLE_TOKEN_ENDPOINT, {
+      method: 'POST',
+      headers: { accept: 'application/json', 'content-type': 'application/x-www-form-urlencoded' },
+      body,
+      signal: AbortSignal.timeout(10_000),
+    });
+    const claims = await verifyOidcIdToken(await googleIdToken(response), {
+      audience: config.credentials.clientId,
+      issuers: ['https://accounts.google.com', 'accounts.google.com'],
+      jwksUrl: GOOGLE_JWKS_ENDPOINT,
+      nonce: transaction.nonce,
+      fetcher,
+    });
+    return { claims };
+  }
   const response = await fetcher(KAKAO_TOKEN_ENDPOINT, {
     method: 'POST',
     headers: { accept: 'application/json', 'content-type': 'application/x-www-form-urlencoded' },
@@ -212,7 +239,9 @@ export function identityFromClaims(
   const email = emailVerified && typeof claims.email === 'string'
     ? claims.email.trim().slice(0, 320)
     : '';
-  const displayName = sanitizeExternalName(claims.nickname ?? claims.name) || 'Kakao member';
+  if (provider === 'google' && !email) throw new OAuthProtocolError('invalid_identity_token');
+  const displayName = sanitizeExternalName(provider === 'google' ? claims.name : claims.nickname ?? claims.name)
+    || (provider === 'google' ? 'Google member' : 'Kakao member');
   let avatarUrl: string | undefined;
   if (typeof claims.picture === 'string' && claims.picture.length < 2_048) {
     try {

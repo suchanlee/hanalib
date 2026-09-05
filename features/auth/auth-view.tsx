@@ -10,6 +10,7 @@ import { oauthStartUrl } from './provider-config';
 
 interface AuthProviders {
   demo: boolean;
+  google: boolean;
   kakao: boolean;
 }
 
@@ -33,7 +34,7 @@ export function AuthView() {
 
   useEffect(() => {
     const controller = new AbortController();
-    void requestJson<AuthProviders>('/api/auth/providers', { signal: controller.signal }, (value) => typeof value.kakao === 'boolean' && typeof value.demo === 'boolean')
+    void requestJson<AuthProviders>('/api/auth/providers', { signal: controller.signal }, (value) => typeof value.google === 'boolean' && typeof value.kakao === 'boolean' && typeof value.demo === 'boolean')
       .then(setProviders)
       .catch((error: unknown) => {
         if (!controller.signal.aborted) {
@@ -44,8 +45,8 @@ export function AuthView() {
     return () => controller.abort();
   }, [actions, attempt]);
 
-  function beginSignIn() {
-    window.location.assign(oauthStartUrl('kakao', `${window.location.pathname}${window.location.search}${window.location.hash}`));
+  function beginSignIn(provider: 'google' | 'kakao') {
+    window.location.assign(oauthStartUrl(provider, `${window.location.pathname}${window.location.search}${window.location.hash}`));
   }
 
   async function demoSignIn(persona: 'owner' | 'borrower' | 'holder' | 'holder-2') {
@@ -101,16 +102,26 @@ export function AuthView() {
 
           <section aria-label={ko ? '로그인' : 'Sign in'} className="space-y-3">
             <Button
+              className="h-12 w-full rounded-xl text-base font-semibold"
+              data-testid="auth-google"
+              disabled={providers?.google !== true || signingIn}
+              onClick={() => beginSignIn('google')}
+              variant="outline"
+            >
+              <span aria-hidden="true" className="text-base font-bold text-[#4285F4]">G</span>
+              {ko ? 'Google로 계속' : 'Continue with Google'}
+            </Button>
+            <Button
               className="h-12 w-full rounded-xl bg-[#FEE500] text-base font-semibold text-[#191919] hover:bg-[#F5DC00]"
               data-testid="auth-kakao"
               disabled={providers?.kakao !== true || signingIn}
-              onClick={beginSignIn}
+              onClick={() => beginSignIn('kakao')}
             >
               <MessageCircle aria-hidden="true" className="size-5 fill-current" />
               {ko ? '카카오로 계속' : 'Continue with Kakao'}
             </Button>
             {providerFailed && <Button variant="outline" className="w-full" onClick={() => { actions.dismissIssue(); setProviderFailed(false); setAttempt((value) => value + 1); }}>{ko ? '로그인 옵션 다시 불러오기' : 'Reload sign-in options'}</Button>}
-            {providers && !providers.kakao && (
+            {providers && !providers.google && !providers.kakao && (
               <output className="block px-2 text-center text-xs leading-5 text-muted-foreground" data-testid="auth-provider-status">
                 {ko
                   ? '로그인 연결을 준비 중이에요. 운영자가 제공자 설정을 완료한 뒤 이용할 수 있어요.'
