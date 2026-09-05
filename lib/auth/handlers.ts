@@ -18,6 +18,7 @@ import { persistKakaoNotificationCredential } from './kakao-notifications';
 import { getD1Database } from '../../db';
 import { demoIdentity } from './demo';
 import { clearSessionCookie, createSessionToken, isSameOriginMutation, sessionCookie } from './session';
+import { operationalLog, requestLogContext, requestLogFields, safeErrorCode, withRequestId } from '../observability/log.ts';
 
 const noStoreHeaders = {
   'cache-control': 'no-store',
@@ -67,6 +68,7 @@ export async function handleOAuthCallback(
   source: AuthEnvSource = process.env,
   fetcher: typeof fetch = fetch,
 ) {
+  const logContext = requestLogContext(request);
   const config = readProviderAuthConfig(provider, source);
   const secure = isSecureDeployment(config);
   const transaction = await oauthTransactionFromRequest(
@@ -79,9 +81,9 @@ export async function handleOAuthCallback(
     transaction.provider !== provider ||
     !input.state ||
     input.state !== transaction.state
-  ) return errorRedirect(config.publicAppUrl, 'invalid_state', secure);
-  if (input.error) return errorRedirect(config.publicAppUrl, 'access_denied', secure);
-  if (!input.code) return errorRedirect(config.publicAppUrl, 'missing_code', secure);
+  ) return withRequestId(errorRedirect(config.publicAppUrl, 'invalid_state', secure), logContext);
+  if (input.error) return withRequestId(errorRedirect(config.publicAppUrl, 'access_denied', secure), logContext);
+  if (!input.code) return withRequestId(errorRedirect(config.publicAppUrl, 'missing_code', secure), logContext);
   try {
     const { claims, tokenSet } = await exchangeAuthorizationCode(config, input.code, transaction, fetcher);
     const identity = identityFromClaims(provider, claims);
@@ -101,9 +103,14 @@ export async function handleOAuthCallback(
     const response = redirect(new URL(transaction.returnTo, config.publicAppUrl).toString(), 303);
     response.headers.append('set-cookie', sessionCookie(token, secure));
     response.headers.append('set-cookie', clearOAuthTransactionCookie(secure));
-    return response;
-  } catch {
-    return errorRedirect(config.publicAppUrl, 'sign_in_failed', secure);
+    return withRequestId(response, logContext);
+  } catch (error) {
+    operationalLog('error', 'oauth-callback-failed', requestLogFields(logContext, 503, {
+      operation: 'oauth-callback',
+      provider,
+      errorCode: safeErrorCode(error, 'sign-in-failed'),
+    }));
+    return withRequestId(errorRedirect(config.publicAppUrl, 'sign_in_failed', secure), logContext);
   }
 }
 

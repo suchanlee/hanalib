@@ -27,6 +27,8 @@ export interface OperationalLogFields {
 
 const codePattern = /^[a-z][a-z0-9_.:-]{0,79}$/i;
 const methodPattern = /^(DELETE|GET|HEAD|OPTIONS|PATCH|POST|PUT)$/;
+const providerStatusPattern = /^[a-z0-9_.:-]{1,180}$/i;
+const requestIdPattern = /^[a-z0-9-]{1,80}$/i;
 const rayPattern = /^[0-9a-f]{16,32}$/i;
 const uuidSegment = /^(?:[a-z]+-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -91,7 +93,7 @@ export function safeErrorCode(error: unknown, fallback: string) {
 
 function sanitized(fields: OperationalLogFields) {
   return {
-    ...(safeCode(fields.requestId) ? { requestId: fields.requestId } : {}),
+    ...(fields.requestId && requestIdPattern.test(fields.requestId) ? { requestId: fields.requestId } : {}),
     ...(fields.method && methodPattern.test(fields.method) ? { method: fields.method } : {}),
     ...(fields.route?.startsWith('/') && fields.route.length <= 160 ? { route: fields.route } : {}),
     ...(safeCode(fields.operation) ? { operation: fields.operation } : {}),
@@ -99,7 +101,7 @@ function sanitized(fields: OperationalLogFields) {
     ...(finiteInteger(fields.durationMs) !== undefined ? { durationMs: finiteInteger(fields.durationMs) } : {}),
     ...(safeCode(fields.errorCode) ? { errorCode: fields.errorCode } : {}),
     ...(safeCode(fields.provider) ? { provider: fields.provider } : {}),
-    ...(safeCode(fields.providerStatus) ? { providerStatus: fields.providerStatus } : {}),
+    ...(fields.providerStatus && providerStatusPattern.test(fields.providerStatus) ? { providerStatus: fields.providerStatus } : {}),
     ...(safeCode(fields.eventType) ? { eventType: fields.eventType } : {}),
     ...(finiteInteger(fields.attemptCount) !== undefined ? { attemptCount: finiteInteger(fields.attemptCount) } : {}),
     ...(finiteInteger(fields.claimed) !== undefined ? { claimed: finiteInteger(fields.claimed) } : {}),
