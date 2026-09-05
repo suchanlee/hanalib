@@ -98,6 +98,16 @@ function actionUrl(value: string, appOrigin: string) {
   return parsed.toString();
 }
 
+function publicImageUrl(value: string | undefined) {
+  if (!value) return undefined;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:' ? parsed.toString() : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function sendKakaoSelfMessage(
   accessToken: string,
   publicAppUrl: string,
@@ -108,18 +118,32 @@ export async function sendKakaoSelfMessage(
   if (!token) throw new Error('invalid-kakao-access-token');
   const appOrigin = new URL(publicAppUrl).origin;
   const rootUrl = `${appOrigin}/`;
-  const templateObject = {
-    object_type: 'text',
-    text: message.text.slice(0, 200),
-    link: { web_url: rootUrl, mobile_web_url: rootUrl },
-    buttons: message.actions?.slice(0, 2).map((action) => {
-      const url = actionUrl(action.url, appOrigin);
-      return {
-        title: action.label.slice(0, 14),
-        link: { web_url: url, mobile_web_url: url },
+  const primaryUrl = message.primaryUrl ? actionUrl(message.primaryUrl, appOrigin) : rootUrl;
+  const buttons = message.actions?.slice(0, 2).map((action) => {
+    const url = actionUrl(action.url, appOrigin);
+    return {
+      title: action.label.slice(0, 14),
+      link: { web_url: url, mobile_web_url: url },
+    };
+  });
+  const imageUrl = publicImageUrl(message.imageUrl);
+  const templateObject = imageUrl
+    ? {
+        object_type: 'feed',
+        content: {
+          title: message.subject.slice(0, 200),
+          description: message.text.slice(0, 200),
+          image_url: imageUrl,
+          link: { web_url: primaryUrl, mobile_web_url: primaryUrl },
+        },
+        buttons,
+      }
+    : {
+        object_type: 'text',
+        text: message.text.slice(0, 200),
+        link: { web_url: primaryUrl, mobile_web_url: primaryUrl },
+        buttons,
       };
-    }),
-  };
   const response = await fetcher(KAKAO_SELF_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {

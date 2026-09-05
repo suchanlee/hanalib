@@ -44,7 +44,7 @@ void test('Twilio signatures are deterministic and reject tampering', async () =
   assert.equal(await verifyTwilioSignature({ ...input, signature: `${signature}x` }), false);
 });
 
-void test('Kakao self messages use a private default template with same-origin action buttons', async () => {
+void test('Kakao self messages use a cover card that deep-links to the exact book', async () => {
   let request: Request | undefined;
   const fetcher: typeof fetch = async (input, init) => {
     request = new Request(input, init);
@@ -56,6 +56,8 @@ void test('Kakao self messages use a private default template with same-origin a
     {
       subject: '대여 요청',
       text: '새로운 대여 요청이 있어요.',
+      primaryUrl: 'https://library.example/?book=item-1',
+      imageUrl: 'https://covers.example/book.jpg',
       actions: [{ label: '요청 확인', url: 'https://library.example/borrowing?request=one' }],
     },
     fetcher,
@@ -65,7 +67,9 @@ void test('Kakao self messages use a private default template with same-origin a
   assert.equal(request.headers.get('authorization'), 'Bearer kakao-access-token');
   const form = new URLSearchParams(await request.text());
   const template = JSON.parse(String(form.get('template_object'))) as Record<string, unknown>;
-  assert.equal(template.object_type, 'text');
+  assert.equal(template.object_type, 'feed');
+  assert.equal((template.content as { image_url: string }).image_url, 'https://covers.example/book.jpg');
+  assert.match(JSON.stringify(template), /https:\/\/library\.example\/\?book=item-1/u);
   assert.match(JSON.stringify(template), /https:\/\/library\.example\/borrowing\?request=one/u);
 
   await assert.rejects(sendKakaoSelfMessage(
@@ -74,6 +78,30 @@ void test('Kakao self messages use a private default template with same-origin a
     { subject: 'unsafe', text: 'unsafe', actions: [{ label: 'Open', url: 'https://attacker.example/' }] },
     fetcher,
   ), /invalid-kakao-message-action/u);
+});
+
+void test('Kakao text fallback still deep-links and does not expose private cover paths', async () => {
+  let request: Request | undefined;
+  await sendKakaoSelfMessage(
+    'kakao-access-token',
+    'https://library.example',
+    {
+      subject: '대여 요청',
+      text: '새로운 대여 요청이 있어요.',
+      primaryUrl: 'https://library.example/?book=item-2',
+      imageUrl: '/api/covers/private-cover',
+    },
+    (async (input, init) => {
+      request = new Request(input, init);
+      return Response.json({ result_code: 0 });
+    }) as typeof fetch,
+  );
+  assert.ok(request);
+  const form = new URLSearchParams(await request.text());
+  const template = JSON.parse(String(form.get('template_object'))) as Record<string, unknown>;
+  assert.equal(template.object_type, 'text');
+  assert.match(JSON.stringify(template), /https:\/\/library\.example\/\?book=item-2/u);
+  assert.doesNotMatch(JSON.stringify(template), /private-cover/u);
 });
 
 void test('Kakao tokens refresh without discarding a still-valid refresh token', async () => {

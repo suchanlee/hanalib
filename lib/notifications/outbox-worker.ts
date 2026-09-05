@@ -79,6 +79,8 @@ export function renderOutboxMessage(row: Pick<OutboxRow, 'eventType' | 'locale' 
       bookTitle: value.bookTitle,
       expiresAt: new Date(value.expiresAt),
       decisionUrl: value.decisionUrl,
+      bookUrl: typeof value.bookUrl === 'string' ? value.bookUrl : undefined,
+      coverUrl: typeof value.coverUrl === 'string' ? value.coverUrl : undefined,
     });
   }
   if (type === 'return_check_due') {

@@ -5,6 +5,8 @@ export interface OutboxPayloadByType {
     actorName: string;
     expiresAt: string;
     decisionUrl: string;
+    bookUrl?: string;
+    coverUrl?: string;
   };
   borrow_accepted: {
     bookTitle: string;

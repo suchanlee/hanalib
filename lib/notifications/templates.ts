@@ -7,6 +7,8 @@ interface BorrowRequestTemplateInput {
   bookTitle: string;
   expiresAt: Date;
   decisionUrl: string;
+  bookUrl?: string;
+  coverUrl?: string;
 }
 
 interface DecisionTemplateInput {
@@ -27,6 +29,8 @@ interface ReturnCheckTemplateInput {
 export interface NotificationTemplate {
   subject: string;
   text: string;
+  primaryUrl?: string;
+  imageUrl?: string;
   actions?: Array<{ label: string; url: string }>;
 }
 
@@ -48,13 +52,23 @@ export function borrowRequestTemplate(
     return {
       subject: `${input.bookTitle} 대여 요청`,
       text: `${input.ownerName}님, ${input.borrowerName}님이 『${input.bookTitle}』을 빌리고 싶어 해요. 앱에서 수락 또는 거절해 주세요. ${date(input.locale, input.expiresAt)}까지 유효해요.`,
-      actions: [{ label: '요청 확인', url: input.decisionUrl }],
+      primaryUrl: input.bookUrl,
+      imageUrl: input.coverUrl,
+      actions: [
+        { label: '요청 확인', url: input.decisionUrl },
+        ...(input.bookUrl ? [{ label: '도서 보기', url: input.bookUrl }] : []),
+      ],
     };
   }
   return {
     subject: `Request to borrow ${input.bookTitle}`,
     text: `${input.ownerName}, ${input.borrowerName} would like to borrow “${input.bookTitle}.” Accept or decline in the app. This request expires ${date(input.locale, input.expiresAt)}.`,
-    actions: [{ label: 'View request', url: input.decisionUrl }],
+    primaryUrl: input.bookUrl,
+    imageUrl: input.coverUrl,
+    actions: [
+      { label: 'View request', url: input.decisionUrl },
+      ...(input.bookUrl ? [{ label: 'View book', url: input.bookUrl }] : []),
+    ],
   };
 }
 

@@ -136,6 +136,7 @@ interface ItemRequestInfoRow {
   ownerId: string;
   itemStatus: string;
   bookTitle: string;
+  coverSourceUrl: string | null;
   ownerDisplayName: string;
   ownerDisplayNameKo: string;
   ownerLocale: string;
@@ -723,6 +724,7 @@ export class D1LibraryRepository implements LibraryRepository {
         ci.owner_id AS ownerId,
         ci.status AS itemStatus,
         be.title AS bookTitle,
+        be.cover_source_url AS coverSourceUrl,
         owner.display_name AS ownerDisplayName,
         owner.display_name_ko AS ownerDisplayNameKo,
         owner.locale AS ownerLocale,
@@ -749,6 +751,8 @@ export class D1LibraryRepository implements LibraryRepository {
       actorName: info.ownerLocale === 'ko' ? info.actorDisplayNameKo : info.actorDisplayName,
       expiresAt: expiresAt.toISOString(),
       decisionUrl: `${this.baseUrl}/borrowing?request=${encodeURIComponent(requestId)}`,
+      bookUrl: `${this.baseUrl}/?book=${encodeURIComponent(info.itemId)}`,
+      ...(info.coverSourceUrl ? { coverUrl: info.coverSourceUrl } : {}),
     };
 
     const results = await this.db.batch([

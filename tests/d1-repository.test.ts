@@ -70,6 +70,7 @@ void test('borrow creation atomically queues only the rendering fields needed by
         ownerId: 'owner',
         itemStatus: 'available',
         bookTitle: '아몬드',
+        coverSourceUrl: 'https://covers.example/almond.jpg',
         ownerDisplayName: 'Owner',
         ownerDisplayNameKo: '소유자',
         ownerLocale: 'ko',
@@ -107,6 +108,8 @@ void test('borrow creation atomically queues only the rendering fields needed by
     actorName: '대여자',
     expiresAt: '2026-09-06T17:00:00.000Z',
     decisionUrl: `https://library.example/borrowing?request=${request.id}`,
+    bookUrl: 'https://library.example/?book=item-1',
+    coverUrl: 'https://covers.example/almond.jpg',
   });
 });
 
