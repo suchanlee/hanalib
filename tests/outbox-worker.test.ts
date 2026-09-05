@@ -24,6 +24,27 @@ void test('renders Korean owner request and English borrower decision messages',
     { label: '도서 보기', url: 'https://example.com/?book=item-1' },
   ]);
 
+  const reminder = renderOutboxMessage({
+    eventType: 'borrow_request_reminder',
+    locale: 'en',
+    payloadJson: JSON.stringify({
+      bookTitle: 'Tomorrow',
+      recipientName: 'Owner',
+      actorName: 'Alex',
+      expiresAt: '2026-09-06T17:00:00.000Z',
+      decisionUrl: 'https://example.com/borrowing?request=request-1',
+      bookUrl: 'https://example.com/?book=item-2',
+      coverUrl: 'https://covers.example/tomorrow.jpg',
+    }),
+  });
+  assert.match(reminder.subject, /expires soon/);
+  assert.match(reminder.text, /expires in 24 hours/);
+  assert.equal(reminder.imageUrl, 'https://covers.example/tomorrow.jpg');
+  assert.deepEqual(reminder.actions, [
+    { label: 'View request', url: 'https://example.com/borrowing?request=request-1' },
+    { label: 'View book', url: 'https://example.com/?book=item-2' },
+  ]);
+
   const decision = renderOutboxMessage({
     eventType: 'borrow_accepted',
     locale: 'en',
@@ -143,6 +164,40 @@ void test('skips a queued return check after its loan is no longer active', asyn
 
   const result = await processReadyOutbox(database as unknown as D1Database, {}, {
     now: Date.parse('2026-09-04T17:00:00.000Z'),
+  });
+  assert.deepEqual(result, { claimed: 1, sent: 0, failed: 0, skipped: 1 });
+  assert.ok(executed.some((sql) => sql.includes('SET processed_at = ?')));
+});
+
+void test('skips a borrow reminder after its request is no longer pending', async () => {
+  const executed: string[] = [];
+  const database = {
+    prepare(sql: string) {
+      const statement = {
+        bind() { return statement; },
+        async all() {
+          return {
+            results: [{
+              id: 'event-reminder', eventType: 'borrow_request_reminder', aggregateId: 'request-1', recipientId: 'owner',
+              locale: 'en', payloadJson: JSON.stringify({
+                bookTitle: 'Tomorrow', recipientName: 'Owner', actorName: 'Borrower',
+                expiresAt: '2026-09-06T17:00:00.000Z', decisionUrl: 'https://example.com/borrowing?request=request-1',
+              }), availableAt: Date.parse('2026-09-05T17:00:00.000Z'), attemptCount: 0,
+            }],
+          };
+        },
+        async first() { return null; },
+        async run() {
+          executed.push(sql);
+          return { meta: { changes: 1 } };
+        },
+      };
+      return statement;
+    },
+  };
+
+  const result = await processReadyOutbox(database as unknown as D1Database, {}, {
+    now: Date.parse('2026-09-05T17:00:00.000Z'),
   });
   assert.deepEqual(result, { claimed: 1, sent: 0, failed: 0, skipped: 1 });
   assert.ok(executed.some((sql) => sql.includes('SET processed_at = ?')));

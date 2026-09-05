@@ -5,7 +5,7 @@ import { operationalLog, safeErrorCode } from '../observability/log.ts';
 import { decryptContact, encryptContact } from './contact-crypto.ts';
 import { parseKakaoCredential, refreshKakaoCredential } from './kakao.ts';
 import { sendNotification, type DeliveryResult, type NotificationSenderConfig } from './sender.ts';
-import { bookReturnedTemplate, borrowRequestTemplate, decisionTemplate, holdOfferTemplate, requestClosedTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
+import { bookReturnedTemplate, borrowRequestReminderTemplate, borrowRequestTemplate, decisionTemplate, holdOfferTemplate, requestClosedTemplate, returnCheckTemplate, type NotificationTemplate } from './templates.ts';
 import {
   isWebPushConfigured,
   sendWebPushToUser,
@@ -57,7 +57,7 @@ function locale(value: string): AppLocale {
 }
 
 function eventType(value: string): LibraryOutboxEventType | undefined {
-  return ['borrow_requested', 'borrow_accepted', 'borrow_declined', 'borrow_canceled', 'borrow_expired', 'book_returned', 'return_check_due', 'hold_available', 'hold_offer_reminder'].includes(value)
+  return ['borrow_requested', 'borrow_request_reminder', 'borrow_accepted', 'borrow_declined', 'borrow_canceled', 'borrow_expired', 'book_returned', 'return_check_due', 'hold_available', 'hold_offer_reminder'].includes(value)
     ? value as LibraryOutboxEventType
     : undefined;
 }
@@ -75,11 +75,11 @@ export function renderOutboxMessage(row: Pick<OutboxRow, 'eventType' | 'locale' 
   const type = eventType(row.eventType);
   if (!type) throw new Error('unsupported-outbox-event');
   const language = locale(row.locale);
-  if (type === 'borrow_requested') {
+  if (type === 'borrow_requested' || type === 'borrow_request_reminder') {
     const value = payload(fullRow, type);
     if (typeof value.actorName !== 'string' || typeof value.expiresAt !== 'string') throw new Error('invalid-outbox-payload');
     if (typeof value.decisionUrl !== 'string') throw new Error('invalid-outbox-payload');
-    return borrowRequestTemplate({
+    const input = {
       locale: language,
       ownerName: value.recipientName,
       borrowerName: value.actorName,
@@ -88,7 +88,10 @@ export function renderOutboxMessage(row: Pick<OutboxRow, 'eventType' | 'locale' 
       decisionUrl: value.decisionUrl,
       bookUrl: typeof value.bookUrl === 'string' ? value.bookUrl : undefined,
       coverUrl: typeof value.coverUrl === 'string' ? value.coverUrl : undefined,
-    });
+    };
+    return type === 'borrow_request_reminder'
+      ? borrowRequestReminderTemplate(input)
+      : borrowRequestTemplate(input);
   }
   if (type === 'return_check_due') {
     const value = payload(fullRow, type);
@@ -185,7 +188,7 @@ async function scheduleNextReturnCheck(db: D1Database, row: OutboxRow, now: numb
 }
 
 async function eventIsActionable(db: D1Database, row: OutboxRow, now: number) {
-  if (row.eventType === 'borrow_requested') {
+  if (row.eventType === 'borrow_requested' || row.eventType === 'borrow_request_reminder') {
     const request = await db.prepare("SELECT 1 AS active FROM loan_requests WHERE id = ? AND status = 'pending' AND expires_at > ? LIMIT 1")
       .bind(row.aggregateId, now)
       .first<{ active: number }>();

@@ -100,9 +100,11 @@ void test('borrow creation atomically queues only the rendering fields needed by
   assert.equal(request.expiresAt, '2026-09-06T17:00:00.000Z');
   assert.equal(database.batches.length, 1);
   const batch = database.batches[0];
-  assert.equal(batch.length, 3);
+  assert.equal(batch.length, 4);
   const outbox = batch.find((statement) => statement.sql.includes("'borrow_requested'"));
+  const reminder = batch.find((statement) => statement.sql.includes("'borrow_request_reminder'"));
   assert.ok(outbox);
+  assert.ok(reminder);
   assert.deepEqual(JSON.parse(String(outbox.values[3])), {
     bookTitle: '아몬드',
     recipientName: '소유자',
@@ -112,6 +114,8 @@ void test('borrow creation atomically queues only the rendering fields needed by
     bookUrl: 'https://library.example/?book=item-1',
     coverUrl: 'https://covers.example/almond.jpg',
   });
+  assert.deepEqual(JSON.parse(String(reminder.values[3])), JSON.parse(String(outbox.values[3])));
+  assert.equal(reminder.values[4], new Date('2026-09-05T17:00:00.000Z').getTime());
 });
 
 void test('canceling a live request immediately queues an owner notification', async () => {
@@ -293,6 +297,8 @@ void test('claiming an offered hold inserts the request before attaching its for
   assert.match(batch[0].sql, /INSERT INTO loan_requests/);
   assert.match(batch[1].sql, /UPDATE holds/);
   assert.ok(batch[2].sql.includes("'borrow_requested'"));
+  assert.ok(batch[3].sql.includes("'borrow_request_reminder'"));
+  assert.equal(batch[3].values[4], new Date('2026-09-05T17:00:00.000Z').getTime());
 });
 
 void test('catalog intake accepts editions without a named author or publisher', async () => {

@@ -99,6 +99,33 @@ export function borrowRequestTemplate(
   };
 }
 
+export function borrowRequestReminderTemplate(
+  input: BorrowRequestTemplateInput,
+): NotificationTemplate {
+  if (input.locale === 'ko') {
+    return {
+      subject: `${input.bookTitle} 대여 요청이 곧 만료돼요`,
+      text: `${input.ownerName}님, ${input.borrowerName}님의 『${input.bookTitle}』 대여 요청이 24시간 후 만료돼요. 앱에서 수락 또는 거절해 주세요.`,
+      primaryUrl: input.bookUrl,
+      imageUrl: input.coverUrl,
+      actions: [
+        { label: '요청 확인', url: input.decisionUrl },
+        ...(input.bookUrl ? [{ label: '도서 보기', url: input.bookUrl }] : []),
+      ],
+    };
+  }
+  return {
+    subject: `Borrow request for ${input.bookTitle} expires soon`,
+    text: `${input.ownerName}, ${input.borrowerName}’s request to borrow “${input.bookTitle}” expires in 24 hours. Accept or decline in the app.`,
+    primaryUrl: input.bookUrl,
+    imageUrl: input.coverUrl,
+    actions: [
+      { label: 'View request', url: input.decisionUrl },
+      ...(input.bookUrl ? [{ label: 'View book', url: input.bookUrl }] : []),
+    ],
+  };
+}
+
 export function decisionTemplate(
   input: DecisionTemplateInput,
 ): NotificationTemplate {

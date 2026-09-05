@@ -1,6 +1,7 @@
 import type { CatalogItem, Loan } from './types';
 
 export const REQUEST_EXPIRY_HOURS = 48;
+export const REQUEST_REMINDER_HOURS_BEFORE_EXPIRY = 24;
 export const FIRST_RETURN_CHECK_DAYS = 7;
 export const RETURN_CHECK_INTERVAL_DAYS = 7;
 export const HOLD_OFFER_HOURS = 48;
@@ -16,6 +17,12 @@ function asDate(value: Date | string) {
 
 export function borrowRequestExpiresAt(requestedAt: Date | string) {
   return new Date(asDate(requestedAt).getTime() + REQUEST_EXPIRY_HOURS * HOUR_MS);
+}
+
+export function borrowRequestReminderAt(requestedAt: Date | string) {
+  return new Date(
+    borrowRequestExpiresAt(requestedAt).getTime() - REQUEST_REMINDER_HOURS_BEFORE_EXPIRY * HOUR_MS,
+  );
 }
 
 export function firstReturnCheckAt(startedAt: Date | string) {

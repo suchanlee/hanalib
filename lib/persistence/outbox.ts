@@ -8,6 +8,15 @@ export interface OutboxPayloadByType {
     bookUrl?: string;
     coverUrl?: string;
   };
+  borrow_request_reminder: {
+    bookTitle: string;
+    recipientName: string;
+    actorName: string;
+    expiresAt: string;
+    decisionUrl: string;
+    bookUrl?: string;
+    coverUrl?: string;
+  };
   borrow_accepted: {
     bookTitle: string;
     recipientName: string;

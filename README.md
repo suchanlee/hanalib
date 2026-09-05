@@ -43,6 +43,7 @@ Immediate events are queued transactionally and delivery is attempted before the
 | Kind | Event | Recipient | Timing and cadence |
 | --- | --- | --- | --- |
 | Immediate | Borrow request created | Book owner | Once, immediately after the request is submitted. The request expires after 48 hours. |
+| Scheduled | Borrow request reminder | Book owner | Once, 24 hours after submission, while the request is still pending (24 hours before expiry). |
 | Immediate | Borrow request accepted | Borrower | Once, immediately after the owner accepts. |
 | Immediate | Borrow request declined | Borrower | Once, immediately after the owner declines. |
 | Immediate | Borrow request canceled | Book owner | Once, immediately after the borrower cancels a pending request. |

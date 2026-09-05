@@ -1,4 +1,4 @@
-import { borrowRequestExpiresAt, firstReturnCheckAt } from '../domain/rules.ts';
+import { borrowRequestExpiresAt, borrowRequestReminderAt, firstReturnCheckAt } from '../domain/rules.ts';
 import type {
   AddBookInput,
   AppLocale,
@@ -1061,8 +1061,24 @@ export class D1LibraryRepository implements LibraryRepository {
         requestedAt.getTime(),
         requestId,
       ),
+      this.db.prepare(`
+        INSERT INTO outbox_events (
+          id, event_type, aggregate_type, aggregate_id, recipient_id, locale,
+          payload_json, available_at, attempt_count
+        )
+        SELECT ?, 'borrow_request_reminder', 'loan_request', lr.id, ?, ?, ?, ?, 0
+        FROM loan_requests lr
+        WHERE lr.id = ? AND lr.status = 'pending'
+      `).bind(
+        id('event'),
+        info.ownerId,
+        locale(info.ownerLocale),
+        JSON.stringify(payload),
+        borrowRequestReminderAt(requestedAt).getTime(),
+        requestId,
+      ),
     ]);
-    if (affected(results[1]) !== 1 || affected(results[2]) !== 1) {
+    if (affected(results[1]) !== 1 || affected(results[2]) !== 1 || affected(results[3]) !== 1) {
       throw libraryError('conflict', 'A live request already exists or the book is no longer available.');
     }
     const request = await this.request(requestId, context.communityId);
@@ -1264,8 +1280,24 @@ export class D1LibraryRepository implements LibraryRepository {
         now,
         requestId,
       ),
+      this.db.prepare(`
+        INSERT INTO outbox_events (
+          id, event_type, aggregate_type, aggregate_id, recipient_id, locale,
+          payload_json, available_at, attempt_count
+        )
+        SELECT ?, 'borrow_request_reminder', 'loan_request', lr.id, ?, ?, ?, ?, 0
+        FROM loan_requests lr
+        WHERE lr.id = ? AND lr.status = 'pending'
+      `).bind(
+        id('event'),
+        info.ownerId,
+        locale(info.ownerLocale),
+        JSON.stringify(payload),
+        borrowRequestReminderAt(requestedAt).getTime(),
+        requestId,
+      ),
     ]);
-    if (affected(results[0]) !== 1 || affected(results[1]) !== 1 || affected(results[2]) !== 1) {
+    if (affected(results[0]) !== 1 || affected(results[1]) !== 1 || affected(results[2]) !== 1 || affected(results[3]) !== 1) {
       throw libraryError('conflict', 'The hold could not be claimed.');
     }
     const request = await this.request(requestId, context.communityId);
