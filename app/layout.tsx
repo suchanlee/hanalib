@@ -23,7 +23,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: '씨앗책장 · Hana Seed Books',
+  title: '하나의 씨앗 도서관 · Hana Seed Books',
   description: 'A private community library for sharing books.',
   manifest: '/manifest.webmanifest',
   icons: {

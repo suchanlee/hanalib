@@ -10,7 +10,7 @@ const sections = [
   {
     title: '1. The service · 서비스',
     paragraphs: [
-      'Hana Seed Books helps members in the United States list, discover, borrow, and return books shared by their community. 씨앗책장은 미국 내 커뮤니티 회원이 책을 등록하고 발견하며 빌리고 반납하도록 돕는 서비스입니다.',
+      'Hana Seed Books helps members in the United States list, discover, borrow, and return books shared by their community. 하나의 씨앗 도서관은 미국 내 커뮤니티 회원이 책을 등록하고 발견하며 빌리고 반납하도록 돕는 서비스입니다.',
       'The service coordinates introductions and records; it does not own, inspect, insure, deliver, or guarantee the condition or availability of member books. 서비스는 연결과 기록을 제공하며 회원 도서의 소유·검수·보험·배송 또는 상태와 이용 가능성을 보장하지 않습니다.',
     ],
   },
@@ -56,7 +56,7 @@ export default function TermsPage() {
   return (
     <LegalPage
       eyebrow="Terms · 이용약관"
-      intro="These terms set expectations for using Hana Seed Books and sharing books with other members. 씨앗책장 이용과 회원 간 도서 공유에 필요한 기본 원칙입니다."
+      intro="These terms set expectations for using Hana Seed Books and sharing books with other members. 하나의 씨앗 도서관 이용과 회원 간 도서 공유에 필요한 기본 원칙입니다."
       sections={sections}
       title="Terms of Service · 이용약관"
     />

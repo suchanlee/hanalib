@@ -54,7 +54,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       eyebrow="Privacy · 개인정보"
-      intro="This policy explains the information Hana Seed Books handles and the choices available to members. 씨앗책장이 처리하는 정보와 회원의 선택권을 안내합니다."
+      intro="This policy explains the information Hana Seed Books handles and the choices available to members. 하나의 씨앗 도서관이 처리하는 정보와 회원의 선택권을 안내합니다."
       sections={sections}
       title="Privacy Policy · 개인정보 처리방침"
     />
