@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: '하나의씨앗 도서관 · Hana Library',
   description: 'A private community library for sharing books.',
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/favicon.svg',
+  },
   applicationName: '하나의씨앗 도서관',
   appleWebApp: {
     capable: true,
