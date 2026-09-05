@@ -39,7 +39,7 @@ function LibraryShell() {
       <h1 className="text-2xl font-semibold">{state.loadStatus === 'loading'
         ? state.locale === 'ko' ? '도서관을 불러오는 중…' : 'Loading your library…'
         : state.locale === 'ko' ? '도서관에 연결하지 못했어요' : 'Unable to load the library'}</h1>
-      {state.loadStatus === 'error' && <Button onClick={() => { void actions.refresh().catch(() => {}); }}>{state.locale === 'ko' ? '다시 불러오기' : 'Try loading again'}</Button>}
+      {state.loadStatus === 'error' && <Button onClick={() => actions.refresh().catch(() => {})}>{state.locale === 'ko' ? '다시 불러오기' : 'Try loading again'}</Button>}
     </main>;
   }
 

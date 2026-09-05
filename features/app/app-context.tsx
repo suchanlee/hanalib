@@ -347,7 +347,7 @@ export function HanaAppProvider({
           setState((current) => ({ ...current, locale }));
           return;
         }
-        void perform('change-language', async () => {
+        return perform('change-language', async () => {
           const member = await apiData<Member>(
             '/api/profile',
             mutationInit('PATCH', { locale }),

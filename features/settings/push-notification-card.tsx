@@ -251,14 +251,14 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
         )}
 
         {installPrompt && state !== 'install-ios' && (
-          <Button className="h-11 w-full" disabled={busy} onClick={() => void install()} type="button" variant="outline">
+          <Button className="h-11 w-full" disabled={busy} onClick={install} type="button" variant="outline">
             <Download aria-hidden="true" />
             {t(locale, '홈 화면에 앱 설치', 'Install app')}
           </Button>
         )}
 
         {state === 'available' && (
-          <Button className="h-11 w-full" data-testid="push-enable" disabled={busy} onClick={() => void enable()} type="button">
+          <Button className="h-11 w-full" data-testid="push-enable" disabled={busy} onClick={enable} type="button">
             {busy ? <Loader2 aria-hidden="true" className="animate-spin" /> : <BellRing aria-hidden="true" />}
             {t(locale, '알림 켜기', 'Turn on notifications')}
           </Button>
@@ -266,11 +266,11 @@ export function PushNotificationCard({ locale }: { locale: AppLocale }) {
 
         {state === 'subscribed' && (
           <div className="grid grid-cols-2 gap-2">
-            <Button className="h-11" data-testid="push-test" disabled={busy} onClick={() => void sendTest()} type="button">
+            <Button className="h-11" data-testid="push-test" disabled={busy} onClick={sendTest} type="button">
               {busy ? <Loader2 aria-hidden="true" className="animate-spin" /> : testSent ? <CheckCircle2 aria-hidden="true" /> : <Send aria-hidden="true" />}
               {testSent ? t(locale, '보냈어요', 'Sent') : t(locale, '테스트', 'Send test')}
             </Button>
-            <Button className="h-11" data-testid="push-disable" disabled={busy} onClick={() => void disable()} type="button" variant="outline">
+            <Button className="h-11" data-testid="push-disable" disabled={busy} onClick={disable} type="button" variant="outline">
               {t(locale, '이 기기에서 끄기', 'Turn off here')}
             </Button>
           </div>

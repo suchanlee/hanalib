@@ -125,16 +125,16 @@ export function AuthView() {
                     : 'Development mode is enabled. This account is available only in local preview.'}
                 </p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
-                  <Button disabled={signingIn} data-testid="auth-demo-owner" onClick={() => void demoSignIn('owner')} size="sm" variant="secondary">
+                  <Button disabled={signingIn} data-testid="auth-demo-owner" onClick={() => demoSignIn('owner')} size="sm" variant="secondary">
                     {ko ? '소유자로 계속' : 'Continue as owner'}
                   </Button>
-                  <Button disabled={signingIn} data-testid="auth-demo-borrower" onClick={() => void demoSignIn('borrower')} size="sm" variant="outline">
+                  <Button disabled={signingIn} data-testid="auth-demo-borrower" onClick={() => demoSignIn('borrower')} size="sm" variant="outline">
                     {ko ? '대여자로 계속' : 'Continue as borrower'}
                   </Button>
-                  <Button disabled={signingIn} data-testid="auth-demo-holder" onClick={() => void demoSignIn('holder')} size="sm" variant="outline">
+                  <Button disabled={signingIn} data-testid="auth-demo-holder" onClick={() => demoSignIn('holder')} size="sm" variant="outline">
                     {ko ? '대기자로 계속' : 'Continue as waitlist member'}
                   </Button>
-                  <Button disabled={signingIn} data-testid="auth-demo-holder-2" onClick={() => void demoSignIn('holder-2')} size="sm" variant="outline">
+                  <Button disabled={signingIn} data-testid="auth-demo-holder-2" onClick={() => demoSignIn('holder-2')} size="sm" variant="outline">
                     {ko ? '두 번째 대기자로 계속' : 'Continue as second waitlist member'}
                   </Button>
                 </div>

@@ -204,6 +204,7 @@ export function SettingsView() {
           <Button
             className="h-11 w-full"
             data-testid="settings-save"
+            loading={saving}
             disabled={!namesValid || saving}
             type="submit"
           >
@@ -224,7 +225,7 @@ export function SettingsView() {
         <Button
           className="h-11 w-full"
           data-testid="settings-sign-out"
-          onClick={() => void signOut()}
+          onClick={signOut}
           variant="ghost"
         >
           <LogOut aria-hidden="true" />

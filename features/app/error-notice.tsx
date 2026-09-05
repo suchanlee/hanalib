@@ -75,7 +75,7 @@ export function ErrorNotice({
             type="button"
             size="sm"
             disabled={busy}
-            onClick={() => void retry()}
+            onClick={retry}
           >
             {busy
               ? ko
@@ -90,7 +90,7 @@ export function ErrorNotice({
           type="button"
           size="sm"
           variant="outline"
-          onClick={() => void copy()}
+          onClick={copy}
         >
           {copied
             ? ko

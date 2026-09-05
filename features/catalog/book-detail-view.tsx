@@ -214,7 +214,7 @@ export function BookDetailView() {
       setFeedback({ tone: 'error', text: t.removeBlocked });
       return;
     }
-    void actions.archiveItem(itemId).catch(() => {});
+    return actions.archiveItem(itemId).catch(() => {});
   }
 
   async function requestBook() {
@@ -397,13 +397,13 @@ export function BookDetailView() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel className="h-11" disabled={isHolding}>{t.cancel}</AlertDialogCancel>
-                        <AlertDialogAction className="h-11" disabled={isHolding} onClick={() => { void claimWaitlistOffer(); }} data-testid="confirm-claim-hold">
+                        <AlertDialogAction className="h-11" disabled={isHolding} onClick={claimWaitlistOffer} data-testid="confirm-claim-hold">
                           {isHolding ? t.requesting : t.confirmRequest}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-                  <Button type="button" variant="outline" className="h-11" disabled={isHolding} onClick={() => { void leaveWaitlist(); }} data-testid="pass-hold">
+                  <Button type="button" variant="outline" className="h-11" disabled={isHolding} onClick={leaveWaitlist} data-testid="pass-hold">
                     {t.passHold}
                   </Button>
                 </div>
@@ -412,7 +412,7 @@ export function BookDetailView() {
               <div className="rounded-2xl border bg-muted/40 p-4 sm:col-span-2" data-testid="hold-queued">
                 <p className="font-semibold">{t.waitlistPosition(ownHold.position, holdCount)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t.joinWaitlistHelp}</p>
-                <Button type="button" variant="outline" className="mt-4 h-11 w-full" disabled={isHolding} onClick={() => { void leaveWaitlist(); }} data-testid="cancel-hold">
+                <Button type="button" variant="outline" className="mt-4 h-11 w-full" disabled={isHolding} onClick={leaveWaitlist} data-testid="cancel-hold">
                   {t.leaveWaitlist}
                 </Button>
               </div>
@@ -420,7 +420,7 @@ export function BookDetailView() {
               <div className="rounded-2xl border bg-muted/40 p-4 sm:col-span-2">
                 <p className="font-semibold">{t.waitingCount(holdCount)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t.joinWaitlistHelp}</p>
-                <Button type="button" className="mt-4 h-11 w-full" disabled={isHolding} onClick={() => { void joinWaitlist(); }} data-testid="join-hold">
+                <Button type="button" className="mt-4 h-11 w-full" disabled={isHolding} onClick={joinWaitlist} data-testid="join-hold">
                   {t.joinWaitlist}
                 </Button>
               </div>
@@ -443,7 +443,7 @@ export function BookDetailView() {
                       type="button"
                       className="h-11"
                       disabled={isRequesting}
-                      onClick={() => { void requestBook(); }}
+                      onClick={requestBook}
                       data-testid="confirm-borrow-request"
                     >
                       {isRequesting ? t.requesting : t.confirmRequest}
@@ -522,7 +522,7 @@ export function BookDetailView() {
                             variant="ghost"
                             className="mt-2 h-10 px-2"
                             disabled={isSaving || isRefreshingCover}
-                            onClick={() => { void refreshCover(); }}
+                            onClick={refreshCover}
                             data-testid="refresh-cover"
                           >
                             <RefreshCw aria-hidden="true" className={`size-4 ${isRefreshingCover ? 'animate-spin' : ''}`} />
@@ -606,7 +606,7 @@ export function BookDetailView() {
                     </form>
                     <DialogFooter>
                       <Button type="button" variant="outline" className="h-11" disabled={isSaving} onClick={() => setEditOpen(false)}>{t.cancel}</Button>
-                      <Button type="submit" form="edit-listing-form" className="h-11" disabled={isSaving} data-testid="save-listing">{isSaving ? t.saving : t.save}</Button>
+                      <Button type="submit" form="edit-listing-form" className="h-11" loading={isSaving} disabled={isSaving} data-testid="save-listing">{isSaving ? t.saving : t.save}</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>

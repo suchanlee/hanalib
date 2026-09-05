@@ -388,7 +388,7 @@ export function CirculationView() {
                     count={state.holdCounts[item.id] ?? 0}
                     locale={locale}
                     onOpen={() => actions.selectItem(item.id)}
-                    onCancel={() => { void actions.cancelHold(hold.id).catch(() => {}); }}
+                    onCancel={() => actions.cancelHold(hold.id).catch(() => {})}
                   />
                 );
               })}
@@ -432,7 +432,7 @@ export function CirculationView() {
                 locale={locale}
                 onReturn={() => actions.markReturned(loan.id).catch(() => {})}
                 returnCheck={returnCheck}
-                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false).catch(() => {}); }}
+                onStillBorrowing={() => returnCheck ? actions.respondToReturnCheck(returnCheck.id, false).catch(() => {}) : undefined}
                 otherMember={owner}
                 view="borrowed"
               />
@@ -455,7 +455,7 @@ export function CirculationView() {
                 locale={locale}
                 onReturn={() => actions.markReturned(loan.id).catch(() => {})}
                 returnCheck={returnCheck}
-                onStillBorrowing={() => { if (returnCheck) void actions.respondToReturnCheck(returnCheck.id, false).catch(() => {}); }}
+                onStillBorrowing={() => returnCheck ? actions.respondToReturnCheck(returnCheck.id, false).catch(() => {}) : undefined}
                 otherMember={borrower}
                 view="lent"
               />

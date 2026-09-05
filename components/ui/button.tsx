@@ -1,5 +1,9 @@
+'use client';
+
+import { useRef, useState } from 'react';
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { LoaderCircle } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -44,14 +48,48 @@ function Button({
   className,
   variant = 'default',
   size = 'default',
+  loading = false,
+  disabled,
+  onClick,
+  children,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & {
+  /** For form submissions; async click handlers are tracked automatically. */
+  loading?: boolean;
+}) {
+  const [pending, setPending] = useState(false);
+  const running = useRef(false);
+  const busy = loading || pending;
+
+  async function handleClick(event: Parameters<NonNullable<typeof onClick>>[0]) {
+    if (running.current || busy || disabled) return;
+    running.current = true;
+    try {
+      // React's event type allows async handlers but discards their return type.
+      const result: unknown = onClick?.(event);
+      if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
+        setPending(true);
+        await result;
+      }
+    } finally {
+      running.current = false;
+      setPending(false);
+    }
+  }
+
   return (
     <ButtonPrimitive
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, className }), 'data-pending:[&>svg:not([data-slot=button-spinner])]:hidden')}
       {...props}
-    />
+      disabled={disabled || busy}
+      aria-busy={busy || props['aria-busy']}
+      data-pending={busy ? '' : undefined}
+      onClick={onClick ? handleClick : undefined}
+    >
+      {busy && <LoaderCircle aria-hidden="true" data-slot="button-spinner" className="size-4 animate-spin motion-reduce:animate-none" />}
+      {children}
+    </ButtonPrimitive>
   );
 }
 

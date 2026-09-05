@@ -626,7 +626,7 @@ export function IntakeView() {
               <Button
                 className="mt-5 h-12 w-full bg-white text-primary hover:bg-white/90"
                 data-testid="start-scan"
-                onClick={() => void startCamera()}
+                onClick={startCamera}
               >
                 <Camera aria-hidden="true" className="size-5" />
                 {c.scan}
@@ -636,7 +636,7 @@ export function IntakeView() {
 
           <ManualIsbnForm disabled={false} locale={locale} onChange={setManualIsbn} onSubmit={() => void performLookup(manualIsbn)} value={manualIsbn} />
           {process.env.NODE_ENV !== 'production' && (
-            <Button className="h-10 w-full text-muted-foreground" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)} variant="ghost">
+            <Button className="h-10 w-full text-muted-foreground" data-testid="simulate-scan" onClick={() => performLookup(DEMO_ISBN, true)} variant="ghost">
               <Sparkles aria-hidden="true" />
               {c.simulate}
             </Button>
@@ -677,7 +677,7 @@ export function IntakeView() {
           )}
           <div className={process.env.NODE_ENV !== 'production' ? 'grid grid-cols-2 gap-2' : 'grid gap-2'}>
             {process.env.NODE_ENV !== 'production' && (
-              <Button className="h-11" data-testid="simulate-scan" onClick={() => void performLookup(DEMO_ISBN, true)}>
+              <Button className="h-11" data-testid="simulate-scan" onClick={() => performLookup(DEMO_ISBN, true)}>
                 <Sparkles aria-hidden="true" />
                 {c.simulate}
               </Button>
@@ -759,7 +759,7 @@ export function IntakeView() {
               <Label className="mt-4 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border bg-background px-3 text-sm font-medium">
                 <ImagePlus aria-hidden="true" className="size-4" />
                 {c.uploadCover}
-                <Input accept="image/jpeg,image/png,image/webp" capture="environment" className="sr-only" data-testid="cover-upload" onChange={handleCoverUpload} type="file" />
+                <input accept="image/jpeg,image/png,image/webp" capture="environment" className="sr-only" data-testid="cover-upload" onChange={handleCoverUpload} type="file" />
               </Label>
             </div>
           </div>
@@ -822,8 +822,8 @@ export function IntakeView() {
             </Alert>
           )}
           <div className="sticky bottom-20 -mx-4 border-t bg-background/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
-            <Button className="h-12 w-full text-base" data-testid="create-book" disabled={isSaving} type="submit">
-              {isSaving ? <LoaderCircle aria-hidden="true" className="size-5 animate-spin" /> : <Check aria-hidden="true" className="size-5" />}
+            <Button className="h-12 w-full text-base" data-testid="create-book" loading={isSaving} disabled={isSaving} type="submit">
+              <Check aria-hidden="true" className="size-5" />
               {isSaving ? c.creating : c.create}
             </Button>
           </div>
