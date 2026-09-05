@@ -2,6 +2,13 @@ import { getD1Database } from '../../db/index';
 import { AuthenticationRequiredError, requireAuthenticatedMember } from '../auth/member.ts';
 import { isSameOriginMutation } from '../auth/session.ts';
 import { processReadyOutbox } from '../notifications/outbox-worker.ts';
+import {
+  operationalLog,
+  requestLogContext,
+  requestLogFields,
+  safeErrorCode,
+  withRequestId,
+} from '../observability/log.ts';
 import type { RequestContext } from './contracts.ts';
 import { D1LibraryRepository } from './d1-repository.ts';
 import { LibraryError, libraryError } from './errors.ts';
@@ -38,6 +45,7 @@ export async function withLibraryApi<T>(
   handler: (repository: D1LibraryRepository, context: RequestContext) => Promise<T>,
   options: HandlerOptions = {},
 ) {
+  const logContext = requestLogContext(request);
   try {
     const config = environment();
     const member = await requireAuthenticatedMember(request);
@@ -66,29 +74,38 @@ export async function withLibraryApi<T>(
         twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
         kakaoRestApiKey: process.env.KAKAO_REST_API_KEY,
         kakaoClientSecret: process.env.KAKAO_CLIENT_SECRET,
-      });
+      }, { requestId: logContext.requestId });
     }
-    return Response.json({ data }, {
+    return withRequestId(Response.json({ data }, {
       status: options.status ?? 200,
       headers: { 'Cache-Control': 'private, no-store' },
-    });
+    }), logContext);
   } catch (error) {
     if (error instanceof LibraryError) {
-      return Response.json({ error: { code: error.code, message: error.message } }, {
+      if (error.status >= 500) {
+        operationalLog('error', 'library-api-failed', requestLogFields(logContext, error.status, {
+          operation: 'library-api',
+          errorCode: error.code,
+        }));
+      }
+      return withRequestId(Response.json({ error: { code: error.code, message: error.message } }, {
         status: error.status,
         headers: { 'Cache-Control': 'private, no-store' },
-      });
+      }), logContext);
     }
     if (error instanceof AuthenticationRequiredError) {
-      return Response.json({ error: { code: 'unauthenticated', message: error.message } }, {
+      return withRequestId(Response.json({ error: { code: 'unauthenticated', message: error.message } }, {
         status: 401,
         headers: { 'Cache-Control': 'private, no-store' },
-      });
+      }), logContext);
     }
-    console.error('library_api_error', error instanceof Error ? error.name : 'unknown');
-    return Response.json({ error: { code: 'internal-error', message: 'The library service is temporarily unavailable.' } }, {
+    operationalLog('error', 'library-api-failed', requestLogFields(logContext, 500, {
+      operation: 'library-api',
+      errorCode: safeErrorCode(error, 'internal-error'),
+    }));
+    return withRequestId(Response.json({ error: { code: 'internal-error', message: 'The library service is temporarily unavailable.' } }, {
       status: 500,
       headers: { 'Cache-Control': 'private, no-store' },
-    });
+    }), logContext);
   }
 }

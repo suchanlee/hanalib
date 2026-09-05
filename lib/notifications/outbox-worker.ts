@@ -1,5 +1,6 @@
 import type { AppLocale, NotificationChannel } from '../domain/types.ts';
 import type { OutboxPayloadByType, LibraryOutboxEventType } from '../persistence/outbox.ts';
+import { operationalLog, safeErrorCode } from '../observability/log.ts';
 import { decryptContact, encryptContact } from './contact-crypto.ts';
 import { parseKakaoCredential, refreshKakaoCredential } from './kakao.ts';
 import { sendNotification, type NotificationSenderConfig } from './sender.ts';
@@ -191,7 +192,7 @@ async function recipient(
 export async function processReadyOutbox(
   db: D1Database,
   config: OutboxWorkerConfig,
-  options: { now?: number; limit?: number; fetcher?: typeof fetch } = {},
+  options: { now?: number; limit?: number; fetcher?: typeof fetch; requestId?: string } = {},
 ): Promise<OutboxWorkerResult> {
   const now = options.now ?? Date.now();
   const limit = Math.max(1, Math.min(options.limit ?? 20, 50));
@@ -252,7 +253,13 @@ export async function processReadyOutbox(
       await db.prepare('UPDATE outbox_events SET available_at = ? WHERE id = ? AND processed_at IS NULL')
         .bind(retryAt, row.id)
         .run();
-      console.error('notification_delivery_failed', error instanceof Error ? error.message : 'unknown');
+      operationalLog('error', 'notification-delivery-failed', {
+        requestId: options.requestId,
+        operation: 'notification-delivery',
+        eventType: row.eventType,
+        attemptCount: row.attemptCount + 1,
+        errorCode: safeErrorCode(error, 'delivery-failed'),
+      });
       result.failed += 1;
     }
   }
