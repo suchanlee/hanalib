@@ -1,0 +1,1 @@
+ALTER TABLE `book_editions` ADD `categories_json` text;

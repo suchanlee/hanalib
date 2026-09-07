@@ -1,0 +1,1290 @@
+{
+  "checked_at_utc": "2026-09-07T04:38:09.726711+00:00",
+  "scope": {
+    "edition_records": 119,
+    "copy_records": 124,
+    "active_books": 115,
+    "displayed_descriptions_missing": 10,
+    "heuristic_flags": 58,
+    "flags_under_300_characters": 55,
+    "flags_over_600_characters": 3,
+    "notes": "Flags are suspicions, not confirmed truncations. All active books were checked using copy overrides. Two viewer-truncated values were verified in the browser."
+  },
+  "rows": [
+    {
+      "isbn13": "9788997381678",
+      "title": "소년과 두더지와 여우와 말",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 253,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781785004919",
+      "title": "Making Moving Toys and Automata",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 769,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781451673265",
+      "title": "Fahrenheit 451",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 55,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788936509484",
+      "title": "묻고 답하다",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788925548913",
+      "title": "예수가 선택한 십자가",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791161292311",
+      "title": "기후 위기 시대의 도전과 교회의 응답",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788953117662",
+      "title": "길갈",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 176,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788963602370",
+      "title": "새가족반",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791161291734",
+      "title": "오직 충성으로 받는 구원",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 253,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791130646381",
+      "title": "이처럼 사소한 것들",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788960530942",
+      "title": "우사기의 도쿄 식탁",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781324050629",
+      "title": "Replaceable You",
+      "bookLanguage": "en",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788955827965",
+      "title": "비가 내리고 풀은 자란다",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932521237",
+      "title": "성경을 보는 눈",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932816616",
+      "title": "다윗: 현실에 뿌리박은 영성",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 245,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781368095099",
+      "title": "Spidey and His Amazing Friends: Electro's Gotta Glow",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 676,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791170830474",
+      "title": "경이라는 세계",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780679720201",
+      "title": "The Stranger",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 988,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781368081467",
+      "title": "Welcome to Merlin Academy",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1320,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791194530701",
+      "title": "괴테는 모든 것을 말했다",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 253,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781937715489",
+      "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 60,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932812946",
+      "title": "가장 위험한 기도 주기도",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 247,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932821399",
+      "title": "새로운 그리스도인이 온다",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 247,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780593310229",
+      "title": "Richard Scarry's Super Silly Seek and Find!",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 476,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781606089743",
+      "title": "The Subversion of Christianity",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 1182,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791188887255",
+      "title": "정원에서 길을 물었다",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781538110690",
+      "title": "Climate Church, Climate World",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 704,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780676970050",
+      "title": "The First Man",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 468,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781587435171",
+      "title": "Strange Religion",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 1108,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9798217024445",
+      "title": "The Prince and the Bot! (Iron Man and His Awesome Friends)",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 755,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788990928436",
+      "title": "페미니즘과 기독교의 맥락들",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 249,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791161292526",
+      "title": "그리스도인은 어떻게 생각해야 할까?",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932907284",
+      "title": "죄와 벌(하)(도스또예프스끼 전집 9)",
+      "bookLanguage": "ko",
+      "sharedSource": null,
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780593089781",
+      "title": "Who Was? and What Is? America Collection Boxed Set 25 books",
+      "bookLanguage": "en",
+      "sharedSource": null,
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788954637770",
+      "title": "라면을 끓이며",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 247,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781554071470",
+      "title": "Nightwatch",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 115,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788962605952",
+      "title": "벌거벗은 통계학(리커버 에디션)",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932816135",
+      "title": "너라는 우주를 만나",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788901101569",
+      "title": "청춘의 독서",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 249,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9798217032617",
+      "title": "We Are Shiz (Universal Pictures Wicked)",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 489,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780545886222",
+      "title": "The Baby-Sitters Club: Claudia and Mean Janine",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 188,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788970906805",
+      "title": "요리천사의 행복 밥상",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780857687609",
+      "title": "Fun with a Pencil",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 414,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780817441814",
+      "title": "Learning to See Creatively",
+      "bookLanguage": "en",
+      "sharedSource": "kakao-books",
+      "characters": 258,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932907314",
+      "title": "악령(상)(3판)(도스또예프스끼 전집 12)",
+      "bookLanguage": "ko",
+      "sharedSource": null,
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781615649983",
+      "title": "Joshua Weissman",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1812,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "copy tail and length verified in production browser"
+    },
+    {
+      "isbn13": "9781847670311",
+      "title": "Complete Peanuts 1950 -1952 Vol.1",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 118,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780062464316",
+      "title": "Homo Deus",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1645,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781583225752",
+      "title": "A Woman's Story",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780553522778",
+      "title": "Puppy Birthday to You! (Paw Patrol)",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 570,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932039244",
+      "title": "중력과 은총",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 75,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788965138310",
+      "title": "유럽 도시 기행 3",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781932974010",
+      "title": "Stikky Night Skies: Learn 6 Constellations, 4 Stars, A Planet, A Galaxy, And How To Navigate At Night--in One Hour, Guaranteed (Stikky)",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781772754629",
+      "title": "Disney Elena of Avalor: Ready to Rule Cinestory Comic",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 540,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781732102200",
+      "title": "A Philosophy of Software Design",
+      "bookLanguage": "en",
+      "sharedSource": null,
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791193238455",
+      "title": "나는 그림을 보며 어른이 되었다",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780062661128",
+      "title": "Autonomy",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1420,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788953125780",
+      "title": "팀 켈러의 탕부 하나님",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791191114225",
+      "title": "작별인사",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788997760244",
+      "title": "일",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 159,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791161290157",
+      "title": "과학시대의 도전과 기독교의 응답",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781580089777",
+      "title": "Tacos",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 164,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788988042366",
+      "title": "폴 투르니에의 치유",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 248,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788901140612",
+      "title": "엄마는 아메리칸 스타일",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788970089997",
+      "title": "결혼 건축가",
+      "bookLanguage": "ko",
+      "sharedSource": null,
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781400078431",
+      "title": "The Year of Magical Thinking",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1336,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788993461237",
+      "title": "에스프레소 바이블",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 204,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780736431095",
+      "title": "The Perfect Tea Party (Disney Junior: Sofia the First)",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 466,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780375704024",
+      "title": "Norwegian Wood",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 764,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780809051014",
+      "title": "Ray Bradbury's Fahrenheit 451",
+      "bookLanguage": "en",
+      "sharedSource": "kakao-books",
+      "characters": 244,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780817439392",
+      "title": "Understanding Exposure",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 203,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932907321",
+      "title": "악령(하)(3판)(도스또예프스끼 전집 13)",
+      "bookLanguage": "ko",
+      "sharedSource": null,
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791157528547",
+      "title": "평일의 예배, 노동",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791187708827",
+      "title": "인권옹호자 예수",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 251,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780553293357",
+      "title": "Foundation",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1175,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788901279374",
+      "title": "밥 먹다가, 울컥",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781601427564",
+      "title": "Accidental Saints",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 1423,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788998441012",
+      "title": "모순",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788953119901",
+      "title": "일과 영성",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781718502321",
+      "title": "Engineering in Plain Sight",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 254,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791187890126",
+      "title": "고통은 나눌 수 있는가",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780545813891",
+      "title": "The Baby-Sitter's Club: The Truth About Stacey",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 161,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780241552292",
+      "title": "Eichmann in Jerusalem (Penguin Modern Classics)",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 248,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780062049643",
+      "title": "Love Wins",
+      "bookLanguage": "en",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932817842",
+      "title": "성을 알면 달라지는 것들",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780062410665",
+      "title": "The Enlightenment",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 2438,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "full display verified in production browser"
+    },
+    {
+      "isbn13": "9780545206945",
+      "title": "I Survived the Sinking of the Titanic, 1912 (I Survived #1)",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 289,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9791141602376",
+      "title": "안녕이라 그랬어(집에디션 리커버)",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780525582199",
+      "title": "It's Trevor Noah",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1480,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788952790620",
+      "title": "인간 실격",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 249,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780817437381",
+      "title": "Creative Nature & Outdoor Photography",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 176,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781594631870",
+      "title": "The Meaning of Marriage",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 199,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932817583",
+      "title": "읽는다는 것",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 237,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932907277",
+      "title": "죄와 벌(상)(도스또예프스끼 전집 8)",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 161,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932840536",
+      "title": "회심",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 241,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780393081084",
+      "title": "The Food Lab",
+      "bookLanguage": "en",
+      "sharedSource": "kakao-books",
+      "characters": 249,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780545886215",
+      "title": "Mary Anne saves the day",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 188,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781684376421",
+      "title": "The Highlights Book of Things to Do",
+      "bookLanguage": "ko",
+      "sharedSource": "google-books",
+      "characters": 1722,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788952757418",
+      "title": "카페 브런치",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 218,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781368112420",
+      "title": "Escape from the Isle of the Lost: A Descendants Novel",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 1673,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788997686971",
+      "title": "중국요리",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 226,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788990353627",
+      "title": "부흥(평양대부흥 100주년 특별 보급판)",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 237,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788936439880",
+      "title": "할매",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788932521220",
+      "title": "나를 넘어서는 성경읽기",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788959160631",
+      "title": "그리움",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781338067613",
+      "title": "Kristy's big day: a graphic novel",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 91,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781484720974",
+      "title": "Isle of the Lost, The-A Descendants Novel, Vol. 1",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 527,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788954682152",
+      "title": "작별하지 않는다",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780571368709",
+      "title": "Small Things Like These",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 249,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788994796734",
+      "title": "하늘과 바람과 별과 시",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9780307336798",
+      "title": "Art of Simple Food",
+      "bookLanguage": "en",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781606852545",
+      "title": "Nickelodeon PAW Patrol",
+      "bookLanguage": "en",
+      "sharedSource": null,
+      "characters": 0,
+      "missing": true,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9788953108103",
+      "title": "영적 발돋움",
+      "bookLanguage": "ko",
+      "sharedSource": "kakao-books",
+      "characters": 250,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781400044177",
+      "title": "Age of Entanglement",
+      "bookLanguage": "en",
+      "sharedSource": "kakao-books",
+      "characters": 252,
+      "missing": false,
+      "looksTruncated": true,
+      "verification": "untruncated database value"
+    },
+    {
+      "isbn13": "9781368047241",
+      "title": "Belle the mysterious message",
+      "bookLanguage": "en",
+      "sharedSource": "google-books",
+      "characters": 504,
+      "missing": false,
+      "looksTruncated": false,
+      "verification": "untruncated database value"
+    }
+  ],
+  "open_library_targeted_sample": [
+    {
+      "isbn13": "9781451673265",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL103123W",
+      "edition_description_raw_length": 1619,
+      "work_description_raw_length": 1712,
+      "error": null
+    },
+    {
+      "isbn13": "9781937715489",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL19757974W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9781583225752",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL102396W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9781732102200",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL21221785W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9780571368709",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL23020966W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 347,
+      "error": null
+    },
+    {
+      "isbn13": "9781324050629",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL42560428W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9780241552292",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL1386647W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 290,
+      "error": null
+    },
+    {
+      "isbn13": "9788932817842",
+      "edition_status": 404,
+      "work_url": null,
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9791161290157",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL44947174W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9788954682152",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL32107522W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9788932907277",
+      "edition_status": 404,
+      "work_url": null,
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    },
+    {
+      "isbn13": "9781368095099",
+      "edition_status": 200,
+      "work_url": "https://openlibrary.org/works/OL29200223W",
+      "edition_description_raw_length": 0,
+      "work_description_raw_length": 0,
+      "error": null
+    }
+  ],
+  "current_adapter_reproduction": [
+    {
+      "isbn": "9781451673265",
+      "title": "Fahrenheit 451",
+      "adapterDescriptionLength": 1608,
+      "availableEditionLength": 1608,
+      "availableWorkLength": 1700,
+      "refreshAccepts": false
+    },
+    {
+      "isbn": "9780571368709",
+      "title": "Small Things Like These",
+      "adapterDescriptionLength": 0,
+      "availableEditionLength": 0,
+      "availableWorkLength": 347,
+      "refreshAccepts": false
+    },
+    {
+      "isbn": "9780241552292",
+      "title": "Eichmann in Jerusalem (Penguin Modern Classics)",
+      "adapterDescriptionLength": 0,
+      "availableEditionLength": 0,
+      "availableWorkLength": 290,
+      "refreshAccepts": false
+    }
+  ],
+  "production_mutations": false
+}

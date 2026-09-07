@@ -1,3 +1,5 @@
+import type { BookCategories, CategoryId, ThemaCode } from '../books/categories';
+
 export type AppLocale = 'ko' | 'en';
 export type AuthProvider = 'google' | 'kakao';
 export type AppScreen = 'catalog' | 'intake' | 'detail' | 'borrowing' | 'settings';
@@ -35,6 +37,7 @@ export interface BookEdition {
   coverUrl?: string;
   coverTone: 'amber' | 'blue' | 'green' | 'rose' | 'ink' | 'violet';
   provenance: Record<string, string>;
+  categories?: BookCategories;
 }
 
 export interface CatalogItem {
@@ -89,6 +92,7 @@ export interface ReturnCheck {
 }
 
 export interface CatalogFilters {
+  category?: CategoryId | 'all' | 'uncategorized';
   ownerId: string;
   status: 'all' | 'available' | 'held' | 'borrowed';
   language: 'all' | 'ko' | 'en' | 'other';
@@ -108,9 +112,11 @@ export interface AddBookInput {
   condition: CatalogItem['condition'];
   ownerNotes?: string;
   provenance: Record<string, string>;
+  categories?: BookCategories;
 }
 
 export interface UpdateCatalogItemInput extends Pick<CatalogItem, 'condition' | 'ownerNotes'> {
+  categoryCodes?: ThemaCode[];
   title?: string;
   titleEn?: string | null;
   authors?: string[];
@@ -120,6 +126,7 @@ export interface UpdateCatalogItemInput extends Pick<CatalogItem, 'condition' | 
   language?: BookEdition['language'];
   pageCount?: number | null;
   description?: string | null;
+  descriptionProvenance?: Record<string, string>;
   coverAssetId?: string;
 }
 

@@ -68,6 +68,7 @@ export const bookEditions = sqliteTable(
     coverStoragePath: text('cover_storage_path'),
     coverTone: text('cover_tone').notNull().default('blue'),
     fieldProvenanceJson: text('field_provenance_json').notNull().default('{}'),
+    categoriesJson: text('categories_json'),
     resolverVersion: integer('resolver_version').notNull().default(1),
     resolvedAt: integer('resolved_at', { mode: 'timestamp_ms' }),
   },
@@ -334,3 +335,13 @@ export const rateLimits = sqliteTable(
   },
   (table) => [index('rate_limits_expires_idx').on(table.expiresAt)],
 );
+
+export const descriptionJobs = sqliteTable('description_jobs', {
+  itemId: text('item_id').primaryKey().references(() => catalogItems.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('pending'),
+  attempts: integer('attempts').notNull().default(0),
+  availableAt: integer('available_at').notNull(),
+  leaseToken: text('lease_token'),
+  outcome: text('outcome'),
+  updatedAt: integer('updated_at').notNull(),
+}, (table) => [index('description_jobs_ready_idx').on(table.status, table.availableAt)]);

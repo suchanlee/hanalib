@@ -1,3 +1,6 @@
+import { waitUntil } from 'cloudflare:workers';
+import { processDescriptionJobs } from '@/lib/books/description-jobs';
+import { lookupProviderConfig } from '@/lib/isbn/config';
 import { getD1Database } from '@/db';
 import { processReadyOutbox } from '@/lib/notifications/outbox-worker';
 import { expireStaleBorrowRequests } from '@/lib/persistence/borrow-request-expiry';
@@ -15,6 +18,9 @@ export async function POST(request: Request) {
   if (!authorized(request)) return withRequestId(Response.json({ error: 'unauthorized' }, { status: 401 }), logContext);
   try {
     const db = getD1Database();
+    waitUntil(processDescriptionJobs(db, lookupProviderConfig()).catch(() => {
+      operationalLog('error', 'description-job-failed', { operation: 'description-hydration', errorCode: 'dispatch-failed' });
+    }));
     const now = Date.now();
     const baseUrl = process.env.PUBLIC_APP_URL ?? 'https://hanalib.app';
     const expired = await expireStaleBorrowRequests(db, now, baseUrl);

@@ -1,0 +1,263 @@
+{
+  "startedAt": "2026-09-07T18:42:34.313Z",
+  "scope": "Local API create/read, live providers, real server interruption; scheduler worker invoked directly after real lease expiry; two UI spot checks",
+  "summary": {
+    "created": 10,
+    "improved": 8,
+    "ownerEditProtected": 1,
+    "noImprovement": 1,
+    "maxCreateMs": 174,
+    "minCreateMs": 8,
+    "otherCopiesUnchanged": true,
+    "recovery": [
+      {
+        "isbn13": "9780307336798",
+        "claimed": 1,
+        "complete": 1,
+        "pending": 0,
+        "failed": 0,
+        "durationMs": 8033,
+        "job": {
+          "status": "complete",
+          "attempts": 2,
+          "outcome": "improved"
+        }
+      },
+      {
+        "isbn13": "9780545886215",
+        "claimed": 0,
+        "complete": 0,
+        "pending": 0,
+        "failed": 0,
+        "durationMs": 0,
+        "job": {
+          "status": "complete",
+          "attempts": 2,
+          "outcome": "not-needed"
+        }
+      }
+    ]
+  },
+  "books": [
+    {
+      "isbn13": "9780062049643",
+      "title": "Love Wins",
+      "role": "normal",
+      "beforeCharacters": 250,
+      "afterCharacters": 1387,
+      "createMs": 174,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "improved",
+      "source": {
+        "description": "open-library",
+        "descriptionUrl": "https://openlibrary.org/books/OL24609716M",
+        "descriptionScope": "edition"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9780545886215",
+      "title": "Mary Anne saves the day",
+      "role": "manual-edit-control",
+      "beforeCharacters": 188,
+      "afterCharacters": 48,
+      "createMs": 65,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 2,
+      "outcome": "not-needed",
+      "source": {
+        "description": "member",
+        "descriptionUrl": null,
+        "descriptionScope": null
+      },
+      "descriptionEdited": true,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9780545813891",
+      "title": "The Baby-Sitter's Club: The Truth About Stacey",
+      "role": "normal",
+      "beforeCharacters": 161,
+      "afterCharacters": 446,
+      "createMs": 8,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "improved",
+      "source": {
+        "description": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL8756332W",
+        "descriptionScope": "work"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9781451673265",
+      "title": "Fahrenheit 451",
+      "role": "normal",
+      "beforeCharacters": 55,
+      "afterCharacters": 1608,
+      "createMs": 8,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "improved",
+      "source": {
+        "description": "open-library",
+        "descriptionUrl": "https://openlibrary.org/books/OL25859954M",
+        "descriptionScope": "edition"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9780571368709",
+      "title": "Small Things Like These",
+      "role": "normal",
+      "beforeCharacters": 0,
+      "afterCharacters": 1708,
+      "createMs": 9,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "improved",
+      "source": {
+        "description": "google-books",
+        "descriptionUrl": "https://books.google.com/books?id=rYPAzgEACAAJ",
+        "descriptionScope": "edition"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9780393081084",
+      "title": "The Food Lab",
+      "role": "normal",
+      "beforeCharacters": 249,
+      "afterCharacters": 1359,
+      "createMs": 8,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "improved",
+      "source": {
+        "description": "google-books",
+        "descriptionUrl": "https://books.google.com/books?id=F1GNEAAAQBAJ",
+        "descriptionScope": "edition"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9780817441814",
+      "title": "Learning to See Creatively",
+      "role": "normal",
+      "beforeCharacters": 258,
+      "afterCharacters": 1121,
+      "createMs": 9,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "improved",
+      "source": {
+        "description": "google-books",
+        "descriptionUrl": "https://books.google.com/books?id=RQFwDwAAQBAJ",
+        "descriptionScope": "edition"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9788932817842",
+      "title": "성을 알면 달라지는 것들",
+      "role": "normal",
+      "beforeCharacters": 250,
+      "afterCharacters": 250,
+      "createMs": 11,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "no-improvement",
+      "source": {
+        "description": "google-books",
+        "descriptionUrl": null,
+        "descriptionScope": null
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9781937715489",
+      "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+      "role": "normal",
+      "beforeCharacters": 60,
+      "afterCharacters": 2193,
+      "createMs": 8,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 1,
+      "outcome": "improved",
+      "source": {
+        "description": "google-books",
+        "descriptionUrl": "https://books.google.com/books?id=glZxrgEACAAJ",
+        "descriptionScope": "edition"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    },
+    {
+      "isbn13": "9780307336798",
+      "title": "Art of Simple Food",
+      "role": "crash-recovery",
+      "beforeCharacters": 250,
+      "afterCharacters": 1211,
+      "createMs": 37,
+      "jobAtResponse": {
+        "status": "running",
+        "attempts": 1
+      },
+      "status": "complete",
+      "attempts": 2,
+      "outcome": "improved",
+      "source": {
+        "description": "google-books",
+        "descriptionUrl": "https://books.google.com/books?id=fOqMEAAAQBAJ",
+        "descriptionScope": "edition"
+      },
+      "descriptionEdited": false,
+      "apiReadBackMatched": true
+    }
+  ]
+}

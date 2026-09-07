@@ -4,6 +4,7 @@ export interface ServerConfig {
   kakaoClientSecret?: string;
   publicAppUrl?: string;
   metadata: {
+    aladinTtbKey?: string;
     nlkApiKey?: string;
     naverClientId?: string;
     naverClientSecret?: string;
@@ -31,6 +32,7 @@ export function readServerConfig(source: EnvSource = process.env): ServerConfig 
     kakaoClientSecret: source.KAKAO_CLIENT_SECRET,
     publicAppUrl: source.PUBLIC_APP_URL,
     metadata: {
+      aladinTtbKey: source.ALADIN_TTB_KEY,
       nlkApiKey: source.NLK_API_KEY,
       naverClientId: source.NAVER_CLIENT_ID,
       naverClientSecret: source.NAVER_CLIENT_SECRET,

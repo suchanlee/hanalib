@@ -17,6 +17,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useHanaApp } from '@/features/app/app-context';
+import { categoryGroups, categoryLabels, matchesCategory } from '@/lib/books/categories';
 import type { CatalogFilters } from '@/lib/domain/types';
 import { copy, memberName } from '@/lib/i18n/copy';
 import { BookCover } from './book-cover';
@@ -35,6 +36,17 @@ function FilterFields({
 
   return (
     <div className="space-y-5">
+      <label className="block text-sm font-medium">
+        <span className="mb-2 block">{state.locale === 'ko' ? '분류' : 'Category'}</span>
+        <NativeSelect className={selectClass} value={value.category ?? 'all'}
+          onChange={(event) => onChange({ category: event.target.value as CatalogFilters['category'] })}
+          data-testid="category-filter">
+          <NativeSelectOption value="all">{state.locale === 'ko' ? '모든 분류' : 'All categories'}</NativeSelectOption>
+          {categoryGroups.map((group) => <NativeSelectOption key={group.id} value={group.id}>{group[state.locale]}</NativeSelectOption>)}
+          <NativeSelectOption value="uncategorized">{state.locale === 'ko' ? '미분류·확인 필요' : 'Uncategorized / needs review'}</NativeSelectOption>
+        </NativeSelect>
+      </label>
+
       <label className="block text-sm font-medium">
         <span className="mb-2 block">{t.ownerFilter}</span>
         <NativeSelect
@@ -90,12 +102,13 @@ export function CatalogView() {
   const t = catalogCopy[state.locale];
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<CatalogFilters>(state.filters);
-  const activeFilterCount = [state.filters.ownerId !== 'all', state.filters.status !== 'all', state.filters.language !== 'all'].filter(Boolean).length;
+  const activeFilterCount = [(state.filters.category ?? 'all') !== 'all', state.filters.ownerId !== 'all', state.filters.status !== 'all', state.filters.language !== 'all'].filter(Boolean).length;
 
   const results = useMemo(() => {
     const query = state.searchQuery.trim().toLocaleLowerCase(state.locale === 'ko' ? 'ko-KR' : 'en-US');
     return state.items.filter((item) => {
       if (item.status === 'archived') return false;
+      if (!matchesCategory(item.edition.categories, state.filters.category)) return false;
       if (state.filters.ownerId !== 'all' && item.ownerId !== state.filters.ownerId) return false;
       if (state.filters.status !== 'all' && item.status !== state.filters.status) return false;
       if (state.filters.language !== 'all' && item.edition.language !== state.filters.language) return false;
@@ -107,6 +120,8 @@ export function CatalogView() {
         ...(item.edition.authorsEn ?? []),
         item.edition.publisher,
         item.edition.isbn13,
+        ...categoryLabels(item.edition.categories, 'ko'),
+        ...categoryLabels(item.edition.categories, 'en'),
       ].filter(Boolean).join(' ').toLocaleLowerCase(state.locale === 'ko' ? 'ko-KR' : 'en-US');
       return haystack.includes(query);
     });
@@ -114,8 +129,8 @@ export function CatalogView() {
 
   function clearAll() {
     actions.setSearchQuery('');
-    actions.setFilters({ ownerId: 'all', status: 'all', language: 'all' });
-    setDraftFilters({ ownerId: 'all', status: 'all', language: 'all' });
+    actions.setFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all' });
+    setDraftFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all' });
   }
 
   function openFilters() {
@@ -202,7 +217,7 @@ export function CatalogView() {
                   variant="outline"
                   className="h-11 sm:flex-1"
                   data-testid="clear-filters"
-                  onClick={() => setDraftFilters({ ownerId: 'all', status: 'all', language: 'all' })}
+                  onClick={() => setDraftFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all' })}
                 >
                   {t.reset}
                 </Button>

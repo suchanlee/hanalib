@@ -1,0 +1,502 @@
+{
+  "reviewedAt": "2026-09-07T05:05:04.836Z",
+  "reviewer": "Codex: individual semantic review, not automated quality classifier",
+  "snapshot": "2026-09-07-description-system-validation.json",
+  "reviewed": 52,
+  "counts": {
+    "cut": 47,
+    "note": 1,
+    "abridged-readable": 2,
+    "corrupt": 1,
+    "acceptable": 1
+  },
+  "scope": "All 51 remaining snippet flags and the one catalog note in the saved production snapshot. The 10 empty descriptions contain no prose to review. No new production snapshot or catalog changes.",
+  "rows": [
+    {
+      "isbn13": "9788997381678",
+      "title": "소년과 두더지와 여우와 말",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final quotation about the bravest action remains open, with no completion of the surrounding sentence.",
+      "evidence": null,
+      "reviewedTextSha256": "208d2ae555049ca01bd60e3700ead66290c6c69bd9eadd8375ef79e9d7843676"
+    },
+    {
+      "isbn13": "9788936509484",
+      "title": "묻고 답하다",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The chapter comparison stops at 한국 교회 without stating what chapters 6–10 cover.",
+      "evidence": null,
+      "reviewedTextSha256": "e488a65efb632791effe11843d0cef8b5ed5f9ecd0310f078523a3bb9fe359ce"
+    },
+    {
+      "isbn13": "9788925548913",
+      "title": "예수가 선택한 십자가",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final sentence stops at 조언, before completing the verb describing the advice.",
+      "evidence": null,
+      "reviewedTextSha256": "2c5dc678e962a97c5adf8299aaf0978a12ede87cc08a9f96dcdb3e023c4ece15"
+    },
+    {
+      "isbn13": "9791161292311",
+      "title": "기후 위기 시대의 도전과 교회의 응답",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final connective 발생하고 있으며 requires a following clause.",
+      "evidence": null,
+      "reviewedTextSha256": "a1807a62d196bc25f8fdc0d48f5ca8a0fd9689e4db51e639d4a2da6930ba8f1d"
+    },
+    {
+      "isbn13": "9788963602370",
+      "title": "새가족반",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The thought about scattered knowledge stops at 연결되어, before its result.",
+      "evidence": null,
+      "reviewedTextSha256": "5b59092ee9ae66e9a38af800e2f684edb71cea5be5c84f71ce7a6d047a11004f"
+    },
+    {
+      "isbn13": "9791161291734",
+      "title": "오직 충성으로 받는 구원",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The definition ends at 받는다는, leaving the modifying clause unfinished.",
+      "evidence": null,
+      "reviewedTextSha256": "74a07453b0d0c07d9774e0f80ace9fbbb0769afa41c62c8653095722c183de8c"
+    },
+    {
+      "isbn13": "9791130646381",
+      "title": "이처럼 사소한 것들",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The account of the author’s reputation ends at 명성을 안겨, before the predicate completes.",
+      "evidence": null,
+      "reviewedTextSha256": "47ac3865f288696eb1c568f625ab0d0fd1104d96b541d49447217967dc1c2cf4"
+    },
+    {
+      "isbn13": "9788960530942",
+      "title": "우사기의 도쿄 식탁",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The recipe comparison stops at 음식점에 갈 필요, before saying what is unnecessary.",
+      "evidence": null,
+      "reviewedTextSha256": "343d3a596fd9e654dd0b34298f0e11163948fd10d0c7267393d59abd28f62ef1"
+    },
+    {
+      "isbn13": "9781324050629",
+      "title": "Replaceable You",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "Promotional credits stop at Stiff and, in the middle of a coordinated book list; there is no actual synopsis.",
+      "evidence": null,
+      "reviewedTextSha256": "95bcef8bdba808fa90abe8b438c71402bc9f9e53a3f0a8b279f4b4d39eb6057f"
+    },
+    {
+      "isbn13": "9788955827965",
+      "title": "비가 내리고 풀은 자란다",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "After a complete plot teaser, a new sentence about the children stops at 아이.",
+      "evidence": null,
+      "reviewedTextSha256": "feb0a78a883254812c69ee5b780813512eece31648910b6f4701db64d3d672af"
+    },
+    {
+      "isbn13": "9788932521237",
+      "title": "성경을 보는 눈",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The account of the lectures ends at 주어진 주제, without completing the action.",
+      "evidence": null,
+      "reviewedTextSha256": "af7db1ec7d28c5a2ca67a5da6126dd13509f7358034a2a99c90cd260a72f350f"
+    },
+    {
+      "isbn13": "9788932816616",
+      "title": "다윗: 현실에 뿌리박은 영성",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "A quotation starts and ends at 인간으로서 그리고; the conjunction and quote are unfinished.",
+      "evidence": null,
+      "reviewedTextSha256": "0c0d9cb871d8309ad7036a507ea70e70c7b1357ab645dfe88e52bb5693b8c310"
+    },
+    {
+      "isbn13": "9791170830474",
+      "title": "경이라는 세계",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "A quotation attributed to Augustine ends immediately after 당신.",
+      "evidence": null,
+      "reviewedTextSha256": "928541d4bcf0c1aa8aae89d3edc4a5edd7c0361fe328d74f032037c7539504b1"
+    },
+    {
+      "isbn13": "9791194530701",
+      "title": "괴테는 모든 것을 말했다(여름 에디션)",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "After a coherent plot setup, the next sentence starts with 출처 and immediately stops.",
+      "evidence": null,
+      "reviewedTextSha256": "7f715a5d5a1114823a76cb0b1e36f7d20dd2eb9a4bf2227a78577255900cee29"
+    },
+    {
+      "isbn13": "9781937715489",
+      "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+      "priorAssessment": "note",
+      "manualAssessment": "note",
+      "reason": "The entire value is a front-cover quotation advertising a new running plan. It does not describe the book’s overall contents.",
+      "evidence": null,
+      "reviewedTextSha256": "c2fa0db52aaf53eaf7f966d2dd7ca27676d41cf8059f36a72e7aa8beaee86126"
+    },
+    {
+      "isbn13": "9788932812946",
+      "title": "가장 위험한 기도 주기도",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The closing clause ends at 지나치게, an adverb with no following predicate.",
+      "evidence": null,
+      "reviewedTextSha256": "c01b78851add0c82680e4d062ea5f3ecabe69feb746c053a18f256dfc052b6c8"
+    },
+    {
+      "isbn13": "9788932821399",
+      "title": "새로운 그리스도인이 온다",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The sentence about the characters’ conversation ends at 영적 갱신에, before the predicate.",
+      "evidence": null,
+      "reviewedTextSha256": "5d2a207a3421d7c4cc324aaed872deff722fb606711b556238f74749a83520eb"
+    },
+    {
+      "isbn13": "9791188887255",
+      "title": "정원에서 길을 물었다",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The account of Korean gardens starts another city example, 산업도시 울산, and stops.",
+      "evidence": null,
+      "reviewedTextSha256": "fe1cb1dd8a0b1c625d1c7f249d3ac0625068811cbc5a8c58cf24036228c56181"
+    },
+    {
+      "isbn13": "9788990928436",
+      "title": "페미니즘과 기독교의 맥락들",
+      "priorAssessment": "snippet",
+      "manualAssessment": "abridged-readable",
+      "reason": "The final Korean sentence is grammatically complete. The text is a readable introduction, though the matching YES24 description continues with the course origin and the book’s scope. Expansion is useful; this is not a broken sentence.",
+      "evidence": {
+        "label": "YES24: matching ISBN and continuation",
+        "url": "https://www.yes24.com/product/goods/59257651"
+      },
+      "reviewedTextSha256": "a174dc5afa0023dee402a3754d309b88c647ff37dc0a0b517a051e5cbfacf78c"
+    },
+    {
+      "isbn13": "9791161292526",
+      "title": "그리스도인은 어떻게 생각해야 할까?",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The biographical setup ends at 성령의 은사, without explaining the author’s experience.",
+      "evidence": null,
+      "reviewedTextSha256": "f17076f00024baad1687ad82f4c365981c337b29702c9e4099a3fbe392882718"
+    },
+    {
+      "isbn13": "9788954637770",
+      "title": "라면을 끓이며",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The prose collection is introduced coherently, but a new sentence ends immediately at 이 책.",
+      "evidence": null,
+      "reviewedTextSha256": "1b7e4c62c445230dd1d0d35f661e606608ecf9b16fa6537686ce5c9feb3f2995"
+    },
+    {
+      "isbn13": "9788962605952",
+      "title": "벌거벗은 통계학(리커버 에디션)",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The statistics explanation stops during 데이터와 데이터, an unfinished comparison.",
+      "evidence": null,
+      "reviewedTextSha256": "16e0263b432c275e8560d4d19bb172ec1f7cc40081118b80c1f1abbe77d6bfc9"
+    },
+    {
+      "isbn13": "9788932816135",
+      "title": "너라는 우주를 만나",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The adoption discussion stops at 막연, before the adjective and sentence are complete.",
+      "evidence": null,
+      "reviewedTextSha256": "4b5bba52be2e98172db1476545d8fbf4a5a7039d2ed6aa4754ddc7015ac814f5"
+    },
+    {
+      "isbn13": "9788901101569",
+      "title": "청춘의 독서",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final sentence starts with 삶에서 and has no continuation.",
+      "evidence": null,
+      "reviewedTextSha256": "879308a6261c6d0f43dcd6155f8a5eb6466cef877523da175c988cef713c4d83"
+    },
+    {
+      "isbn13": "9788970906805",
+      "title": "요리천사의 행복 밥상",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The list of advice ends inside a quotation after 아이.",
+      "evidence": null,
+      "reviewedTextSha256": "e1e406329d3f4dae192d8a0e61e8858aae8c06400a2fde701c39879dd6cf441c"
+    },
+    {
+      "isbn13": "9780817441814",
+      "title": "Learning to See Creatively",
+      "priorAssessment": "snippet",
+      "manualAssessment": "corrupt",
+      "reason": "Words are visibly damaged: developinghotographic, visualizeheir, and rewrittenuide. The final sentence itself can stand, but published descriptions continue beyond it. Repair the corrupted text; do not classify it as broken merely for lacking a period.",
+      "evidence": {
+        "label": "FNAC: matching ISBN and undamaged, longer description (search-index text; direct open failed)",
+        "url": "https://www.fnac.pt/Learning-to-See-Creatively-Bryan-Peterson/a339938?oref=0459d3e3-a906-a067-29a8-b0765ab164a7"
+      },
+      "reviewedTextSha256": "7117ad1aec04f52bbfddf20fbb2df07acdd5617aa2ea0bd7e4f42a72ca70c78a"
+    },
+    {
+      "isbn13": "9788965138310",
+      "title": "유럽 도시 기행 3",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The closing sentence stops at 사람들이 무엇, leaving the embedded question unfinished.",
+      "evidence": null,
+      "reviewedTextSha256": "9662ad23c50a0a0143d9a9cba170ca631de757bcf8cb21cee368cc727268557a"
+    },
+    {
+      "isbn13": "9791193238455",
+      "title": "나는 그림을 보며 어른이 되었다",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The list of values ends at 지켜내야 할, a modifier with no following noun.",
+      "evidence": null,
+      "reviewedTextSha256": "1ee1052048b929c12a2c1093e3332cd6e950d9228e1aea5fc2eda9d8887acc2a"
+    },
+    {
+      "isbn13": "9788953125780",
+      "title": "팀 켈러의 탕부 하나님",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final phrase ends at ‘탕자의 비유’의, a possessive without its head noun.",
+      "evidence": null,
+      "reviewedTextSha256": "cbb96429fe5a471affd75583dc62f5d11bc5a6367c658ff40e9c03e83801c925"
+    },
+    {
+      "isbn13": "9791191114225",
+      "title": "작별인사",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The plot description ends inside the word 따뜻, before the adjective and sentence complete.",
+      "evidence": null,
+      "reviewedTextSha256": "3afd92a1d80952b971286c5d06c4b3a2ecf93cdfd1a8e9f9940631bf7f32a50f"
+    },
+    {
+      "isbn13": "9791161290157",
+      "title": "과학시대의 도전과 기독교의 응답",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final sentence stops at 저자의 간절, an unfinished description of the author’s concern.",
+      "evidence": null,
+      "reviewedTextSha256": "c7c34f19a7dea8057ea99321e8b6a3f3c19aa24e3e09f3af4d0fc887a53fff1d"
+    },
+    {
+      "isbn13": "9788988042366",
+      "title": "폴 투르니에의 치유",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final statement about illness ends at 의미, without stating its predicate.",
+      "evidence": null,
+      "reviewedTextSha256": "fc7670090aa105262a82d7d308f89b4e1a9daf106c9eb4c136ae952b2ad482a8"
+    },
+    {
+      "isbn13": "9788901140612",
+      "title": "엄마는 아메리칸 스타일",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The sentence ends at 좋아하는, a modifier with no following object.",
+      "evidence": null,
+      "reviewedTextSha256": "da6b246ad6a02e829f3046ae2e80d9787ed8f72be496b380cf96d4741332c048"
+    },
+    {
+      "isbn13": "9791157528547",
+      "title": "평일의 예배, 노동",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The sentence about biblical insight stops at 예리, an unfinished adjective/adverb.",
+      "evidence": null,
+      "reviewedTextSha256": "81057c179d3eee5cc729838641df2c84240479e9754215920780a676bf0fd290"
+    },
+    {
+      "isbn13": "9791187708827",
+      "title": "인권옹호자 예수",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The author introduction starts with 다양성 교육 and stops before identifying the role or action.",
+      "evidence": null,
+      "reviewedTextSha256": "e6e0ab6b1534b8d975b5e61ebe4713a0bf4004794a1d36c1ffe4d8290fbdf95e"
+    },
+    {
+      "isbn13": "9788901279374",
+      "title": "밥 먹다가, 울컥",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The serial-publication account ends at 연재 중단 소식, before describing the response.",
+      "evidence": null,
+      "reviewedTextSha256": "3c00d777d2c0363b53b09669b52e408049a789bc1d005f8974cc777c90c75b38"
+    },
+    {
+      "isbn13": "9788998441012",
+      "title": "모순",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The character list stops at 조폭의 보스 without finishing the list or sentence.",
+      "evidence": null,
+      "reviewedTextSha256": "5591817f3fd3467b8fb51330f555a050594e6f3a9da6577bb47219824aa41d0e"
+    },
+    {
+      "isbn13": "9788953119901",
+      "title": "일과 영성",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "A question about using one’s abilities ends at 활용 before completing its verb.",
+      "evidence": null,
+      "reviewedTextSha256": "5d05bd518e21134878376dba4f4cd2a93cc5fa889268f52bdd641c98c7d4accf"
+    },
+    {
+      "isbn13": "9781718502321",
+      "title": "Engineering in Plain Sight",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The publisher’s matching sentence continues beyond field guide genre to explain the shift from natural phenomena to built structures. The stored description loses that essential continuation.",
+      "evidence": {
+        "label": "No Starch Press: matching ISBN and sentence continuation (search-index text; direct open failed)",
+        "url": "https://nostarch.com/node/677"
+      },
+      "reviewedTextSha256": "d58212f27b3cdb992ca6d758a3e6a56fb9482f2a8bd0ff5f475d97e4ab6db846"
+    },
+    {
+      "isbn13": "9791187890126",
+      "title": "고통은 나눌 수 있는가",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final contrast starts 그러나 이제 고통을 겪는 이들 and stops before the predicate.",
+      "evidence": null,
+      "reviewedTextSha256": "1941e6d05664c21af0af4e3b916641600c3e6c37d1c1a28bab51b99fe736008e"
+    },
+    {
+      "isbn13": "9780062049643",
+      "title": "Love Wins",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The matching Open Library description continues Is this acceptable with to God? and several explanatory paragraphs. The stored text cuts the question short.",
+      "evidence": {
+        "label": "Open Library: matching ISBN and work description",
+        "url": "https://openlibrary.org/books/OL24609716M/Love_Wins"
+      },
+      "reviewedTextSha256": "75df289e9e641a739eb8f950b2249dd5e9adc538abeee6d9c4e5bdb94d72c246"
+    },
+    {
+      "isbn13": "9788932817842",
+      "title": "성을 알면 달라지는 것들",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final contrast ends at 싱글이라면, a conditional without its consequent.",
+      "evidence": null,
+      "reviewedTextSha256": "d4fea0334190ec6c1b98ba787454edad18405c8c9510dd7a30403d556aed21b1"
+    },
+    {
+      "isbn13": "9788952790620",
+      "title": "인간 실격",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final sentence names 다자이 오사무 and stops before explaining what the author conveys.",
+      "evidence": null,
+      "reviewedTextSha256": "485aafa6e0c56c6d200663f2aa223be7f3437c11bbe37e587d69e2ba6b2d54d5"
+    },
+    {
+      "isbn13": "9788932817583",
+      "title": "읽는다는 것",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The intellectual itinerary ends at 가다머 without completing the sequence or the sentence.",
+      "evidence": null,
+      "reviewedTextSha256": "8e7b2019a07b707aa9f321b9deab794e5c364edc5aec60e1a0ebf5d12f05605c"
+    },
+    {
+      "isbn13": "9780393081084",
+      "title": "The Food Lab",
+      "priorAssessment": "snippet",
+      "manualAssessment": "abridged-readable",
+      "reason": "The final steak question is understandable and grammatically complete apart from its missing question mark. The matching published blurb continues with more questions and the book’s method. Treat as a readable teaser with optional expansion, not an obviously broken sentence.",
+      "evidence": {
+        "label": "OverDrive: matching ISBN and publisher description",
+        "url": "https://www.overdrive.com/media/2398158/the-food-lab"
+      },
+      "reviewedTextSha256": "289fda7b9d8b0ce47bf704cce554033886f91fa72f3143ae3e310b759bbcdac8"
+    },
+    {
+      "isbn13": "9788990353627",
+      "title": "부흥(평양대부흥 100주년 특별 보급판)",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The author’s ministry account stops at 성경의 권위, before stating his position or action.",
+      "evidence": null,
+      "reviewedTextSha256": "0260b6588150cc0d583c1a85c115551cb38fd9e509055afa01777ea225385d81"
+    },
+    {
+      "isbn13": "9788936439880",
+      "title": "할매",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "After an endorsement, the author introduction ends at 수상에 빛나는, a modifier with no following noun.",
+      "evidence": null,
+      "reviewedTextSha256": "fd30e98daf692a486ad4fac68d1d1abbb464b6a28d1d114b97028bb66e744bb5"
+    },
+    {
+      "isbn13": "9788932521220",
+      "title": "나를 넘어서는 성경읽기",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The contrast ends at 초인이 아니라 우리 곁, leaving the intended description of ordinary people unfinished.",
+      "evidence": null,
+      "reviewedTextSha256": "0c1dd1b230aeb65f352b5fa3b3d44ea6dd9c172cc7cb552e75ebc8c7bf660dc9"
+    },
+    {
+      "isbn13": "9788959160631",
+      "title": "그리움",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The final sentence promises something about English lyrics, but ends at 영어 before explaining what is provided.",
+      "evidence": null,
+      "reviewedTextSha256": "6eba01a39e0cdae8f877dbaf7dc0544ead7b3b633883370d3c1e6cca9dd9cc6f"
+    },
+    {
+      "isbn13": "9788994796734",
+      "title": "하늘과 바람과 별과 시",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The discussion of the poems ends at 언제나, with no continuation.",
+      "evidence": null,
+      "reviewedTextSha256": "0fcef024b64f29fe341e9f2ef1eef15536f9ae9e4e81512a38fdfd79e821cd63"
+    },
+    {
+      "isbn13": "9788953108103",
+      "title": "영적 발돋움",
+      "priorAssessment": "snippet",
+      "manualAssessment": "acceptable",
+      "reason": "The synopsis finishes a complete account of relationships, calling, identity, and belonging. The trailing 양장 is a standalone hardcover-format label, not a missing narrative ending. Keep the description; format cleanup is optional.",
+      "evidence": {
+        "label": "YES24: matching ISBN; hardcover format corroborated (not an exact-text completeness comparison)",
+        "url": "https://www.yes24.com/product/goods/2511761"
+      },
+      "reviewedTextSha256": "5718b14ee0b1e08ae5f13086927cfc11d6e7a2279544c9e979863a5d011a6c8f"
+    },
+    {
+      "isbn13": "9781400044177",
+      "title": "Age of Entanglement",
+      "priorAssessment": "snippet",
+      "manualAssessment": "cut",
+      "reason": "The historical setup ends at the most cited of all of, an incomplete prepositional phrase.",
+      "evidence": null,
+      "reviewedTextSha256": "2522d0a080d2069726287bcb7ec40499a0f50d7c432f183bca3eddb292df238f"
+    }
+  ]
+}

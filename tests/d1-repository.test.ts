@@ -504,7 +504,7 @@ void test('catalog intake never overwrites a shared ISBN edition', async () => {
 });
 
 void test('catalog intake rejects invalid descriptions before writing', async () => {
-  for (const description of [42, null, 'a'.repeat(5_001)]) {
+  for (const description of [42, null, 'a'.repeat(50_001)]) {
     const database = new RecordedD1((sql) => sql.includes('SELECT 1 AS active') ? { active: 1 } : null);
     const repository = new D1LibraryRepository(database as unknown as D1Database, { now: () => fixedNow });
 

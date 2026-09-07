@@ -1,0 +1,5767 @@
+{
+  "checkedAt": "2026-09-07T16:39:02.415Z",
+  "total": 115,
+  "complete": true,
+  "improvements": 12,
+  "previousSuggestionsUnchanged": true,
+  "newRequestsDuringEnrichment": 75,
+  "offlineCacheMisses": [],
+  "freshGoogleAndKakao": false,
+  "sourceHashes": {
+    "lib/isbn/server-lookup.ts": "751783a640a44448d46afbf6f6ac4f17e71b0f5cee22b2c7fa6d12274c8034d7",
+    "lib/isbn/server-normalizers.ts": "ce9dae367925c26235a0b46bf31f2a62a93c362c927bb433cd65716c9da4a642",
+    "lib/isbn/retrieval.ts": "5416fb34fb03df2e2572dd1f56165cfc660da02f8c328d7f271c0ea7f7eb8c09",
+    "scripts/audit-book-descriptions.ts": "19ec6146f11bec919fd4ff507fecb57be954b075749f9ab26e5b6b13146330d3"
+  },
+  "rows": [
+    {
+      "isbn13": "9788997381678",
+      "title": "소년과 두더지와 여우와 말",
+      "improvement": false,
+      "currentCharacters": 253,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781785004919",
+      "title": "Making Moving Toys and Automata",
+      "improvement": false,
+      "currentCharacters": 769,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7993203A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL21194506W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL21194506W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781451673265",
+      "title": "Fahrenheit 451",
+      "improvement": true,
+      "currentCharacters": 55,
+      "proposedCharacters": 1608,
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/books/OL25859954M",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL103123W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "description-language-mismatch",
+          "record": "/works/OL103123W",
+          "descriptionCharacters": 1542
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 1608
+        }
+      ]
+    },
+    {
+      "isbn13": "9788936509484",
+      "title": "묻고 답하다",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL5951833A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL40043158W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL40043158W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788925548913",
+      "title": "예수가 선택한 십자가",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791161292311",
+      "title": "기후 위기 시대의 도전과 교회의 응답",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788953117662",
+      "title": "길갈",
+      "improvement": false,
+      "currentCharacters": 176,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788963602370",
+      "title": "새가족반",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791161291734",
+      "title": "오직 충성으로 받는 구원",
+      "improvement": false,
+      "currentCharacters": 253,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791130646381",
+      "title": "이처럼 사소한 것들",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL23020966W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "title-or-author-unconfirmed",
+          "record": "/works/OL23020966W",
+          "descriptionCharacters": 347
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788960530942",
+      "title": "우사기의 도쿄 식탁",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781324050629",
+      "title": "Replaceable You",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL12314403A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL42560428W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL42560428W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788955827965",
+      "title": "비가 내리고 풀은 자란다",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932521237",
+      "title": "성경을 보는 눈",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932816616",
+      "title": "다윗: 현실에 뿌리박은 영성",
+      "improvement": false,
+      "currentCharacters": 245,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781368095099",
+      "title": "Spidey and His Amazing Friends: Electro's Gotta Glow",
+      "improvement": false,
+      "currentCharacters": 676,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL10801449A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL29200223W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL29200223W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9791170830474",
+      "title": "경이라는 세계",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780679720201",
+      "title": "The Stranger",
+      "improvement": false,
+      "currentCharacters": 988,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL1230613W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "title-or-author-unconfirmed",
+          "record": "/works/OL1230613W",
+          "descriptionCharacters": 260
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "skipped",
+          "reason": "page-budget-exhausted"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781368081467",
+      "title": "Welcome to Merlin Academy",
+      "improvement": false,
+      "currentCharacters": 1320,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791194530701",
+      "title": "괴테는 모든 것을 말했다(여름 에디션)",
+      "improvement": false,
+      "currentCharacters": 253,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781937715489",
+      "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+      "improvement": false,
+      "currentCharacters": 60,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7320668A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL19757974W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL19757974W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932812946",
+      "title": "가장 위험한 기도 주기도",
+      "improvement": false,
+      "currentCharacters": 247,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL8768834A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL23130546W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL23130546W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932821399",
+      "title": "새로운 그리스도인이 온다",
+      "improvement": false,
+      "currentCharacters": 247,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780593310229",
+      "title": "Richard Scarry's Super Silly Seek and Find!",
+      "improvement": false,
+      "currentCharacters": 476,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7983937A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL25464414W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL25464414W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781606089743",
+      "title": "The Subversion of Christianity",
+      "improvement": false,
+      "currentCharacters": 1182,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7460806A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL9504938A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL6744811A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL25356911W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL25356911W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9791188887255",
+      "title": "정원에서 길을 물었다",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781538110690",
+      "title": "Climate Church, Climate World",
+      "improvement": false,
+      "currentCharacters": 704,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL9375024A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL217748A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL24866033W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "no-description-improvement",
+          "record": "/works/OL24866033W",
+          "descriptionCharacters": 985
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 985
+        }
+      ]
+    },
+    {
+      "isbn13": "9780676970050",
+      "title": "The First Man",
+      "improvement": false,
+      "currentCharacters": 468,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781587435171",
+      "title": "Strange Religion",
+      "improvement": false,
+      "currentCharacters": 1108,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL6877852A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL37629219W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL37629219W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9798217024445",
+      "title": "The Prince and the Bot! (Iron Man and His Awesome Friends)",
+      "improvement": false,
+      "currentCharacters": 755,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788990928436",
+      "title": "페미니즘과 기독교의 맥락들",
+      "improvement": false,
+      "currentCharacters": 249,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791161292526",
+      "title": "그리스도인은 어떻게 생각해야 할까?",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932907284",
+      "title": "죄와 벌(하)(도스또예프스끼 전집 9)",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780593089781",
+      "title": "Who Was? and What Is? America Collection Boxed Set 25 books",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL44148253W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL44148253W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788954637770",
+      "title": "라면을 끓이며",
+      "improvement": false,
+      "currentCharacters": 247,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL4288220A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL20026822W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL20026822W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781554071470",
+      "title": "Nightwatch",
+      "improvement": false,
+      "currentCharacters": 115,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL19665748W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL19665748W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788962605952",
+      "title": "벌거벗은 통계학(리커버 에디션)",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932816135",
+      "title": "너라는 우주를 만나",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788901101569",
+      "title": "청춘의 독서",
+      "improvement": false,
+      "currentCharacters": 249,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL5015577A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL33024377W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL33024377W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9798217032617",
+      "title": "We Are Shiz (Universal Pictures Wicked)",
+      "improvement": false,
+      "currentCharacters": 489,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780545886222",
+      "title": "The Baby-Sitters Club: Claudia and Mean Janine",
+      "improvement": true,
+      "currentCharacters": 188,
+      "proposedCharacters": 454,
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/books/OL26215111M",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL8756328W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "title-or-author-unconfirmed",
+          "record": "/works/OL8756328W",
+          "descriptionCharacters": 454
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 454
+        }
+      ]
+    },
+    {
+      "isbn13": "9788970906805",
+      "title": "요리천사의 행복 밥상",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780857687609",
+      "title": "Fun with a Pencil",
+      "improvement": false,
+      "currentCharacters": 414,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL4771583A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL181333W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "edition-language-missing",
+          "record": "/works/OL181333W",
+          "descriptionCharacters": 221
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9780817441814",
+      "title": "Learning to See Creatively",
+      "improvement": false,
+      "currentCharacters": 258,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2855444A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL8532656W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL8532656W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932907314",
+      "title": "악령(상)(3판)(도스또예프스끼 전집 12)",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781615649983",
+      "title": "Joshua Weissman",
+      "improvement": false,
+      "currentCharacters": 1812,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL9260791A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL24575051W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL24575051W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781847670311",
+      "title": "Complete Peanuts 1950 -1952 Vol.1",
+      "improvement": false,
+      "currentCharacters": 118,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL22428A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2751472A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL20659134W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "title-or-author-unconfirmed",
+          "record": "/works/OL20659134W",
+          "descriptionCharacters": 122
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9780062464316",
+      "title": "Homo Deus",
+      "improvement": false,
+      "currentCharacters": 1645,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL3778242A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL17641518W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL17641518W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 1249
+        }
+      ]
+    },
+    {
+      "isbn13": "9781583225752",
+      "title": "A Woman's Story",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL29466A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL102396W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL102396W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9780553522778",
+      "title": "Puppy Birthday to You! (Paw Patrol)",
+      "improvement": false,
+      "currentCharacters": 570,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2675811A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL18146668W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL18146668W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932039244",
+      "title": "중력과 은총",
+      "improvement": false,
+      "currentCharacters": 75,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788965138310",
+      "title": "유럽 도시 기행 3",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781932974010",
+      "title": "Stikky Night Skies: Learn 6 Constellations, 4 Stars, A Planet, A Galaxy, And How To Navigate At Night--in One Hour, Guaranteed (Stikky)",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL3064291A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL8896198W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL8896198W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781772754629",
+      "title": "Disney Elena of Avalor: Ready to Rule Cinestory Comic",
+      "improvement": false,
+      "currentCharacters": 540,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2687141A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL21831722W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL21831722W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781732102200",
+      "title": "A Philosophy of Software Design",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL723595A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL21221785W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL21221785W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9791193238455",
+      "title": "나는 그림을 보며 어른이 되었다",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780062661128",
+      "title": "Autonomy",
+      "improvement": false,
+      "currentCharacters": 1420,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL1755550A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL19748997W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "no-description-improvement",
+          "record": "/works/OL19748997W",
+          "descriptionCharacters": 228
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 228
+        }
+      ]
+    },
+    {
+      "isbn13": "9788953125780",
+      "title": "팀 켈러의 탕부 하나님",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791191114225",
+      "title": "작별인사",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL5856504A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL31854824W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL31854824W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788997760244",
+      "title": "일",
+      "improvement": false,
+      "currentCharacters": 159,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791161290157",
+      "title": "과학시대의 도전과 기독교의 응답",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL16194305A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL44947174W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL44947174W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781580089777",
+      "title": "Tacos",
+      "improvement": false,
+      "currentCharacters": 164,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2626009A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL14932259W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL14932259W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788988042366",
+      "title": "폴 투르니에의 치유",
+      "improvement": false,
+      "currentCharacters": 248,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788901140612",
+      "title": "엄마는 아메리칸 스타일",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788970089997",
+      "title": "결혼 건축가",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781400078431",
+      "title": "The Year of Magical Thinking",
+      "improvement": false,
+      "currentCharacters": 1336,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL4441955A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL500171W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "title-or-author-unconfirmed",
+          "record": "/works/OL500171W",
+          "descriptionCharacters": 674
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788993461237",
+      "title": "에스프레소 바이블",
+      "improvement": false,
+      "currentCharacters": 204,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780736431095",
+      "title": "The Perfect Tea Party (Disney Junior: Sofia the First)",
+      "improvement": false,
+      "currentCharacters": 466,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL1477234A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL22759696W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "adaptation-mismatch",
+          "record": "/works/OL22759696W",
+          "descriptionCharacters": 408
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 408
+        }
+      ]
+    },
+    {
+      "isbn13": "9780375704024",
+      "title": "Norwegian Wood",
+      "improvement": false,
+      "currentCharacters": 764,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL2625457W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "edition-language-missing",
+          "record": "/works/OL2625457W",
+          "descriptionCharacters": 2025
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 560
+        }
+      ]
+    },
+    {
+      "isbn13": "9780809051014",
+      "title": "Ray Bradbury's Fahrenheit 451",
+      "improvement": true,
+      "currentCharacters": 244,
+      "proposedCharacters": 311,
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/books/OL24645428M",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL3465657W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "title-or-author-unconfirmed",
+          "record": "/works/OL3465657W",
+          "descriptionCharacters": 311
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 311
+        }
+      ]
+    },
+    {
+      "isbn13": "9780817439392",
+      "title": "Understanding Exposure",
+      "improvement": true,
+      "currentCharacters": 203,
+      "proposedCharacters": 531,
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL3901933W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL6548911A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL3901933W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL3901933W",
+          "descriptionCharacters": 531
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 531
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932907321",
+      "title": "악령(하)(3판)(도스또예프스끼 전집 13)",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791157528547",
+      "title": "평일의 예배, 노동",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9791187708827",
+      "title": "인권옹호자 예수",
+      "improvement": false,
+      "currentCharacters": 251,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL15765286A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL43936066W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL43936066W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9780553293357",
+      "title": "Foundation",
+      "improvement": false,
+      "currentCharacters": 1175,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL34221A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL46125W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL46125W",
+          "descriptionCharacters": 1120
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 1120
+        }
+      ]
+    },
+    {
+      "isbn13": "9788901279374",
+      "title": "밥 먹다가, 울컥",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781601427564",
+      "title": "Accidental Saints",
+      "improvement": false,
+      "currentCharacters": 1423,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL17610513W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "edition-language-missing",
+          "record": "/works/OL17610513W",
+          "descriptionCharacters": 1425
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788998441012",
+      "title": "모순",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL4283202A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL10348883W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL10348883W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788953119901",
+      "title": "일과 영성",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL31551380W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL31551380W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781718502321",
+      "title": "Engineering in Plain Sight",
+      "improvement": false,
+      "currentCharacters": 254,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL10342885A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL27700321W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL27700321W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9791187890126",
+      "title": "고통은 나눌 수 있는가",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780545813891",
+      "title": "The Baby-Sitter's Club: The Truth About Stacey",
+      "improvement": true,
+      "currentCharacters": 161,
+      "proposedCharacters": 446,
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL8756332W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL8756332W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2980597A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL8756332W",
+          "descriptionCharacters": 446
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 446
+        }
+      ]
+    },
+    {
+      "isbn13": "9780241552292",
+      "title": "Eichmann in Jerusalem (Penguin Modern Classics)",
+      "improvement": true,
+      "currentCharacters": 248,
+      "proposedCharacters": 284,
+      "proposedProvenance": {
+        "title": "kakao-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "kakao-books",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL1386647W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL142235A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL1386647W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL1386647W",
+          "descriptionCharacters": 284
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 284
+        }
+      ]
+    },
+    {
+      "isbn13": "9780062049643",
+      "title": "Love Wins",
+      "improvement": true,
+      "currentCharacters": 250,
+      "proposedCharacters": 1387,
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/books/OL24609716M",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL15678650W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "edition-language-missing",
+          "record": "/works/OL15678650W",
+          "descriptionCharacters": 1194
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "no-description-improvement",
+          "record": "/works/OL15678650W",
+          "descriptionCharacters": 1194
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 1387
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932817842",
+      "title": "성을 알면 달라지는 것들",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780062410665",
+      "title": "The Enlightenment",
+      "improvement": false,
+      "currentCharacters": 2438,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL866650A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL21662836W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL21662836W",
+          "descriptionCharacters": 2114
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 2114
+        }
+      ]
+    },
+    {
+      "isbn13": "9780545206945",
+      "title": "I Survived the Sinking of the Titanic, 1912 (I Survived #1)",
+      "improvement": false,
+      "currentCharacters": 289,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL15492795W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL15492795W",
+          "descriptionCharacters": 40
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 40
+        }
+      ]
+    },
+    {
+      "isbn13": "9791141602376",
+      "title": "안녕이라 그랬어(집에디션 리커버)",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780525582199",
+      "title": "It's Trevor Noah",
+      "improvement": false,
+      "currentCharacters": 1480,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7406196A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL20161699W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "edition-language-missing",
+          "record": "/works/OL20161699W",
+          "descriptionCharacters": 748
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788952790620",
+      "title": "인간 실격",
+      "improvement": false,
+      "currentCharacters": 249,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780817437381",
+      "title": "Creative Nature & Outdoor Photography",
+      "improvement": false,
+      "currentCharacters": 176,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL1481961A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL5967851W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL5967851W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL5967851W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL5967851W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL5967851W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781594631870",
+      "title": "The Meaning of Marriage",
+      "improvement": true,
+      "currentCharacters": 199,
+      "proposedCharacters": 1283,
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL16079742W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL390283A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL16079742W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL16079742W",
+          "descriptionCharacters": 1283
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 1283
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932817583",
+      "title": "읽는다는 것",
+      "improvement": false,
+      "currentCharacters": 237,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932907277",
+      "title": "죄와 벌(상)(도스또예프스끼 전집 8)",
+      "improvement": false,
+      "currentCharacters": 161,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932840536",
+      "title": "회심",
+      "improvement": false,
+      "currentCharacters": 241,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780393081084",
+      "title": "The Food Lab",
+      "improvement": false,
+      "currentCharacters": 249,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL18146664W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7442728A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "no-description-improvement",
+          "record": "/works/OL18146664W",
+          "descriptionCharacters": 17
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-edition-selection",
+          "outcome": "rejected",
+          "reason": "title-mismatch",
+          "record": "/books/OL26629978M"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 17
+        }
+      ]
+    },
+    {
+      "isbn13": "9780545886215",
+      "title": "Mary Anne saves the day",
+      "improvement": true,
+      "currentCharacters": 188,
+      "proposedCharacters": 630,
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL8117954W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL8117954W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "edition-language-missing",
+          "record": "/works/OL8117954W",
+          "descriptionCharacters": 630
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2980597A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL8117954W",
+          "descriptionCharacters": 630
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 630
+        }
+      ]
+    },
+    {
+      "isbn13": "9781684376421",
+      "title": "The Highlights Book of Things to Do",
+      "improvement": false,
+      "currentCharacters": 1722,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2859867A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL21683256W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL21683256W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788952757418",
+      "title": "카페 브런치",
+      "improvement": false,
+      "currentCharacters": 218,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781368112420",
+      "title": "Escape from the Isle of the Lost: A Descendants Novel",
+      "improvement": false,
+      "currentCharacters": 1673,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7481829A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL37715377W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL37715377W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788997686971",
+      "title": "중국요리",
+      "improvement": false,
+      "currentCharacters": 226,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788990353627",
+      "title": "부흥(평양대부흥 100주년 특별 보급판)",
+      "improvement": false,
+      "currentCharacters": 241,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788936439880",
+      "title": "할매",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788932521220",
+      "title": "나를 넘어서는 성경읽기",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9788959160631",
+      "title": "그리움",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781338067613",
+      "title": "Kristy's big day: a graphic novel",
+      "improvement": true,
+      "currentCharacters": 91,
+      "proposedCharacters": 465,
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/books/OL26889721M",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL7513503A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL19671707W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "title-or-author-unconfirmed",
+          "record": "/works/OL19671707W",
+          "descriptionCharacters": 465
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 465
+        }
+      ]
+    },
+    {
+      "isbn13": "9781484720974",
+      "title": "Isle of the Lost, The-A Descendants Novel, Vol. 1",
+      "improvement": false,
+      "currentCharacters": 527,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL17175900W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "rejected",
+          "reason": "edition-language-missing",
+          "record": "/works/OL17175900W",
+          "descriptionCharacters": 179
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 179
+        }
+      ]
+    },
+    {
+      "isbn13": "9788954682152",
+      "title": "작별하지 않는다",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL2671323A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL32107522W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL32107522W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9780571368709",
+      "title": "Small Things Like These",
+      "improvement": true,
+      "currentCharacters": 249,
+      "proposedCharacters": 347,
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL23020966W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL82155A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL23020966W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL23020966W",
+          "descriptionCharacters": 347
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 347
+        }
+      ]
+    },
+    {
+      "isbn13": "9788994796734",
+      "title": "하늘과 바람과 별과 시",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9780307336798",
+      "title": "Art of Simple Food",
+      "improvement": true,
+      "currentCharacters": 250,
+      "proposedCharacters": 1044,
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL3256032W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL530475A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL3256032W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "ok",
+          "record": "/works/OL3256032W",
+          "descriptionCharacters": 1044
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "ok",
+          "descriptionCharacters": 1044
+        }
+      ]
+    },
+    {
+      "isbn13": "9781606852545",
+      "title": "Nickelodeon PAW Patrol",
+      "improvement": false,
+      "currentCharacters": 0,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL3872567A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL34588112W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL34588112W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9788953108103",
+      "title": "영적 발돋움",
+      "improvement": false,
+      "currentCharacters": 250,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    },
+    {
+      "isbn13": "9781400044177",
+      "title": "Age of Entanglement",
+      "improvement": false,
+      "currentCharacters": 252,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "author:/authors/OL5097013A",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work:/works/OL18558191W",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "work-selection",
+          "outcome": "not-found",
+          "reason": "no-description",
+          "record": "/works/OL18558191W"
+        },
+        {
+          "provider": "open-library",
+          "stage": "alternative-editions",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "description-selection",
+          "outcome": "not-found",
+          "descriptionCharacters": 0
+        }
+      ]
+    },
+    {
+      "isbn13": "9781368047241",
+      "title": "Belle the mysterious message",
+      "improvement": false,
+      "currentCharacters": 504,
+      "proposedCharacters": 0,
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "diagnostics": [
+        {
+          "provider": "open-library",
+          "stage": "edition",
+          "outcome": "not-found",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "search",
+          "outcome": "ok",
+          "attempts": 1
+        },
+        {
+          "provider": "open-library",
+          "stage": "edition-discovery",
+          "outcome": "ok",
+          "attempts": 1
+        }
+      ]
+    }
+  ]
+}

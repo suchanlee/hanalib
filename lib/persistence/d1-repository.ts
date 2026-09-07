@@ -1,3 +1,6 @@
+import { assessDescription } from '../books/descriptions.ts';
+import { MAX_DESCRIPTION_LENGTH } from '../books/descriptions.ts';
+import { confirmCategories, parseBookCategories, validBookCategories, validCategoryCodes, type BookCategories } from '../books/categories.ts';
 import { borrowRequestExpiresAt, borrowRequestReminderAt, firstReturnCheckAt } from '../domain/rules.ts';
 import type {
   AddBookInput,
@@ -52,7 +55,10 @@ const CATALOG_SELECT = `
     COALESCE(ci.cover_source_override_url, be.cover_source_url) AS coverSourceUrl,
     be.cover_storage_path AS coverStoragePath,
     COALESCE(json_extract(ci.metadata_overrides_json, '$.coverTone'), be.cover_tone) AS coverTone,
-    be.field_provenance_json AS provenanceJson
+    json_patch(be.field_provenance_json, COALESCE(json_extract(ci.metadata_overrides_json, '$.descriptionProvenance'), '{}')) AS provenanceJson,
+    json_extract(ci.metadata_overrides_json, '$.descriptionEdited') AS descriptionEdited,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.categories'), be.categories_json) AS categoriesJson,
+    json_extract(ci.metadata_overrides_json, '$.categories') AS categoryOverrideJson
   FROM catalog_items ci
   INNER JOIN book_editions be ON be.id = ci.edition_id
 `;
@@ -81,6 +87,9 @@ interface CatalogRow {
   coverStoragePath: string | null;
   coverTone: string;
   provenanceJson: string;
+  descriptionEdited?: number | null;
+  categoriesJson?: string | null;
+  categoryOverrideJson?: string | null;
 }
 
 interface MemberRow {
@@ -267,6 +276,7 @@ function mapCatalogItem(row: CatalogRow): CatalogItem {
         : row.coverSourceUrl ?? (row.coverStoragePath ? `/api/covers/${encodeURIComponent(row.coverStoragePath)}` : undefined),
       coverTone,
       provenance: parseJson<Record<string, string>>(row.provenanceJson, {}),
+      categories: parseBookCategories(row.categoriesJson),
     },
   };
 }
@@ -375,6 +385,7 @@ function validProvenance(value: Record<string, unknown>) {
 
 function metadataOverrides(item: CatalogItem) {
   return {
+    categories: undefined as BookCategories | undefined,
     title: item.edition.title,
     titleEn: item.edition.titleEn ?? null,
     authors: item.edition.authors,
@@ -384,6 +395,12 @@ function metadataOverrides(item: CatalogItem) {
     language: item.edition.language,
     pageCount: item.edition.pageCount ?? null,
     description: item.edition.description ?? null,
+    descriptionEdited: false,
+    descriptionProvenance: {
+      description: item.edition.provenance.description ?? null,
+      descriptionUrl: item.edition.provenance.descriptionUrl ?? null,
+      descriptionScope: item.edition.provenance.descriptionScope ?? null,
+    } as Record<'description' | 'descriptionUrl' | 'descriptionScope', string | null>,
     coverTone: item.edition.coverTone,
   };
 }
@@ -755,6 +772,7 @@ export class D1LibraryRepository implements LibraryRepository {
     if (
       !input ||
       typeof input.isbn13 !== 'string' ||
+      (input.categories !== undefined && !validBookCategories(input.categories)) ||
       typeof input.title !== 'string' ||
       !Array.isArray(input.authors) ||
       !input.authors.every((author) => typeof author === 'string') ||
@@ -780,7 +798,7 @@ export class D1LibraryRepository implements LibraryRepository {
       (input.titleEn !== undefined && !boundedText(input.titleEn, 300)) ||
       !validAuthors(input.authors) ||
       !boundedText(input.publisher, 200) ||
-      (input.description !== undefined && !boundedText(input.description, 5_000)) ||
+      (input.description !== undefined && !boundedText(input.description, MAX_DESCRIPTION_LENGTH)) ||
       (input.ownerNotes !== undefined && !boundedText(input.ownerNotes, 1_000)) ||
       (input.coverUrl !== undefined && input.coverUrl.length > 2_048) ||
       !validProvenance(input.provenance)
@@ -818,8 +836,8 @@ export class D1LibraryRepository implements LibraryRepository {
         INSERT INTO book_editions (
           id, isbn13, title, title_en, authors_json, authors_en_json, publisher,
           published_on, language, page_count, description, cover_source_url, cover_tone,
-          field_provenance_json, resolver_version, resolved_at
-        ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+          field_provenance_json, resolver_version, resolved_at, categories_json
+        ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
         ON CONFLICT(isbn13) DO NOTHING
       `).bind(
         editionId,
@@ -836,6 +854,7 @@ export class D1LibraryRepository implements LibraryRepository {
         coverToneFor(input.title),
         JSON.stringify(input.provenance),
         now,
+        input.categories && input.categories.status !== 'confirmed' ? JSON.stringify(input.categories) : null,
       ),
       this.db.prepare(`
         INSERT INTO catalog_items (
@@ -857,7 +876,11 @@ export class D1LibraryRepository implements LibraryRepository {
           authors: input.authors.map((author) => author.trim()), authorsEn: [],
           publisher: input.publisher.trim() || null, publishedOn: String(input.publishedYear),
           language: input.language, pageCount: input.pageCount ?? null, description: input.description?.trim() || null,
+          descriptionEdited: input.provenance.description === 'member',
+          descriptionProvenance: { description: input.provenance.description ?? null,
+            descriptionUrl: input.provenance.descriptionUrl ?? null, descriptionScope: input.provenance.descriptionScope ?? null },
           coverTone: coverToneFor(input.title),
+          categories: input.categories,
         }),
         uploadedCoverId ? null : input.coverUrl ?? null,
         operationKey,
@@ -872,6 +895,12 @@ export class D1LibraryRepository implements LibraryRepository {
         SET catalog_item_id = ?
         WHERE id = ? AND owner_id = ? AND kind = 'cover' AND catalog_item_id IS NULL
       `).bind(itemId, uploadedCoverId, context.actorId));
+    }
+    if (input.provenance.description !== 'member' && assessDescription(input.description).quality !== 'substantive') {
+      statements.push(this.db.prepare(`
+        INSERT INTO description_jobs (item_id, available_at, updated_at)
+        VALUES (?, ?, ?)
+      `).bind(itemId, now, now));
     }
     const results = await this.db.batch(statements);
     if (affected(results[1]) !== 1) throw libraryError('conflict', 'The book could not be added.');
@@ -897,7 +926,8 @@ export class D1LibraryRepository implements LibraryRepository {
       (changes.publishedYear !== undefined && (!Number.isInteger(changes.publishedYear) || changes.publishedYear < 1000 || changes.publishedYear > 2200)) ||
       (changes.language !== undefined && !['ko', 'en', 'other'].includes(changes.language)) ||
       (changes.pageCount !== undefined && changes.pageCount !== null && (!Number.isInteger(changes.pageCount) || changes.pageCount <= 0)) ||
-      (changes.description !== undefined && changes.description !== null && typeof changes.description !== 'string')
+      (changes.description !== undefined && changes.description !== null && typeof changes.description !== 'string') ||
+      (changes.categoryCodes !== undefined && !validCategoryCodes(changes.categoryCodes))
     ) {
       throw libraryError('invalid-input', 'Invalid book details.');
     }
@@ -907,7 +937,7 @@ export class D1LibraryRepository implements LibraryRepository {
       (changes.authors !== undefined && !validAuthors(changes.authors)) ||
       (changes.authorsEn !== undefined && !validAuthors(changes.authorsEn)) ||
       (changes.publisher !== undefined && !boundedText(changes.publisher, 200)) ||
-      (changes.description != null && !boundedText(changes.description, 5_000)) ||
+      (changes.description != null && !boundedText(changes.description, MAX_DESCRIPTION_LENGTH)) ||
       (changes.ownerNotes !== undefined && !boundedText(changes.ownerNotes, 1_000))
     ) throw libraryError('invalid-input', 'One or more book details exceed the allowed length.');
     const ownedRow = await this.catalogItem(itemId, context.communityId);
@@ -915,6 +945,11 @@ export class D1LibraryRepository implements LibraryRepository {
       throw libraryError('not-found', 'Only the owner can edit an active listing.');
     }
     const overrides = metadataOverrides(mapCatalogItem(ownedRow));
+    overrides.categories = parseBookCategories(ownedRow.categoryOverrideJson);
+    overrides.descriptionEdited = Boolean(ownedRow.descriptionEdited);
+    if (changes.categoryCodes !== undefined) {
+      overrides.categories = confirmCategories(changes.categoryCodes, parseBookCategories(ownedRow.categoriesJson));
+    }
     if (changes.title !== undefined) {
       overrides.title = changes.title.trim();
       overrides.coverTone = coverToneFor(changes.title);
@@ -926,7 +961,26 @@ export class D1LibraryRepository implements LibraryRepository {
     if (changes.publishedYear !== undefined) overrides.publishedOn = String(changes.publishedYear);
     if (changes.language !== undefined) overrides.language = changes.language;
     if (changes.pageCount !== undefined) overrides.pageCount = changes.pageCount;
-    if (changes.description !== undefined) overrides.description = changes.description?.trim() || null;
+    if (changes.descriptionProvenance !== undefined && (
+      !changes.descriptionProvenance || typeof changes.descriptionProvenance !== 'object' || Array.isArray(changes.descriptionProvenance) ||
+      !validProvenance(changes.descriptionProvenance) ||
+      Object.keys(changes.descriptionProvenance).some(key => !['description', 'descriptionUrl', 'descriptionScope'].includes(key)) ||
+      !['member', 'google-books', 'open-library', 'kakao-books', 'nlk', 'naver', 'aladin'].includes(changes.descriptionProvenance.description) ||
+      (changes.descriptionProvenance.descriptionUrl !== undefined && !changes.descriptionProvenance.descriptionUrl.startsWith('https://')) ||
+      (changes.descriptionProvenance.descriptionScope !== undefined && !['work', 'edition'].includes(changes.descriptionProvenance.descriptionScope))
+    )) throw libraryError('invalid-input', 'Invalid description source.');
+    if (changes.description !== undefined) {
+      const description = changes.description?.trim() || null;
+      if (description !== overrides.description || changes.descriptionProvenance !== undefined) {
+        overrides.descriptionEdited = true;
+        overrides.descriptionProvenance = {
+          description: changes.descriptionProvenance?.description ?? 'member',
+          descriptionUrl: changes.descriptionProvenance?.descriptionUrl ?? null,
+          descriptionScope: changes.descriptionProvenance?.descriptionScope ?? null,
+        };
+      }
+      overrides.description = description;
+    }
 
     if (changes.coverAssetId !== undefined) {
       if (!coverAssetIdPattern.test(changes.coverAssetId)) {

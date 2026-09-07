@@ -1,5 +1,8 @@
 'use client';
 
+import { categoryLabels, type ThemaCode } from '@/lib/books/categories';
+import { CategoryPicker } from './category-picker';
+
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Clock3, Hash, ImagePlus, Languages, Library, Pencil, RefreshCw, Trash2, UserRound, UsersRound } from 'lucide-react';
 import {
@@ -37,11 +40,14 @@ import { memberName } from '@/lib/i18n/copy';
 import { uploadMemberCover, validCoverFile } from '@/lib/storage/client-cover';
 import { BookCover } from './book-cover';
 import { BookDescription } from './book-description';
+import { DescriptionEditor } from './description-editor';
 import { catalogCopy, conditionLabel, languageLabel, statusLabel } from './catalog-copy';
 
 type Feedback = { tone: 'success' | 'error'; text: string } | null;
 
 interface EditListingDraft {
+  categoryCodes: ThemaCode[];
+  categoriesChanged: boolean;
   title: string;
   titleEn: string;
   authors: string;
@@ -51,12 +57,15 @@ interface EditListingDraft {
   language: BookEdition['language'];
   pageCount: string;
   description: string;
+  descriptionProvenance?: Record<string, string>;
   condition: CatalogItem['condition'];
   ownerNotes: string;
 }
 
 function editListingDraft(item?: CatalogItem): EditListingDraft {
   return {
+    categoryCodes: item?.edition.categories?.codes ?? [],
+    categoriesChanged: false,
     title: item?.edition.title ?? '',
     titleEn: item?.edition.titleEn ?? '',
     authors: item?.edition.authors.join(', ') ?? '',
@@ -152,6 +161,7 @@ export function BookDetailView() {
     }
     try {
       await actions.updateItem(itemId, {
+        categoryCodes: editDraft.categoriesChanged ? editDraft.categoryCodes : undefined,
         title: editDraft.title.trim(),
         titleEn: editDraft.titleEn.trim() || null,
         authors: editDraft.authors.split(',').map((author) => author.trim()).filter(Boolean),
@@ -161,6 +171,7 @@ export function BookDetailView() {
         language: editDraft.language,
         pageCount,
         description: editDraft.description.trim() || null,
+        descriptionProvenance: editDraft.descriptionProvenance,
         condition: editDraft.condition,
         ownerNotes: editDraft.ownerNotes.trim() || undefined,
         coverAssetId,
@@ -329,6 +340,11 @@ export function BookDetailView() {
           {item.edition.titleEn && item.edition.titleEn !== item.edition.title ? (
             <p className="mt-2 text-base text-muted-foreground">{item.edition.titleEn}</p>
           ) : null}
+          <div className="mt-3 flex flex-wrap gap-2" data-testid="book-categories">
+            <span className="text-sm">{categoryLabels(item.edition.categories, state.locale).join(', ')}</span>
+            {item.edition.categories?.status === 'review' && <Badge variant="outline">{state.locale === 'ko' ? '분류 확인 필요' : 'Categories need review'}</Badge>}
+            {item.edition.categories?.status === 'suggested' && <span className="text-sm text-muted-foreground">{state.locale === 'ko' ? '자동 분류' : 'Suggested categories'}</span>}
+          </div>
           <p className="mt-4 text-lg">{item.edition.authors.join(', ') || (state.locale === 'ko' ? '저자 정보 없음' : 'Author not listed')}</p>
           {item.edition.authorsEn?.length ? <p className="mt-1 text-sm text-muted-foreground">{item.edition.authorsEn.join(', ')}</p> : null}
 
@@ -568,6 +584,9 @@ export function BookDetailView() {
                           <Input id="item-page-count" className="h-11" inputMode="numeric" min="1" type="number" value={editDraft.pageCount} onChange={(event) => editField('pageCount', event.target.value)} />
                         </div>
                       </div>
+                      <CategoryPicker locale={state.locale} codes={editDraft.categoryCodes}
+                        status={editDraft.categoriesChanged ? 'confirmed' : item.edition.categories?.status}
+                        onChange={(categoryCodes) => setEditDraft((current) => ({ ...current, categoryCodes, categoriesChanged: true }))} />
                       <div className="space-y-2">
                         <Label htmlFor="item-language">{t.language}</Label>
                         <NativeSelect
@@ -594,10 +613,8 @@ export function BookDetailView() {
                           <NativeSelectOption value="well-loved">{t.wellLoved}</NativeSelectOption>
                         </NativeSelect>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="item-description">{t.descriptionLabel}</Label>
-                        <Textarea id="item-description" value={editDraft.description} onChange={(event) => editField('description', event.target.value)} className="min-h-24" />
-                      </div>
+                      <DescriptionEditor id="item-description" isbn13={item.edition.isbn13} locale={state.locale} bookLanguage={editDraft.language}
+                        value={editDraft.description} onChange={(value, provenance) => { setEditDraft((draft) => ({ ...draft, description: value, descriptionProvenance: provenance })); setEditError(''); }} />
                       <div className="space-y-2">
                         <Label htmlFor="owner-notes">{t.ownerNote}</Label>
                         <Textarea id="owner-notes" value={editDraft.ownerNotes} onChange={(event) => editField('ownerNotes', event.target.value)} maxLength={280} className="min-h-24" data-testid="owner-notes" />

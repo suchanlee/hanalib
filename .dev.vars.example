@@ -19,6 +19,7 @@ KAKAO_CLIENT_SECRET=
 NLK_API_KEY=
 NAVER_CLIENT_ID=
 NAVER_CLIENT_SECRET=
+ALADIN_TTB_KEY=
 GOOGLE_BOOKS_API_KEY=
 # Local/test only. Production always rejects fixture fallback even if set.
 ISBN_FIXTURES_ENABLED=true

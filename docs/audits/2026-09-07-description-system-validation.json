@@ -1,0 +1,2320 @@
+{
+  "checkedAt": "2026-09-07T04:58:40.438Z",
+  "complete": true,
+  "total": 115,
+  "improvements": 9,
+  "unresolved": 62,
+  "sourceCoverage": {
+    "freshOpenLibrary": true,
+    "freshGoogleBooks": false,
+    "freshKakaoBooks": false,
+    "storedGoogleAndKakaoDescriptions": true,
+    "networkRequests": 341,
+    "offlineReplayCompleted": true
+  },
+  "beforeQualityCounts": {
+    "snippet": 55,
+    "substantive": 28,
+    "note": 2,
+    "summary": 20,
+    "missing": 10
+  },
+  "afterQualityCounts": {
+    "snippet": 51,
+    "substantive": 35,
+    "summary": 18,
+    "note": 1,
+    "missing": 10
+  },
+  "sourceHashes": {
+    "lib/books/descriptions.ts": "e56864336937abaddb9c831525adad8bda4b4752b7a96502d3a7c64c6381df2e",
+    "lib/isbn/providers.ts": "ed36c87ff92017611ca56ea7cdd6a3a6f0ed687e08354f78c71930ebdd85f953",
+    "lib/isbn/server-lookup.ts": "e73ca9cb0fb5c22cf9004e437da84fc7397e0f6b55f0cdf2dbc4650596065a88",
+    "scripts/audit-book-descriptions.ts": "61cf6590ec1dfe81007e57f88e59179569103ab5ce08e2d450daa5ba473baf38"
+  },
+  "rows": [
+    {
+      "isbn13": "9788997381678",
+      "title": "소년과 두더지와 여우와 말",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 253,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781785004919",
+      "title": "Making Moving Toys and Automata",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 769,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781451673265",
+      "title": "Fahrenheit 451",
+      "beforeQuality": "note",
+      "afterQuality": "substantive",
+      "improvement": true,
+      "reason": "Replaces a catalog note with a synopsis",
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/isbn/9781451673265",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 55,
+      "proposedCharacters": 1608
+    },
+    {
+      "isbn13": "9788936509484",
+      "title": "묻고 답하다",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788925548913",
+      "title": "예수가 선택한 십자가",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791161292311",
+      "title": "기후 위기 시대의 도전과 교회의 응답",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788953117662",
+      "title": "길갈",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 176,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788963602370",
+      "title": "새가족반",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791161291734",
+      "title": "오직 충성으로 받는 구원",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 253,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791130646381",
+      "title": "이처럼 사소한 것들",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788960530942",
+      "title": "우사기의 도쿄 식탁",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781324050629",
+      "title": "Replaceable You",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788955827965",
+      "title": "비가 내리고 풀은 자란다",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932521237",
+      "title": "성경을 보는 눈",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932816616",
+      "title": "다윗: 현실에 뿌리박은 영성",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 245,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781368095099",
+      "title": "Spidey and His Amazing Friends: Electro's Gotta Glow",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 676,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791170830474",
+      "title": "경이라는 세계",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780679720201",
+      "title": "The Stranger",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 988,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781368081467",
+      "title": "Welcome to Merlin Academy",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 1320,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791194530701",
+      "title": "괴테는 모든 것을 말했다(여름 에디션)",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 253,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781937715489",
+      "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+      "beforeQuality": "note",
+      "afterQuality": "note",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 60,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932812946",
+      "title": "가장 위험한 기도 주기도",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 247,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932821399",
+      "title": "새로운 그리스도인이 온다",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 247,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780593310229",
+      "title": "Richard Scarry's Super Silly Seek and Find!",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 476,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781606089743",
+      "title": "The Subversion of Christianity",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1182,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791188887255",
+      "title": "정원에서 길을 물었다",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781538110690",
+      "title": "Climate Church, Climate World",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "No clear improvement",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 704,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780676970050",
+      "title": "The First Man",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 468,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781587435171",
+      "title": "Strange Religion",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1108,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9798217024445",
+      "title": "The Prince and the Bot! (Iron Man and His Awesome Friends)",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 755,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788990928436",
+      "title": "페미니즘과 기독교의 맥락들",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 249,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791161292526",
+      "title": "그리스도인은 어떻게 생각해야 할까?",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932907284",
+      "title": "죄와 벌(하)(도스또예프스끼 전집 9)",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780593089781",
+      "title": "Who Was? and What Is? America Collection Boxed Set 25 books",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788954637770",
+      "title": "라면을 끓이며",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 247,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781554071470",
+      "title": "Nightwatch",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 115,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788962605952",
+      "title": "벌거벗은 통계학(리커버 에디션)",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932816135",
+      "title": "너라는 우주를 만나",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788901101569",
+      "title": "청춘의 독서",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 249,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9798217032617",
+      "title": "We Are Shiz (Universal Pictures Wicked)",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 489,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780545886222",
+      "title": "The Baby-Sitters Club: Claudia and Mean Janine",
+      "beforeQuality": "summary",
+      "afterQuality": "substantive",
+      "improvement": true,
+      "reason": "Offers substantially more detail than a short summary",
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/isbn/9780545886222",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 188,
+      "proposedCharacters": 454
+    },
+    {
+      "isbn13": "9788970906805",
+      "title": "요리천사의 행복 밥상",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780857687609",
+      "title": "Fun with a Pencil",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 414,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780817441814",
+      "title": "Learning to See Creatively",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 258,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932907314",
+      "title": "악령(상)(3판)(도스또예프스끼 전집 12)",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781615649983",
+      "title": "Joshua Weissman",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1812,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781847670311",
+      "title": "Complete Peanuts 1950 -1952 Vol.1",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 118,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780062464316",
+      "title": "Homo Deus",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1645,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781583225752",
+      "title": "A Woman's Story",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780553522778",
+      "title": "Puppy Birthday to You! (Paw Patrol)",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 570,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932039244",
+      "title": "중력과 은총",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 75,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788965138310",
+      "title": "유럽 도시 기행 3",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781932974010",
+      "title": "Stikky Night Skies: Learn 6 Constellations, 4 Stars, A Planet, A Galaxy, And How To Navigate At Night--in One Hour, Guaranteed (Stikky)",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781772754629",
+      "title": "Disney Elena of Avalor: Ready to Rule Cinestory Comic",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 540,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781732102200",
+      "title": "A Philosophy of Software Design",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791193238455",
+      "title": "나는 그림을 보며 어른이 되었다",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780062661128",
+      "title": "Autonomy",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1420,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788953125780",
+      "title": "팀 켈러의 탕부 하나님",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791191114225",
+      "title": "작별인사",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788997760244",
+      "title": "일",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 159,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791161290157",
+      "title": "과학시대의 도전과 기독교의 응답",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781580089777",
+      "title": "Tacos",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 164,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788988042366",
+      "title": "폴 투르니에의 치유",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 248,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788901140612",
+      "title": "엄마는 아메리칸 스타일",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788970089997",
+      "title": "결혼 건축가",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781400078431",
+      "title": "The Year of Magical Thinking",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1336,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788993461237",
+      "title": "에스프레소 바이블",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 204,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780736431095",
+      "title": "The Perfect Tea Party (Disney Junior: Sofia the First)",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 466,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780375704024",
+      "title": "Norwegian Wood",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 764,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780809051014",
+      "title": "Ray Bradbury's Fahrenheit 451",
+      "beforeQuality": "snippet",
+      "afterQuality": "summary",
+      "improvement": true,
+      "reason": "Offers a synopsis instead of a likely cut-off snippet",
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/isbn/9780809051014",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 244,
+      "proposedCharacters": 311
+    },
+    {
+      "isbn13": "9780817439392",
+      "title": "Understanding Exposure",
+      "beforeQuality": "summary",
+      "afterQuality": "substantive",
+      "improvement": true,
+      "reason": "Offers substantially more detail than a short summary",
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL3901933W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 203,
+      "proposedCharacters": 531
+    },
+    {
+      "isbn13": "9788932907321",
+      "title": "악령(하)(3판)(도스또예프스끼 전집 13)",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791157528547",
+      "title": "평일의 예배, 노동",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791187708827",
+      "title": "인권옹호자 예수",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 251,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780553293357",
+      "title": "Foundation",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1175,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788901279374",
+      "title": "밥 먹다가, 울컥",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781601427564",
+      "title": "Accidental Saints",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1423,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788998441012",
+      "title": "모순",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788953119901",
+      "title": "일과 영성",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781718502321",
+      "title": "Engineering in Plain Sight",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 254,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791187890126",
+      "title": "고통은 나눌 수 있는가",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780545813891",
+      "title": "The Baby-Sitter's Club: The Truth About Stacey",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 161,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780241552292",
+      "title": "Eichmann in Jerusalem (Penguin Modern Classics)",
+      "beforeQuality": "snippet",
+      "afterQuality": "summary",
+      "improvement": true,
+      "reason": "Offers a synopsis instead of a likely cut-off snippet",
+      "proposedProvenance": {
+        "title": "kakao-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "kakao-books",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL1386647W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 248,
+      "proposedCharacters": 284
+    },
+    {
+      "isbn13": "9780062049643",
+      "title": "Love Wins",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932817842",
+      "title": "성을 알면 달라지는 것들",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780062410665",
+      "title": "The Enlightenment",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 2438,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780545206945",
+      "title": "I Survived the Sinking of the Titanic, 1912 (I Survived #1)",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 289,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9791141602376",
+      "title": "안녕이라 그랬어(집에디션 리커버)",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780525582199",
+      "title": "It's Trevor Noah",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1480,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788952790620",
+      "title": "인간 실격",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 249,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780817437381",
+      "title": "Creative Nature & Outdoor Photography",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 176,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781594631870",
+      "title": "The Meaning of Marriage",
+      "beforeQuality": "summary",
+      "afterQuality": "substantive",
+      "improvement": true,
+      "reason": "Offers substantially more detail than a short summary",
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL16079742W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 199,
+      "proposedCharacters": 1283
+    },
+    {
+      "isbn13": "9788932817583",
+      "title": "읽는다는 것",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 237,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932907277",
+      "title": "죄와 벌(상)(도스또예프스끼 전집 8)",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 161,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932840536",
+      "title": "회심",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 241,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780393081084",
+      "title": "The Food Lab",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "No clear improvement",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 249,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780545886215",
+      "title": "Mary Anne saves the day",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 188,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781684376421",
+      "title": "The Highlights Book of Things to Do",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1722,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788952757418",
+      "title": "카페 브런치",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 218,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781368112420",
+      "title": "Escape from the Isle of the Lost: A Descendants Novel",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 1673,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788997686971",
+      "title": "중국요리",
+      "beforeQuality": "summary",
+      "afterQuality": "summary",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 226,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788990353627",
+      "title": "부흥(평양대부흥 100주년 특별 보급판)",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 241,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788936439880",
+      "title": "할매",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788932521220",
+      "title": "나를 넘어서는 성경읽기",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788959160631",
+      "title": "그리움",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781338067613",
+      "title": "Kristy's big day: a graphic novel",
+      "beforeQuality": "summary",
+      "afterQuality": "substantive",
+      "improvement": true,
+      "reason": "Offers substantially more detail than a short summary",
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/isbn/9781338067613",
+        "descriptionScope": "edition"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 91,
+      "proposedCharacters": 465
+    },
+    {
+      "isbn13": "9781484720974",
+      "title": "Isle of the Lost, The-A Descendants Novel, Vol. 1",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 527,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788954682152",
+      "title": "작별하지 않는다",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780571368709",
+      "title": "Small Things Like These",
+      "beforeQuality": "snippet",
+      "afterQuality": "substantive",
+      "improvement": true,
+      "reason": "Offers a synopsis instead of a likely cut-off snippet",
+      "proposedProvenance": {
+        "title": "google-books",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "google-books",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL23020966W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 249,
+      "proposedCharacters": 347
+    },
+    {
+      "isbn13": "9788994796734",
+      "title": "하늘과 바람과 별과 시",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9780307336798",
+      "title": "Art of Simple Food",
+      "beforeQuality": "snippet",
+      "afterQuality": "substantive",
+      "improvement": true,
+      "reason": "Offers a synopsis instead of a likely cut-off snippet",
+      "proposedProvenance": {
+        "title": "open-library",
+        "authors": "open-library",
+        "publisher": "open-library",
+        "publishedYear": "open-library",
+        "language": "open-library",
+        "pageCount": "open-library",
+        "description": "open-library",
+        "coverUrl": "open-library",
+        "descriptionUrl": "https://openlibrary.org/works/OL3256032W",
+        "descriptionScope": "work"
+      },
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": 1044
+    },
+    {
+      "isbn13": "9781606852545",
+      "title": "Nickelodeon PAW Patrol",
+      "beforeQuality": "missing",
+      "afterQuality": "missing",
+      "improvement": false,
+      "reason": "No usable candidate",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 0,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9788953108103",
+      "title": "영적 발돋움",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 250,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781400044177",
+      "title": "Age of Entanglement",
+      "beforeQuality": "snippet",
+      "afterQuality": "snippet",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "ok"
+      },
+      "currentCharacters": 252,
+      "proposedCharacters": null
+    },
+    {
+      "isbn13": "9781368047241",
+      "title": "Belle the mysterious message",
+      "beforeQuality": "substantive",
+      "afterQuality": "substantive",
+      "improvement": false,
+      "reason": "Same description",
+      "proposedProvenance": null,
+      "providerStatus": {
+        "aladin": "not-configured",
+        "nlk": "not-configured",
+        "naver": "not-configured",
+        "kakao-books": "not-configured",
+        "google-books": "not-configured",
+        "open-library": "not-found"
+      },
+      "currentCharacters": 504,
+      "proposedCharacters": null
+    }
+  ]
+}

@@ -17,7 +17,8 @@ export async function POST(request: Request, route: RouteContext) {
     const hasKoreanText = /[\uac00-\ud7a3]/.test(`${item.edition.title} ${item.edition.authors.join(' ')}`);
     const locale = item.edition.language === 'ko' || hasKoreanText ? 'ko' : 'en';
     const result = await resolveBookMetadata(item.edition.isbn13, locale, {
-      nlkApiKey: process.env.NLK_API_KEY,
+      aladinTtbKey: process.env.ALADIN_TTB_KEY,
+        nlkApiKey: process.env.NLK_API_KEY,
       naverClientId: process.env.NAVER_CLIENT_ID,
       naverClientSecret: process.env.NAVER_CLIENT_SECRET,
       kakaoRestApiKey: process.env.KAKAO_REST_API_KEY,

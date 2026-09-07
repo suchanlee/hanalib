@@ -1,5 +1,9 @@
 'use client';
 
+import { confirmCategories, type BookCategories } from '@/lib/books/categories';
+import { CategoryPicker } from '@/features/catalog/category-picker';
+import { DescriptionEditor } from '@/features/catalog/description-editor';
+
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import Image from 'next/image';
 import {
@@ -37,6 +41,7 @@ import { settleCameraAction } from './camera-lifecycle';
 type IntakeStage = 'idle' | 'permission' | 'scanning' | 'lookup' | 'confirm' | 'error' | 'success';
 
 interface IntakeDraft {
+  categories?: BookCategories;
   isbn13: string;
   title: string;
   titleEn: string;
@@ -197,6 +202,7 @@ const intakeCopy = {
 
 function createDraft(metadata: StitchedBookMetadata): IntakeDraft {
   return {
+    categories: metadata.categories,
     isbn13: metadata.isbn13,
     title: metadata.title,
     titleEn: metadata.titleEn ?? '',
@@ -205,7 +211,7 @@ function createDraft(metadata: StitchedBookMetadata): IntakeDraft {
     publishedYear: String(metadata.publishedYear),
     language: metadata.language === 'en' ? 'en' : 'ko',
     pageCount: metadata.pageCount ? String(metadata.pageCount) : '',
-    description: metadata.description?.trim().slice(0, 5_000) ?? '',
+    description: metadata.description?.trim() ?? '',
     coverUrl: metadata.coverUrl ?? '',
     condition: 'good',
     ownerNotes: '',
@@ -505,7 +511,9 @@ export function IntakeView() {
   };
 
   const editDraft = <Key extends keyof IntakeDraft>(key: Key, value: IntakeDraft[Key]) => {
-    setDraft((current) => current ? { ...current, [key]: value } : current);
+    setDraft((current) => current ? { ...current, [key]: value,
+      provenance: key === 'description' ? { ...current.provenance, description: 'member' } : current.provenance,
+    } : current);
     setFormError('');
   };
 
@@ -565,6 +573,7 @@ export function IntakeView() {
     let itemId: string;
     try {
       itemId = await actions.addBook({
+        categories: draft.categories,
         isbn13: draft.isbn13,
         title: draft.title.trim(),
         titleEn: draft.titleEn.trim() || undefined,
@@ -801,6 +810,10 @@ export function IntakeView() {
                 <NativeSelectOption value="en">{c.english}</NativeSelectOption>
               </NativeSelect>
             </div>
+            <CategoryPicker locale={locale} codes={draft.categories?.codes ?? []} status={draft.categories?.status}
+              onChange={(codes) => editDraft('categories', confirmCategories(codes, draft.categories))} />
+            <DescriptionEditor id="book-description" isbn13={draft.isbn13} locale={locale} bookLanguage={draft.language}
+              value={draft.description} onChange={(value) => editDraft('description', value)} allowLookup={false} />
             <div className="space-y-2">
               <Label htmlFor="book-condition">{c.conditionLabel}</Label>
               <NativeSelect className="w-full" id="book-condition" onChange={(event) => editDraft('condition', event.target.value as IntakeDraft['condition'])} value={draft.condition}>

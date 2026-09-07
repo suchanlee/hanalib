@@ -1,0 +1,2344 @@
+{
+  "total": 115,
+  "totals": {
+    "edition-not-found": 53,
+    "work-has-no-description": 34,
+    "language-mismatch": 3,
+    "not-improvement-over-edition": 10,
+    "title-mismatch": 11,
+    "edition-language-missing": 7
+  },
+  "rows": [
+    {
+      "isbn13": "9788997381678",
+      "title": "소년과 두더지와 여우와 말",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 253,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781785004919",
+      "title": "Making Moving Toys and Automata",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL28702866M",
+      "workKey": "/works/OL21194506W",
+      "currentCharacters": 769,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781451673265",
+      "title": "Fahrenheit 451",
+      "priorQuality": "substantive",
+      "priorImprovement": true,
+      "editionKey": "/books/OL25859954M",
+      "workKey": "/works/OL103123W",
+      "currentCharacters": 55,
+      "editionCharacters": 1608,
+      "workCharacters": 1700,
+      "reasons": [
+        "language-mismatch",
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "Description language differs or is unknown"
+      }
+    },
+    {
+      "isbn13": "9788936509484",
+      "title": "묻고 답하다",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL54506215M",
+      "workKey": "/works/OL40043158W",
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788925548913",
+      "title": "예수가 선택한 십자가",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791161292311",
+      "title": "기후 위기 시대의 도전과 교회의 응답",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788953117662",
+      "title": "길갈",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 176,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788963602370",
+      "title": "새가족반",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791161291734",
+      "title": "오직 충성으로 받는 구원",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 253,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791130646381",
+      "title": "이처럼 사소한 것들",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL59396524M",
+      "workKey": "/works/OL23020966W",
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 347,
+      "reasons": [
+        "title-mismatch",
+        "language-mismatch"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "Description language differs or is unknown"
+      }
+    },
+    {
+      "isbn13": "9788960530942",
+      "title": "우사기의 도쿄 식탁",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781324050629",
+      "title": "Replaceable You",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL57772649M",
+      "workKey": "/works/OL42560428W",
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788955827965",
+      "title": "비가 내리고 풀은 자란다",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932521237",
+      "title": "성경을 보는 눈",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932816616",
+      "title": "다윗: 현실에 뿌리박은 영성",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 245,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781368095099",
+      "title": "Spidey and His Amazing Friends: Electro's Gotta Glow",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL46153295M",
+      "workKey": "/works/OL29200223W",
+      "currentCharacters": 676,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791170830474",
+      "title": "경이라는 세계",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780679720201",
+      "title": "The Stranger",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL35354173M",
+      "workKey": "/works/OL1230613W",
+      "currentCharacters": 988,
+      "editionCharacters": 0,
+      "workCharacters": 262,
+      "reasons": [
+        "title-mismatch",
+        "language-mismatch"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "Description language differs or is unknown"
+      }
+    },
+    {
+      "isbn13": "9781368081467",
+      "title": "Welcome to Merlin Academy",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "currentCharacters": 1320,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791194530701",
+      "title": "괴테는 모든 것을 말했다(여름 에디션)",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 253,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781937715489",
+      "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+      "priorQuality": "note",
+      "priorImprovement": false,
+      "editionKey": "/books/OL26971010M",
+      "workKey": "/works/OL19757974W",
+      "currentCharacters": 60,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932812946",
+      "title": "가장 위험한 기도 주기도",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL30970868M",
+      "workKey": "/works/OL23130546W",
+      "currentCharacters": 247,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932821399",
+      "title": "새로운 그리스도인이 온다",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 247,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780593310229",
+      "title": "Richard Scarry's Super Silly Seek and Find!",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL34147690M",
+      "workKey": "/works/OL25464414W",
+      "currentCharacters": 476,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781606089743",
+      "title": "The Subversion of Christianity",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL33974506M",
+      "workKey": "/works/OL25356911W",
+      "currentCharacters": 1182,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791188887255",
+      "title": "정원에서 길을 물었다",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781538110690",
+      "title": "Climate Church, Climate World",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL33051964M",
+      "workKey": "/works/OL24866033W",
+      "currentCharacters": 704,
+      "editionCharacters": 985,
+      "workCharacters": 985,
+      "reasons": [
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9780676970050",
+      "title": "The First Man",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "currentCharacters": 468,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781587435171",
+      "title": "Strange Religion",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL50733844M",
+      "workKey": "/works/OL37629219W",
+      "currentCharacters": 1108,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9798217024445",
+      "title": "The Prince and the Bot! (Iron Man and His Awesome Friends)",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "currentCharacters": 755,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788990928436",
+      "title": "페미니즘과 기독교의 맥락들",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 249,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791161292526",
+      "title": "그리스도인은 어떻게 생각해야 할까?",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932907284",
+      "title": "죄와 벌(하)(도스또예프스끼 전집 9)",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780593089781",
+      "title": "Who Was? and What Is? America Collection Boxed Set 25 books",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "editionKey": "/books/OL60370716M",
+      "workKey": "/works/OL44148253W",
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788954637770",
+      "title": "라면을 끓이며",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL27206871M",
+      "workKey": "/works/OL20026822W",
+      "currentCharacters": 247,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781554071470",
+      "title": "Nightwatch",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL8571378M",
+      "workKey": "/works/OL19665748W",
+      "currentCharacters": 115,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788962605952",
+      "title": "벌거벗은 통계학(리커버 에디션)",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932816135",
+      "title": "너라는 우주를 만나",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788901101569",
+      "title": "청춘의 독서",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL44884934M",
+      "workKey": "/works/OL33024377W",
+      "currentCharacters": 249,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9798217032617",
+      "title": "We Are Shiz (Universal Pictures Wicked)",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "currentCharacters": 489,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780545886222",
+      "title": "The Baby-Sitters Club: Claudia and Mean Janine",
+      "priorQuality": "substantive",
+      "priorImprovement": true,
+      "editionKey": "/books/OL26215111M",
+      "workKey": "/works/OL8756328W",
+      "currentCharacters": 188,
+      "editionCharacters": 454,
+      "workCharacters": 454,
+      "reasons": [
+        "title-mismatch",
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers substantially more detail than a short summary"
+      }
+    },
+    {
+      "isbn13": "9788970906805",
+      "title": "요리천사의 행복 밥상",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780857687609",
+      "title": "Fun with a Pencil",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL27285139M",
+      "workKey": "/works/OL181333W",
+      "currentCharacters": 414,
+      "editionCharacters": 0,
+      "workCharacters": 221,
+      "reasons": [
+        "title-mismatch",
+        "edition-language-missing"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9780817441814",
+      "title": "Learning to See Creatively",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL8074036M",
+      "workKey": "/works/OL8532656W",
+      "currentCharacters": 258,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932907314",
+      "title": "악령(상)(3판)(도스또예프스끼 전집 12)",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781615649983",
+      "title": "Joshua Weissman",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL32589344M",
+      "workKey": "/works/OL24575051W",
+      "currentCharacters": 1812,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781847670311",
+      "title": "Complete Peanuts 1950 -1952 Vol.1",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL28455319M",
+      "workKey": "/works/OL20659134W",
+      "currentCharacters": 118,
+      "editionCharacters": 0,
+      "workCharacters": 122,
+      "reasons": [
+        "title-mismatch"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9780062464316",
+      "title": "Homo Deus",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL27226513M",
+      "workKey": "/works/OL17641518W",
+      "currentCharacters": 1645,
+      "editionCharacters": 1249,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781583225752",
+      "title": "A Woman's Story",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "editionKey": "/books/OL3674618M",
+      "workKey": "/works/OL102396W",
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780553522778",
+      "title": "Puppy Birthday to You! (Paw Patrol)",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL26629982M",
+      "workKey": "/works/OL18146668W",
+      "currentCharacters": 570,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932039244",
+      "title": "중력과 은총",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 75,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788965138310",
+      "title": "유럽 도시 기행 3",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781932974010",
+      "title": "Stikky Night Skies: Learn 6 Constellations, 4 Stars, A Planet, A Galaxy, And How To Navigate At Night--in One Hour, Guaranteed (Stikky)",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL8811823M",
+      "workKey": "/works/OL8896198W",
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781772754629",
+      "title": "Disney Elena of Avalor: Ready to Rule Cinestory Comic",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL29750553M",
+      "workKey": "/works/OL21831722W",
+      "currentCharacters": 540,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781732102200",
+      "title": "A Philosophy of Software Design",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "editionKey": "/books/OL28736729M",
+      "workKey": "/works/OL21221785W",
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791193238455",
+      "title": "나는 그림을 보며 어른이 되었다",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780062661128",
+      "title": "Autonomy",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL26962049M",
+      "workKey": "/works/OL19748997W",
+      "currentCharacters": 1420,
+      "editionCharacters": 228,
+      "workCharacters": 228,
+      "reasons": [
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9788953125780",
+      "title": "팀 켈러의 탕부 하나님",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791191114225",
+      "title": "작별인사",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL43560939M",
+      "workKey": "/works/OL31854824W",
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788997760244",
+      "title": "일",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 159,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791161290157",
+      "title": "과학시대의 도전과 기독교의 응답",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL61332346M",
+      "workKey": "/works/OL44947174W",
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781580089777",
+      "title": "Tacos",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL24087121M",
+      "workKey": "/works/OL14932259W",
+      "currentCharacters": 164,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788988042366",
+      "title": "폴 투르니에의 치유",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 248,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788901140612",
+      "title": "엄마는 아메리칸 스타일",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788970089997",
+      "title": "결혼 건축가",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781400078431",
+      "title": "The Year of Magical Thinking",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL16287630M",
+      "workKey": "/works/OL500171W",
+      "currentCharacters": 1336,
+      "editionCharacters": 0,
+      "workCharacters": 674,
+      "reasons": [
+        "title-mismatch"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9788993461237",
+      "title": "에스프레소 바이블",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 204,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780736431095",
+      "title": "The Perfect Tea Party (Disney Junior: Sofia the First)",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL30734147M",
+      "workKey": "/works/OL22759696W",
+      "currentCharacters": 466,
+      "editionCharacters": 408,
+      "workCharacters": 408,
+      "reasons": [
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9780375704024",
+      "title": "Norwegian Wood",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL24196635M",
+      "workKey": "/works/OL2625457W",
+      "currentCharacters": 764,
+      "editionCharacters": 560,
+      "workCharacters": 2025,
+      "reasons": [
+        "edition-language-missing",
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9780809051014",
+      "title": "Ray Bradbury's Fahrenheit 451",
+      "priorQuality": "summary",
+      "priorImprovement": true,
+      "editionKey": "/books/OL24645428M",
+      "workKey": "/works/OL3465657W",
+      "currentCharacters": 244,
+      "editionCharacters": 311,
+      "workCharacters": 311,
+      "reasons": [
+        "title-mismatch",
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers a synopsis instead of a likely cut-off snippet"
+      }
+    },
+    {
+      "isbn13": "9780817439392",
+      "title": "Understanding Exposure",
+      "priorQuality": "substantive",
+      "priorImprovement": true,
+      "editionKey": "/books/OL24419571M",
+      "workKey": "/works/OL3901933W",
+      "currentCharacters": 203,
+      "editionCharacters": 0,
+      "workCharacters": 531,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers substantially more detail than a short summary"
+      }
+    },
+    {
+      "isbn13": "9788932907321",
+      "title": "악령(하)(3판)(도스또예프스끼 전집 13)",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791157528547",
+      "title": "평일의 예배, 노동",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791187708827",
+      "title": "인권옹호자 예수",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL59911833M",
+      "workKey": "/works/OL43936066W",
+      "currentCharacters": 251,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780553293357",
+      "title": "Foundation",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL7825249M",
+      "workKey": "/works/OL46125W",
+      "currentCharacters": 1175,
+      "editionCharacters": 0,
+      "workCharacters": 1120,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9788901279374",
+      "title": "밥 먹다가, 울컥",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781601427564",
+      "title": "Accidental Saints",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL26214607M",
+      "workKey": "/works/OL17610513W",
+      "currentCharacters": 1423,
+      "editionCharacters": 0,
+      "workCharacters": 1425,
+      "reasons": [
+        "edition-language-missing"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9788998441012",
+      "title": "모순",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL30417226M",
+      "workKey": "/works/OL10348883W",
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788953119901",
+      "title": "일과 영성",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL43219402M",
+      "workKey": "/works/OL31551380W",
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781718502321",
+      "title": "Engineering in Plain Sight",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL37783137M",
+      "workKey": "/works/OL27700321W",
+      "currentCharacters": 254,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9791187890126",
+      "title": "고통은 나눌 수 있는가",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780545813891",
+      "title": "The Baby-Sitter's Club: The Truth About Stacey",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL26215092M",
+      "workKey": "/works/OL8756332W",
+      "currentCharacters": 161,
+      "editionCharacters": 0,
+      "workCharacters": 446,
+      "reasons": [
+        "title-mismatch"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers substantially more detail than a short summary"
+      }
+    },
+    {
+      "isbn13": "9780241552292",
+      "title": "Eichmann in Jerusalem (Penguin Modern Classics)",
+      "priorQuality": "summary",
+      "priorImprovement": true,
+      "editionKey": "/books/OL34792800M",
+      "workKey": "/works/OL1386647W",
+      "currentCharacters": 248,
+      "editionCharacters": 0,
+      "workCharacters": 290,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers a synopsis instead of a likely cut-off snippet"
+      }
+    },
+    {
+      "isbn13": "9780062049643",
+      "title": "Love Wins",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL24614589M",
+      "workKey": "/works/OL15678650W",
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 1194,
+      "reasons": [
+        "edition-language-missing"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Extends the existing description"
+      }
+    },
+    {
+      "isbn13": "9788932817842",
+      "title": "성을 알면 달라지는 것들",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780062410665",
+      "title": "The Enlightenment",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL38964097M",
+      "workKey": "/works/OL21662836W",
+      "currentCharacters": 2438,
+      "editionCharacters": 0,
+      "workCharacters": 2114,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9780545206945",
+      "title": "I Survived the Sinking of the Titanic, 1912 (I Survived #1)",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL24456127M",
+      "workKey": "/works/OL15492795W",
+      "currentCharacters": 289,
+      "editionCharacters": 0,
+      "workCharacters": 40,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9791141602376",
+      "title": "안녕이라 그랬어(집에디션 리커버)",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780525582199",
+      "title": "It's Trevor Noah",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL28107399M",
+      "workKey": "/works/OL20161699W",
+      "currentCharacters": 1480,
+      "editionCharacters": 0,
+      "workCharacters": 752,
+      "reasons": [
+        "title-mismatch",
+        "edition-language-missing"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9788952790620",
+      "title": "인간 실격",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 249,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780817437381",
+      "title": "Creative Nature & Outdoor Photography",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL3576065M",
+      "workKey": "/works/OL5967851W",
+      "currentCharacters": 176,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781594631870",
+      "title": "The Meaning of Marriage",
+      "priorQuality": "substantive",
+      "priorImprovement": true,
+      "editionKey": "/books/OL28676930M",
+      "workKey": "/works/OL16079742W",
+      "currentCharacters": 199,
+      "editionCharacters": 199,
+      "workCharacters": 1283,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers substantially more detail than a short summary"
+      }
+    },
+    {
+      "isbn13": "9788932817583",
+      "title": "읽는다는 것",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 237,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932907277",
+      "title": "죄와 벌(상)(도스또예프스끼 전집 8)",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 161,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932840536",
+      "title": "회심",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 241,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780393081084",
+      "title": "The Food Lab",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL26682267M",
+      "workKey": "/works/OL18146664W",
+      "currentCharacters": 249,
+      "editionCharacters": 17,
+      "workCharacters": 17,
+      "reasons": [
+        "title-mismatch",
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9780545886215",
+      "title": "Mary Anne saves the day",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "editionKey": "/books/OL27913164M",
+      "workKey": "/works/OL8117954W",
+      "currentCharacters": 188,
+      "editionCharacters": 0,
+      "workCharacters": 630,
+      "reasons": [
+        "edition-language-missing"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers substantially more detail than a short summary"
+      }
+    },
+    {
+      "isbn13": "9781684376421",
+      "title": "The Highlights Book of Things to Do",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL29496716M",
+      "workKey": "/works/OL21683256W",
+      "currentCharacters": 1722,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788952757418",
+      "title": "카페 브런치",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 218,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781368112420",
+      "title": "Escape from the Isle of the Lost: A Descendants Novel",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL50869863M",
+      "workKey": "/works/OL37715377W",
+      "currentCharacters": 1673,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788997686971",
+      "title": "중국요리",
+      "priorQuality": "summary",
+      "priorImprovement": false,
+      "currentCharacters": 226,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788990353627",
+      "title": "부흥(평양대부흥 100주년 특별 보급판)",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 241,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788936439880",
+      "title": "할매",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788932521220",
+      "title": "나를 넘어서는 성경읽기",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788959160631",
+      "title": "그리움",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781338067613",
+      "title": "Kristy's big day: a graphic novel",
+      "priorQuality": "substantive",
+      "priorImprovement": true,
+      "editionKey": "/books/OL26889721M",
+      "workKey": "/works/OL19671707W",
+      "currentCharacters": 91,
+      "editionCharacters": 465,
+      "workCharacters": 465,
+      "reasons": [
+        "title-mismatch",
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers substantially more detail than a short summary"
+      }
+    },
+    {
+      "isbn13": "9781484720974",
+      "title": "Isle of the Lost, The-A Descendants Novel, Vol. 1",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "editionKey": "/books/OL25746646M",
+      "workKey": "/works/OL17175900W",
+      "currentCharacters": 527,
+      "editionCharacters": 179,
+      "workCharacters": 179,
+      "reasons": [
+        "edition-language-missing",
+        "not-improvement-over-edition"
+      ],
+      "rawWorkWouldPassImprovement": {
+        "eligible": false,
+        "reason": "No clear improvement"
+      }
+    },
+    {
+      "isbn13": "9788954682152",
+      "title": "작별하지 않는다",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "editionKey": "/books/OL43840959M",
+      "workKey": "/works/OL32107522W",
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780571368709",
+      "title": "Small Things Like These",
+      "priorQuality": "substantive",
+      "priorImprovement": true,
+      "editionKey": "/books/OL36285622M",
+      "workKey": "/works/OL23020966W",
+      "currentCharacters": 249,
+      "editionCharacters": 0,
+      "workCharacters": 347,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers a synopsis instead of a likely cut-off snippet"
+      }
+    },
+    {
+      "isbn13": "9788994796734",
+      "title": "하늘과 바람과 별과 시",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9780307336798",
+      "title": "Art of Simple Food",
+      "priorQuality": "substantive",
+      "priorImprovement": true,
+      "editionKey": "/books/OL9484267M",
+      "workKey": "/works/OL3256032W",
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 1044,
+      "reasons": [],
+      "rawWorkWouldPassImprovement": {
+        "eligible": true,
+        "reason": "Offers a synopsis instead of a likely cut-off snippet"
+      }
+    },
+    {
+      "isbn13": "9781606852545",
+      "title": "Nickelodeon PAW Patrol",
+      "priorQuality": "missing",
+      "priorImprovement": false,
+      "editionKey": "/books/OL46904158M",
+      "workKey": "/works/OL34588112W",
+      "currentCharacters": 0,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9788953108103",
+      "title": "영적 발돋움",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "currentCharacters": 250,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781400044177",
+      "title": "Age of Entanglement",
+      "priorQuality": "snippet",
+      "priorImprovement": false,
+      "editionKey": "/books/OL30128016M",
+      "workKey": "/works/OL18558191W",
+      "currentCharacters": 252,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "work-has-no-description"
+      ],
+      "rawWorkWouldPassImprovement": null
+    },
+    {
+      "isbn13": "9781368047241",
+      "title": "Belle the mysterious message",
+      "priorQuality": "substantive",
+      "priorImprovement": false,
+      "currentCharacters": 504,
+      "editionCharacters": 0,
+      "workCharacters": 0,
+      "reasons": [
+        "edition-not-found"
+      ],
+      "rawWorkWouldPassImprovement": null
+    }
+  ],
+  "checkedAt": "2026-09-07T05:13:25.843Z",
+  "liveProbe": {
+    "openLibraryRequests": 30,
+    "googleRequests": 1,
+    "googleStatus": 429,
+    "rows": [
+      {
+        "isbn13": "9788936509484",
+        "title": "묻고 답하다",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL54506215M",
+        "exactMatches": [
+          {
+            "key": "/books/OL54506215M",
+            "title": "묻고 답하다",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9791130646381",
+        "title": "이처럼 사소한 것들",
+        "status": 200,
+        "editionsReturned": 53,
+        "hasNext": false,
+        "selectedEdition": "/books/OL59396524M",
+        "exactMatches": [
+          {
+            "key": "/books/OL59396524M",
+            "title": "이처럼 사소한 것들",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781324050629",
+        "title": "Replaceable You",
+        "status": 200,
+        "editionsReturned": 2,
+        "hasNext": false,
+        "selectedEdition": "/books/OL57772649M",
+        "exactMatches": [
+          {
+            "key": "/books/OL57772649M",
+            "title": "Replaceable You",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781937715489",
+        "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL26971010M",
+        "exactMatches": [
+          {
+            "key": "/books/OL26971010M",
+            "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9788932812946",
+        "title": "가장 위험한 기도 주기도",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL30970868M",
+        "exactMatches": [
+          {
+            "key": "/books/OL30970868M",
+            "title": "Kajang wihŏm han kido Chu kido",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780593089781",
+        "title": "Who Was? and What Is? America Collection Boxed Set 25 books",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL60370716M",
+        "exactMatches": [
+          {
+            "key": "/books/OL60370716M",
+            "title": "Who Was? and What Is? America Collection Boxed Set 25 books",
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9788954637770",
+        "title": "라면을 끓이며",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL27206871M",
+        "exactMatches": [
+          {
+            "key": "/books/OL27206871M",
+            "title": "Ramyŏn ŭl kkŭrimyŏ",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781554071470",
+        "title": "Nightwatch",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL8571378M",
+        "exactMatches": [
+          {
+            "key": "/books/OL8571378M",
+            "title": "NightWatch",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9788901101569",
+        "title": "청춘의 독서",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL44884934M",
+        "exactMatches": [
+          {
+            "key": "/books/OL44884934M",
+            "title": "Ch'ŏngch'un ŭi toksŏ",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780817441814",
+        "title": "Learning to See Creatively",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL8074036M",
+        "exactMatches": [
+          {
+            "key": "/books/OL8074036M",
+            "title": "Learning to See Creatively",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781847670311",
+        "title": "Complete Peanuts 1950 -1952 Vol.1",
+        "status": 200,
+        "editionsReturned": 6,
+        "hasNext": false,
+        "selectedEdition": "/books/OL28455319M",
+        "exactMatches": [
+          {
+            "key": "/books/OL28455319M",
+            "title": "Complete Peanuts 1950-1952",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781583225752",
+        "title": "A Woman's Story",
+        "status": 200,
+        "editionsReturned": 17,
+        "hasNext": false,
+        "selectedEdition": "/books/OL3674618M",
+        "exactMatches": [
+          {
+            "key": "/books/OL3674618M",
+            "title": "A woman's story",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781932974010",
+        "title": "Stikky Night Skies: Learn 6 Constellations, 4 Stars, A Planet, A Galaxy, And How To Navigate At Night--in One Hour, Guaranteed (Stikky)",
+        "status": 200,
+        "editionsReturned": 3,
+        "hasNext": false,
+        "selectedEdition": "/books/OL8811823M",
+        "exactMatches": [
+          {
+            "key": "/books/OL8811823M",
+            "title": "Stikky Night Skies",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781732102200",
+        "title": "A Philosophy of Software Design",
+        "status": 200,
+        "editionsReturned": 3,
+        "hasNext": false,
+        "selectedEdition": "/books/OL28736729M",
+        "exactMatches": [
+          {
+            "key": "/books/OL28736729M",
+            "title": "A Philosophy of Software Design",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9791191114225",
+        "title": "작별인사",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL43560939M",
+        "exactMatches": [
+          {
+            "key": "/books/OL43560939M",
+            "title": "Chakpyŏl insa",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9791161290157",
+        "title": "과학시대의 도전과 기독교의 응답",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL61332346M",
+        "exactMatches": [
+          {
+            "key": "/books/OL61332346M",
+            "title": "과학시대의도전과기독교의응답",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781580089777",
+        "title": "Tacos",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL24087121M",
+        "exactMatches": [
+          {
+            "key": "/books/OL24087121M",
+            "title": "Tacos",
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9791187708827",
+        "title": "인권옹호자 예수",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL59911833M",
+        "exactMatches": [
+          {
+            "key": "/books/OL59911833M",
+            "title": "인권 옹호자 예수",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9788998441012",
+        "title": "모순",
+        "status": 200,
+        "editionsReturned": 5,
+        "hasNext": false,
+        "selectedEdition": "/books/OL30417226M",
+        "exactMatches": [
+          {
+            "key": "/books/OL30417226M",
+            "title": "Mosun",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9788953119901",
+        "title": "일과 영성",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL43219402M",
+        "exactMatches": [
+          {
+            "key": "/books/OL43219402M",
+            "title": "팀 켈러의 일과 영성, Every Good Endeavor(Korean Edition)",
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781718502321",
+        "title": "Engineering in Plain Sight",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL37783137M",
+        "exactMatches": [
+          {
+            "key": "/books/OL37783137M",
+            "title": "Engineering in Plain Sight",
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780545813891",
+        "title": "The Baby-Sitter's Club: The Truth About Stacey",
+        "status": 200,
+        "editionsReturned": 8,
+        "hasNext": false,
+        "selectedEdition": "/books/OL26215092M",
+        "exactMatches": [
+          {
+            "key": "/books/OL26215092M",
+            "title": "The Baby-Sitter's Club: The Truth About Stacey",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780062049643",
+        "title": "Love Wins",
+        "status": 200,
+        "editionsReturned": 2,
+        "hasNext": false,
+        "selectedEdition": "/books/OL24614589M",
+        "exactMatches": [
+          {
+            "key": "/books/OL24609716M",
+            "title": "Love Wins",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 1387
+          },
+          {
+            "key": "/books/OL24614589M",
+            "title": "Love Wins",
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780545206945",
+        "title": "I Survived the Sinking of the Titanic, 1912 (I Survived #1)",
+        "status": 200,
+        "editionsReturned": 12,
+        "hasNext": false,
+        "selectedEdition": "/books/OL24456127M",
+        "exactMatches": [
+          {
+            "key": "/books/OL24456127M",
+            "title": "I Survived the Sinking of the Titanic, 1912",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780817437381",
+        "title": "Creative Nature & Outdoor Photography",
+        "status": 200,
+        "editionsReturned": 4,
+        "hasNext": false,
+        "selectedEdition": "/books/OL3576065M",
+        "exactMatches": [
+          {
+            "key": "/books/OL23735775M",
+            "title": "Creative nature & outdoor photography",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          },
+          {
+            "key": "/books/OL3576065M",
+            "title": "Creative nature & outdoor photography",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          },
+          {
+            "key": "/books/OL24073863M",
+            "title": "Creative nature & outdoor photography",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          },
+          {
+            "key": "/books/OL24117118M",
+            "title": "Creative nature & outdoor photography",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780393081084",
+        "title": "The Food Lab",
+        "status": 200,
+        "editionsReturned": 7,
+        "hasNext": false,
+        "selectedEdition": "/books/OL26682267M",
+        "exactMatches": [
+          {
+            "key": "/books/OL26682267M",
+            "title": "The Food Lab: Better Home Cooking Through Science",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 17
+          },
+          {
+            "key": "/books/OL26629978M",
+            "title": "The Food Lab",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9780545886215",
+        "title": "Mary Anne saves the day",
+        "status": 200,
+        "editionsReturned": 5,
+        "hasNext": false,
+        "selectedEdition": "/books/OL27913164M",
+        "exactMatches": [
+          {
+            "key": "/books/OL27913164M",
+            "title": "Mary Anne saves the day",
+            "descriptionCharacters": 0
+          },
+          {
+            "key": "/books/OL26885615M",
+            "title": "Mary Anne saves the day",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 191
+          }
+        ]
+      },
+      {
+        "isbn13": "9788954682152",
+        "title": "작별하지 않는다",
+        "status": 200,
+        "editionsReturned": 7,
+        "hasNext": false,
+        "selectedEdition": "/books/OL43840959M",
+        "exactMatches": [
+          {
+            "key": "/books/OL43840959M",
+            "title": "Chakpyŏl haji annŭnda",
+            "languages": [
+              {
+                "key": "/languages/kor"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781606852545",
+        "title": "Nickelodeon PAW Patrol",
+        "status": 200,
+        "editionsReturned": 1,
+        "hasNext": false,
+        "selectedEdition": "/books/OL46904158M",
+        "exactMatches": [
+          {
+            "key": "/books/OL46904158M",
+            "title": "LeapFrog LeapReader Book Paw Patrol The Great Robot Rescue",
+            "descriptionCharacters": 0
+          }
+        ]
+      },
+      {
+        "isbn13": "9781400044177",
+        "title": "Age of Entanglement",
+        "status": 200,
+        "editionsReturned": 3,
+        "hasNext": false,
+        "selectedEdition": "/books/OL30128016M",
+        "exactMatches": [
+          {
+            "key": "/books/OL30128016M",
+            "title": "The Age of Entanglement",
+            "languages": [
+              {
+                "key": "/languages/eng"
+              }
+            ],
+            "descriptionCharacters": 0
+          }
+        ]
+      }
+    ]
+  },
+  "sourceHashes": {
+    "lib/isbn/server-lookup.ts": "e73ca9cb0fb5c22cf9004e437da84fc7397e0f6b55f0cdf2dbc4650596065a88",
+    "lib/isbn/server-normalizers.ts": "d4d2c03745b645d6355706d3062efc7b0131ede3a73f18b28779a4a4a39afe13",
+    "lib/books/descriptions.ts": "e56864336937abaddb9c831525adad8bda4b4752b7a96502d3a7c64c6381df2e"
+  }
+}

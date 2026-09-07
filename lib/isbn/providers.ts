@@ -1,7 +1,10 @@
+import { classifySubjects } from '../books/classify.ts';
+import { bestDescription } from '../books/descriptions.ts';
+import type { CategoryEvidence } from '../books/categories';
 import { ApiError, requestJson } from '../http/client.ts';
 import type { AddBookInput, AppLocale } from '@/lib/domain/types';
 
-export type MetadataSource = 'nlk' | 'naver' | 'kakao-books' | 'google-books' | 'open-library' | 'member' | 'fixture';
+export type MetadataSource = 'aladin' | 'nlk' | 'naver' | 'kakao-books' | 'google-books' | 'open-library' | 'member' | 'fixture';
 
 export interface MetadataCandidate {
   source: MetadataSource;
@@ -14,7 +17,10 @@ export interface MetadataCandidate {
   language?: AddBookInput['language'];
   pageCount?: number;
   description?: string;
+  descriptionSourceUrl?: string;
+  descriptionScope?: 'edition' | 'work';
   coverUrl?: string;
+  subjects?: string[];
 }
 
 export interface BookMetadataProvider {
@@ -83,8 +89,10 @@ export class ResolvedBookProvider {
     this.developmentMemberId = developmentMemberId;
   }
 
-  async lookup(isbn13: string, locale: AppLocale, signal?: AbortSignal): Promise<StitchedBookMetadata | null> {
-    const search = new URLSearchParams({ isbn: isbn13, locale });
+  async lookup(isbn13: string, locale: AppLocale, signal?: AbortSignal, mode: 'fast' | 'enrich' = 'fast'): Promise<StitchedBookMetadata | null> {
+    const deadline = mode === 'fast' ? AbortSignal.timeout(1_900) : undefined;
+    const lookupSignal = deadline ? (signal ? AbortSignal.any([signal, deadline]) : deadline) : signal;
+    const search = new URLSearchParams({ isbn: isbn13, locale, mode });
     if (this.allowDevelopmentFixture) search.set('fixture', '1');
     const headers = new Headers({ accept: 'application/json' });
     if (process.env.NODE_ENV !== 'production' && this.developmentMemberId) {
@@ -95,7 +103,7 @@ export class ResolvedBookProvider {
       cache: 'no-store',
       credentials: 'same-origin',
       headers,
-      signal,
+      signal: lookupSignal,
     });
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) return null;
@@ -145,12 +153,13 @@ function bestEditionTitle(candidates: MetadataCandidate[], locale: AppLocale, so
 }
 
 export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: MetadataCandidate[]): StitchedBookMetadata {
+  candidates = candidates.filter((candidate) => candidate.isbn13 === isbn13);
   const bibliographicOrder: MetadataSource[] = locale === 'ko'
-    ? ['nlk', 'naver', 'kakao-books', 'google-books', 'open-library', 'fixture', 'member']
-    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture', 'member'];
+    ? ['nlk', 'naver', 'kakao-books', 'google-books', 'open-library', 'aladin', 'fixture', 'member']
+    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'aladin', 'fixture', 'member'];
   const coverOrder: MetadataSource[] = locale === 'ko'
-    ? ['kakao-books', 'naver', 'google-books', 'nlk', 'open-library', 'fixture', 'member']
-    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture', 'member'];
+    ? ['kakao-books', 'naver', 'google-books', 'nlk', 'open-library', 'aladin', 'fixture', 'member']
+    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'aladin', 'fixture', 'member'];
   const title = bestEditionTitle(candidates, locale, bibliographicOrder);
   const titleEn = firstValue(candidates, ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture'], (candidate) => candidate.titleEn);
   const authors = firstValue(candidates, bibliographicOrder, (candidate) => candidate.authors);
@@ -161,9 +170,8 @@ export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: Me
     ? { value: titleCandidate.language, source: titleCandidate.source }
     : firstValue(candidates, bibliographicOrder, (candidate) => candidate.language);
   const pageCount = firstValue(candidates, ['google-books', 'open-library', 'nlk', 'naver', 'kakao-books', 'fixture'], (candidate) => candidate.pageCount);
-  const description = firstValue(candidates, locale === 'ko'
-    ? ['kakao-books', 'naver', 'google-books', 'nlk', 'open-library', 'fixture']
-    : ['google-books', 'open-library', 'kakao-books', 'naver', 'nlk', 'fixture'], (candidate) => candidate.description);
+  const editionLanguage = language?.value === 'ko' || /[\uac00-\ud7a3]/.test(title?.value ?? '') ? 'ko' : language?.value === 'en' ? 'en' : locale;
+  const description = bestDescription(candidates.filter((candidate) => candidate.isbn13 === isbn13), editionLanguage, bibliographicOrder);
   const coverUrl = firstValue(candidates, coverOrder, (candidate) => candidate.coverUrl);
 
   const selections = { title, titleEn, authors, publisher, publishedYear, language, pageCount, description, coverUrl };
@@ -171,6 +179,9 @@ export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: Me
   for (const [field, selection] of Object.entries(selections)) {
     if (selection) provenance[field] = selection.source;
   }
+
+  if (description?.candidate.descriptionSourceUrl) provenance.descriptionUrl = description.candidate.descriptionSourceUrl;
+  if (description?.candidate.descriptionScope) provenance.descriptionScope = description.candidate.descriptionScope;
 
   return {
     isbn13,
@@ -184,6 +195,9 @@ export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: Me
     description: description?.value,
     coverUrl: coverUrl?.value,
     provenance,
+    categories: classifySubjects(candidates.flatMap((candidate): CategoryEvidence[] =>
+      candidate.subjects?.length && ['aladin', 'google-books', 'open-library'].includes(candidate.source)
+        ? [{ source: candidate.source as CategoryEvidence['source'], subjects: candidate.subjects }] : [])),
   };
 }
 
