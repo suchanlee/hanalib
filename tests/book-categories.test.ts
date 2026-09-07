@@ -52,7 +52,6 @@ void test('department names, awards, plot topics and reader age do not become ad
   for (const [source, subjects] of [
     ['aladin', ['국내도서>소설/시/희곡>세계의 문학>아일랜드문학']],
     ['aladin', ['국내도서>추천도서>국내 문학상>창비청소년문학상']],
-    ['google-books', ['Juvenile Fiction / Mysteries & Detective Stories']],
     ['open-library', ['Homicide', 'Murder', 'Missing persons', 'The Future']],
   ] as const) {
     const categories = classifySubjects([{ source, subjects: [...subjects] }]);
@@ -276,4 +275,19 @@ void test('Aladin outage preserves Google categories and no Aladin key remains o
   );
   assert.equal(result.providerStatus.aladin, 'failed');
   assert.deepEqual(result.metadata?.categories?.codes, ['FBC']);
+});
+
+void test('youth genres remain discoverable independently from audience', () => {
+  for (const subject of ['Juvenile Fiction', 'Young Adult Fiction', '국내도서/어린이/동화']) {
+    assert.deepEqual(bookCategoryGroups(classifySubjects([{source: 'google-books', subjects: [subject]}])), ['fiction']);
+  }
+  assert.deepEqual(bookCategoryGroups(classifySubjects([{source: 'google-books', subjects: ['Juvenile Fiction / Comics & Graphic Novels']} ])), ['fiction', 'comics']);
+  assert.deepEqual(bookCategoryGroups(classifySubjects([{source: 'google-books', subjects: ['Young Adult Fiction / Fantasy']} ])), ['fiction', 'fantasy']);
+  assert.deepEqual(bookCategoryGroups(classifySubjects([{source: 'google-books', subjects: ['Juvenile Nonfiction']} ])), []);
+});
+
+void test('practical categories represented in the catalog are mapped', () => {
+  for (const [subject, group] of [['Cooking', 'cooking'], ['Photography', 'art'], ['Crafts & Hobbies', 'crafts'], ['Marathon running', 'sports'], ['Technology & Engineering', 'technology'], ['Computers', 'computing']]) {
+    assert.deepEqual(bookCategoryGroups(classifySubjects([{source: 'google-books', subjects: [subject]}])), [group]);
+  }
 });

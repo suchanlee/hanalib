@@ -40,7 +40,23 @@ function mapSubject(
     }
     return [];
   }
-  if (/어린이|청소년|유아|juvenile|young adult|children/.test(s)) return [];
+  if (/^(juvenile fiction|young adult fiction)(?:\/|$)/.test(s)) {
+    if (/graphic novel|comics/.test(s)) return ['YF', 'XQ'];
+    return [/fantasy/.test(s) ? 'YFH' : 'YF'];
+  }
+  if (/어린이|청소년|유아|juvenile|young adult|children/.test(s)) {
+    if (/만화|그래픽노블/.test(s)) return ['YF', 'XQ'];
+    if (/동화|소설/.test(s)) return [/판타지/.test(s) ? 'YFH' : 'YF'];
+    return [];
+  }
+  if (/^(cooking|cookbooks)(?:\/|$)|(?:^|\/)요리(?:\/|$)/.test(s)) return ['WB'];
+  if (/^crafts & hobbies(?:\/|$)/.test(s)) return ['WF'];
+  if (/^sports & recreation(?:\/|$)|^marathon running$/.test(s)) return ['SC'];
+  if (/^technology & engineering(?:\/|$)/.test(s)) return ['TB'];
+  if (/^computers(?:\/|$)/.test(s)) return ['UB'];
+  if (/^(photography|painting)(?:\/|$)/.test(s)) return ['AB'];
+  if (/^(astronomy|quantum theory)$/.test(s)) return ['PD'];
+  if (/^(korean |english |french )essays$/.test(s)) return ['DNL'];
   if (/그래픽노블|만화|graphic novel|comics/.test(s)) return ['XQ'];
   const fiction = /소설|^fiction(?:\/|$)/.test(s);
   if (fiction) {

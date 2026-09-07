@@ -1,0 +1,2348 @@
+{
+  "date": "2026-09-07",
+  "scope": "116 active production editions. Original reviewed audit + cached exact-ISBN Google categories + individual editorial review. No fresh provider requests. Not publisher-assigned Thema.",
+  "rows": [
+    {
+      "isbn13": "9780545813891",
+      "title": "The Baby-Sitter's Club: The Truth About Stacey",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF",
+          "XQ"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Previously reviewed Baby-Sitters Club graphic-novel edition; stored synopsis describes Stacey and the club."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780062410665",
+      "title": "The Enlightenment",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "NH"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "History"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781580089777",
+      "title": "Tacos",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Cooking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788901140612",
+      "title": "엄마는 아메리칸 스타일",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Cooking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780545886222",
+      "title": "The Baby-Sitters Club: Claudia and Mean Janine",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "JUVENILE FICTION"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780553293357",
+      "title": "Foundation",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9798217032617",
+      "title": "We Are Shiz (Universal Pictures Wicked)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791161290157",
+      "title": "과학시대의 도전과 기독교의 응답",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM",
+          "PD"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis explicitly discusses Christian theology and its relationship with science."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781583225752",
+      "title": "A Woman's Story",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DNC",
+          "DNB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "외국도서 > 전기/자서전 > 여성",
+              "외국도서 > 가족/관계 > 일반",
+              "외국도서 > 소설/시/희곡 > 문학 > 문학일반",
+              "외국도서 > 전기/자서전 > 개인 회고록",
+              "외국도서 > 전기/자서전 > 문학",
+              "외국도서 > 전기/자서전 > 일반"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780241552292",
+      "title": "Eichmann in Jerusalem (Penguin Modern Classics)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "NHTZ1"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "외국도서 > 역사 > 유럽 > 일반",
+              "외국도서 > 역사 > 홀로코스트"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791191114225",
+      "title": "작별인사",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FL",
+          "FBA"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 한국소설 > 2000년대 이후 한국소설",
+              "국내도서 > 소설/시/희곡 > 테마문학 > 영화소설"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781368095099",
+      "title": "Spidey and His Amazing Friends: Electro's Gotta Glow",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788901101569",
+      "title": "청춘의 독서",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DNL"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes reflective personal readings of influential books by Yoo Si-min."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932907277",
+      "title": "죄와 벌(상)(도스또예프스끼 전집 8)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description explicitly identifies this edition as Crime and Punishment, volume 1."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780545886215",
+      "title": "Mary Anne saves the day",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "JUVENILE FICTION",
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788970089997",
+      "title": "결혼 건축가",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 종교/역학 > 기독교(개신교) > 기독교(개신교) 신앙생활 > 사랑/결혼"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781732102200",
+      "title": "A Philosophy of Software Design",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "UB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Manual review of exact-ISBN cached edition: John Ousterhout, A Philosophy of Software Design, Yaknyam Press, 2018; professional software design."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780809051014",
+      "title": "Ray Bradbury's Fahrenheit 451",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "XQ"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Comics & Graphic Novels"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788997686971",
+      "title": "중국요리",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes Chinese recipes and cooking techniques."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781684376421",
+      "title": "The Highlights Book of Things to Do",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WF"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description lists a hands-on activity collection with crafting, building and drawing."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932821399",
+      "title": "새로운 그리스도인이 온다",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis identifies an introduction to emerging Christianity and spiritual renewal."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932816135",
+      "title": "너라는 우주를 만나",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP",
+          "DNC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 종교/역학 > 기독교(개신교) > 기독교(개신교) 신앙생활 > 간증/영적성장",
+              "국내도서 > 종교/역학 > 기독교(개신교) > 기독교(개신교) 신앙생활 > 부부생활/자녀양육"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932812946",
+      "title": "가장 위험한 기도 주기도",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes a practical exposition of the Lord's Prayer."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781601427564",
+      "title": "Accidental Saints",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QR"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Religion"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781594631870",
+      "title": "The Meaning of Marriage",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description explicitly describes biblical marriage guidance."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791187708827",
+      "title": "인권옹호자 예수",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM",
+          "JH"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis examines Christianity, sexual minorities and social discrimination."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788990928436",
+      "title": "페미니즘과 기독교의 맥락들",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM",
+          "JH"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis examines feminism and Korean Christianity."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788965138310",
+      "title": "유럽 도시 기행 3",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WTL",
+          "NHTB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 인문학 > 교양 인문학",
+              "국내도서 > 여행 > 테마여행 > 문화/역사기행",
+              "국내도서 > 역사 > 문화/역사기행 > 동서양 문화/역사기행"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781338067613",
+      "title": "Kristy's big day: a graphic novel",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF",
+          "XQ"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description explicitly identifies the edition as a full-color graphic novel."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791187890126",
+      "title": "고통은 나눌 수 있는가",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "JH"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis identifies a sociological examination of suffering in Korean society."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788988042366",
+      "title": "폴 투르니에의 치유",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes the integration of Christian faith and psychological healing."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788959160631",
+      "title": "그리움",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "AB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis identifies a collection of twelve composed songs with performance recordings."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781324050629",
+      "title": "Replaceable You",
+      "categories": {
+        "version": 1,
+        "status": "review",
+        "codes": [],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Medical"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781484720974",
+      "title": "Isle of the Lost, The-A Descendants Novel, Vol. 1",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791161292526",
+      "title": "그리스도인은 어떻게 생각해야 할까?",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description concerns Christian thought and a New Testament scholar's spiritual experience."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780593310229",
+      "title": "Richard Scarry's Super Silly Seek and Find!",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781606089743",
+      "title": "The Subversion of Christianity",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QR"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Religion"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781615649983",
+      "title": "Joshua Weissman",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Cooking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780375704024",
+      "title": "Norwegian Wood",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780817439392",
+      "title": "Understanding Exposure",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "AB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Photography"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781451673265",
+      "title": "Fahrenheit 451",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791130646381",
+      "title": "이처럼 사소한 것들",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBA"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 세계의 소설 > 아일랜드소설",
+              "국내도서 > 소설/시/희곡 > 세계의 문학 > 아일랜드문학",
+              "국내도서 > 소설/시/희곡 > 테마문학 > 영화소설",
+              "국내도서 > 추천도서 > 알라딘 독자 선정 올해의 책 > 2024년 > 올해의 책 TOP 10"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781606852545",
+      "title": "Nickelodeon PAW Patrol",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Previously reviewed exact LeapReader Paw Patrol storybook edition; see youth-audience audit."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788955827965",
+      "title": "비가 내리고 풀은 자란다",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes a story about two schoolchildren becoming friends."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788970906805",
+      "title": "요리천사의 행복 밥상",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Cooking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788936439880",
+      "title": "할매",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBA"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 한국소설 > 2000년대 이후 한국소설"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788953125780",
+      "title": "팀 켈러의 탕부 하나님",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis identifies Tim Keller's exposition of the prodigal-son parable."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781587435171",
+      "title": "Strange Religion",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QR"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Religion"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781772754629",
+      "title": "Disney Elena of Avalor: Ready to Rule Cinestory Comic",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9798217024445",
+      "title": "The Prince and the Bot! (Iron Man and His Awesome Friends)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780062661128",
+      "title": "Autonomy",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "KJ"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Business & Economics"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780553522778",
+      "title": "Puppy Birthday to You! (Paw Patrol)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791161292311",
+      "title": "기후 위기 시대의 도전과 교회의 응답",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis frames the climate crisis through biblical creation and the church’s response."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781368081467",
+      "title": "Welcome to Merlin Academy",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788953108103",
+      "title": "영적 발돋움",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes Christian spiritual life and relationships with self, others and God."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932907321",
+      "title": "악령(하)(3판)(도스또예프스끼 전집 13)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Manual review of exact-ISBN stored author, publisher and volume metadata: Dostoevsky collected works, Crime and Punishment / Demons."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780545206945",
+      "title": "I Survived the Sinking of the Titanic, 1912 (I Survived #1)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788953119901",
+      "title": "일과 영성",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes Tim Keller's teaching on Christian vocation and work."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932817583",
+      "title": "읽는다는 것",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description explicitly identifies a guide to Bible reading and meditation."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780676970050",
+      "title": "The First Man",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788954637770",
+      "title": "라면을 끓이며",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DNL"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 에세이 > 한국에세이",
+              "국내도서 > 에세이 > 명사에세이 > 문인에세이",
+              "국내도서 > 추천도서 > 알라딘 독자 선정 올해의 책 > 2015년 > 올해의 책 Top 20"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788952790620",
+      "title": "인간 실격",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 일본소설 > 1950년대 이전 일본소설",
+              "국내도서 > 소설/시/희곡 > 세계의 문학 > 일본문학",
+              "국내도서 > 소설/시/희곡 > 테마문학 > 영화소설"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788901279374",
+      "title": "밥 먹다가, 울컥",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DNL"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 에세이 > 한국에세이",
+              "국내도서 > 에세이 > 음식에세이"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781937715489",
+      "title": "Hansons Marathon Method: Run Your Fastest Marathon the Hansons Way",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "SC"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Marathon running"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781932974010",
+      "title": "Stikky Night Skies: Learn 6 Constellations, 4 Stars, A Planet, A Galaxy, And How To Navigate At Night--in One Hour, Guaranteed (Stikky)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "PD"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Astronomy"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791193238455",
+      "title": "나는 그림을 보며 어른이 되었다",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "AB",
+          "DNL"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 인문학 > 교양 인문학"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780062464316",
+      "title": "Homo Deus",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "NHTB",
+          "PSAJ"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "외국도서 > 과학/수학/생태 > 과학 > 생명과학 > 진화",
+              "외국도서 > 기술공학 > 기술공학 > 일반",
+              "외국도서 > 언어학 > 문헌정보학 > 일반",
+              "외국도서 > 역사 > 문명",
+              "외국도서 > 역사 > 사회사",
+              "외국도서 > 인문/사회 > 사회과학 > 미래학"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780857687609",
+      "title": "Fun with a Pencil",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "AB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Art"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780817437381",
+      "title": "Creative Nature & Outdoor Photography",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "AB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Photography"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780525582199",
+      "title": "It's Trevor Noah",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DNC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description explicitly identifies the young readers' adaptation of Trevor Noah's memoir."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780571368709",
+      "title": "Small Things Like These",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBA"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "외국도서 > 소설/시/희곡 > 소설 > 근현대",
+              "외국도서 > 소설/시/희곡 > 소설 > 역사"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788954682152",
+      "title": "작별하지 않는다",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBA"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 한국소설 > 2000년대 이후 한국소설",
+              "국내도서 > 추천도서 > 알라딘 독자 선정 올해의 책 > 2021년 > 올해의 책 TOP 10",
+              "국내도서 > 추천도서 > 해외 문학상 > 메디치상",
+              "국내도서 > 추천도서 > 해외 문학상 > 노벨문학상",
+              "국내도서 > 추천도서 > 국내 문학상 > 대산문학상"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781368112420",
+      "title": "Escape from the Isle of the Lost: A Descendants Novel",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788993461237",
+      "title": "에스프레소 바이블",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes espresso extraction, grinding, milk steaming and coffee recipes."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788963602370",
+      "title": "새가족반",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis identifies introductory instruction in Christian faith."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788997381678",
+      "title": "소년과 두더지와 여우와 말",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DNL",
+          "XQ"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 에세이 > 사진/그림 에세이",
+              "국내도서 > 만화/라이트노벨 > 그래픽노블",
+              "국내도서 > 에세이 > 외국에세이",
+              "국내도서 > 추천도서 > 외부/전문기관 추천도서 > (사)행복한아침독서 추천도서 > 2021년 > 유초중등전체(공공도서관용)",
+              "국내도서 > 추천도서 > 외부/전문기관 추천도서 > (사)행복한아침독서 추천도서 > 2021년 > 영유아및어른그림책전체"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780817441814",
+      "title": "Learning to See Creatively",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "AB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Photography"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780736431095",
+      "title": "The Perfect Tea Party (Disney Junior: Sofia the First)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932521237",
+      "title": "성경을 보는 눈",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes lectures on interpreting the Bible and living Christian faith."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932521220",
+      "title": "나를 넘어서는 성경읽기",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes biblical interpretation and its application to contemporary life."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788997760244",
+      "title": "일",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis examines work through the Bible and Christian tradition."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781785004919",
+      "title": "Making Moving Toys and Automata",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Crafts & Hobbies"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781368047241",
+      "title": "Belle the mysterious message",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YFH"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes Belle, an enchanted castle and magical companions."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781718502321",
+      "title": "Engineering in Plain Sight",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "TB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Technology & Engineering"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932907314",
+      "title": "악령(상)(3판)(도스또예프스끼 전집 12)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Manual review of exact-ISBN stored author, publisher and volume metadata: Dostoevsky collected works, Crime and Punishment / Demons."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788998441012",
+      "title": "모순",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 한국소설 > 2000년대 이전 한국소설"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781400044177",
+      "title": "Age of Entanglement",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "PD"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Quantum theory"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781368064224",
+      "title": "HSMTMTS: In the Spotlight: Nini and Ricky's Stories",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "YF"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Juvenile Fiction"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780393081084",
+      "title": "The Food Lab",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Cooking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791161291734",
+      "title": "오직 충성으로 받는 구원",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes a theological argument concerning salvation and fidelity to Christ."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781400078431",
+      "title": "The Year of Magical Thinking",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DNB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Biography & Autobiography"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788936509484",
+      "title": "묻고 답하다",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM",
+          "QD"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes a dialogue on Christian faith and philosophical questions of life, death and suffering."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788962605952",
+      "title": "벌거벗은 통계학(리커버 에디션)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "PD"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis identifies a general-reader explanation of statistics and interpretation of data."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781538110690",
+      "title": "Climate Church, Climate World",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QR",
+          "JH"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description examines faith-based responses to climate change and social justice."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791157528547",
+      "title": "평일의 예배, 노동",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes a biblical theology of work and vocation."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788990353627",
+      "title": "부흥(평양대부흥 100주년 특별 보급판)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis identifies a collection of Christian sermons about revival."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781847670311",
+      "title": "Complete Peanuts 1950 -1952 Vol.1",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "XQ"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description explicitly identifies collected Peanuts newspaper comic strips."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780679720201",
+      "title": "The Stranger",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "외국도서 > 소설/시/희곡 > 소설 > 고전",
+              "외국도서 > 소설/시/희곡 > 소설 > 근현대",
+              "외국도서 > 소설/시/희곡 > 소설 > 문학",
+              "외국도서 > 소설/시/희곡 > 소설 > 심리소설",
+              "외국도서 > Lexile®지수 > 4학년(695L-910L)",
+              "외국도서 > Lexile®지수 > 5학년(805L-980L)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788960530942",
+      "title": "우사기의 도쿄 식탁",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Cookbooks"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780307336798",
+      "title": "Art of Simple Food",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "google-books",
+            "subjects": [
+              "Cooking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932840536",
+      "title": "회심",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis discusses Christian discipleship, gospel and social participation."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788994796734",
+      "title": "하늘과 바람과 별과 시",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "DCF"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 시 > 한국시",
+              "국내도서 > 소설/시/희곡 > 시 > 유고시집"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788925548913",
+      "title": "예수가 선택한 십자가",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis explains the Christian gospel and the crucifixion."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932907284",
+      "title": "죄와 벌(하)(도스또예프스끼 전집 9)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Manual review of exact-ISBN stored author, publisher and volume metadata: Dostoevsky collected works, Crime and Punishment / Demons."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780593089781",
+      "title": "Who Was? and What Is? America Collection Boxed Set 25 books",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "NH",
+          "DNB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Previously reviewed exact Who Was / What Is American history and biography boxed set; see youth-audience audit."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788952757418",
+      "title": "카페 브런치",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "WB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes Korean-style home brunch recipes."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791141602376",
+      "title": "안녕이라 그랬어(집에디션 리커버)",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBA",
+          "FYB"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 한국소설 > 2000년대 이후 한국소설"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9780062049643",
+      "title": "Love Wins",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description discusses Christian theology of divine love, judgment, heaven and hell."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791170830474",
+      "title": "경이라는 세계",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM",
+          "DNL"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 종교/역학 > 기독교(개신교) > 기독교 일반",
+              "국내도서 > 인문학 > 인문 에세이",
+              "국내도서 > 추천도서 > 외부/전문기관 추천도서 > 세종도서 교양부문 선정도서 > 2024년"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9781554071470",
+      "title": "Nightwatch",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "PD"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored description identifies a stargazing reference with star charts, planets and equipment."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932816616",
+      "title": "다윗: 현실에 뿌리박은 영성",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes Eugene Peterson's biblical meditations on David and spirituality."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791188887255",
+      "title": "정원에서 길을 물었다",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 종교/역학 > 기독교(개신교) > 기독교(개신교) 신앙생활 > 신앙생활일반"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9791194530701",
+      "title": "괴테는 모든 것을 말했다",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "FBA"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 소설/시/희곡 > 일본소설 > 1950년대 이후 일본소설",
+              "국내도서 > 소설/시/희곡 > 세계의 문학 > 일본문학",
+              "국내도서 > 추천도서 > 해외 문학상 > 아쿠타가와상"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932817842",
+      "title": "성을 알면 달라지는 것들",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRMP"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 종교/역학 > 기독교(개신교) > 기독교(개신교) 신앙생활 > 간증/영적성장",
+              "국내도서 > 종교/역학 > 기독교(개신교) > 기독교(개신교) 신앙생활 > 부부생활/자녀양육"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788932039244",
+      "title": "중력과 은총",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QD",
+          "DNL"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "Reviewed 2026-09-06 exact-ISBN audit",
+              "국내도서 > 인문학 > 인문 에세이",
+              "국내도서 > 인문학 > 서양철학 > 프랑스철학",
+              "국내도서 > 인문학 > 철학 일반 > 교양 철학",
+              "국내도서 > 종교/역학 > 종교일반 > 종교철학"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "isbn13": "9788953117662",
+      "title": "길갈",
+      "categories": {
+        "version": 1,
+        "status": "suggested",
+        "codes": [
+          "QRM",
+          "DNC"
+        ],
+        "evidence": [
+          {
+            "source": "audit",
+            "subjects": [
+              "2026-09-07: individual editorial review of stored metadata, not an automated title/description rule.",
+              "Stored synopsis describes the author's personal life experiences and Christian testimony."
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

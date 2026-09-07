@@ -24,11 +24,17 @@ export const categoryGroups = [
   { id: 'science', code: 'PD', en: 'Science', ko: '과학' },
   { id: 'society', code: 'JH', en: 'Society', ko: '사회' },
   { id: 'business', code: 'KJ', en: 'Business', ko: '경영' },
+  { id: 'cooking', code: 'WB', en: 'Food & cooking', ko: '요리·음식' },
+  { id: 'crafts', code: 'WF', en: 'Crafts & hobbies', ko: '공예·취미' },
+  { id: 'sports', code: 'SC', en: 'Sports', ko: '스포츠' },
+  { id: 'technology', code: 'TB', en: 'Technology & engineering', ko: '기술·공학' },
+  { id: 'computing', code: 'UB', en: 'Computing', ko: '컴퓨터·IT' },
   { id: 'self-help', code: 'VS', en: 'Personal development', ko: '자기계발' },
 ] as const;
 
 export type CategoryId = (typeof categoryGroups)[number]['id'];
 export const themaCodes = [
+  'WB', 'WF', 'SC', 'TB', 'UB', 'YF', 'YFH',
   'FB',
   'FBA',
   'FBC',
@@ -130,6 +136,8 @@ export function confirmCategories(
 export function groupsForCodes(codes: readonly ThemaCode[]): CategoryId[] {
   const ids = new Set<CategoryId>();
   for (const code of codes) {
+    if (code.startsWith('YF')) ids.add('fiction');
+    if (code === 'YFH') ids.add('fantasy');
     if (code.startsWith('F') && code !== 'FYB') ids.add('fiction');
     const direct = categoryGroups.find((group) => group.code === code);
     if (direct) ids.add(direct.id);
