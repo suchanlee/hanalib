@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/sheet';
 import { useHanaApp } from '@/features/app/app-context';
 import { matchesAudience } from '@/lib/books/audience';
-import { categoryGroups, categoryLabels, matchesCategory } from '@/lib/books/categories';
+import { bookCategoryGroups, categoryGroups, categoryLabels, matchesCategory } from '@/lib/books/categories';
 import type { CatalogFilters } from '@/lib/domain/types';
 import { copy, memberName } from '@/lib/i18n/copy';
 import { BookCover } from './book-cover';
@@ -34,6 +34,14 @@ function FilterFields({
 }) {
   const { state } = useHanaApp();
   const t = catalogCopy[state.locale];
+  const availableCategories = new Set(
+    state.items
+      .filter((item) => item.status !== 'archived' && matchesAudience(item.edition.isYouthBook, value.audience))
+      .flatMap((item) => {
+        const groups = bookCategoryGroups(item.edition.categories);
+        return groups.length ? groups : ['uncategorized'];
+      }),
+  );
   const selectClass = 'w-full [&_select]:h-11 [&_select]:bg-background [&_select]:px-3 [&_select]:text-base';
 
   return (
@@ -44,8 +52,13 @@ function FilterFields({
           onChange={(event) => onChange({ category: event.target.value as CatalogFilters['category'] })}
           data-testid="category-filter">
           <NativeSelectOption value="all">{state.locale === 'ko' ? '모든 분류' : 'All categories'}</NativeSelectOption>
-          {categoryGroups.map((group) => <NativeSelectOption key={group.id} value={group.id}>{group[state.locale]}</NativeSelectOption>)}
-          <NativeSelectOption value="uncategorized">{state.locale === 'ko' ? '미분류·확인 필요' : 'Uncategorized / needs review'}</NativeSelectOption>
+          {categoryGroups.filter((group) => availableCategories.has(group.id)).map((group) => <NativeSelectOption key={group.id} value={group.id}>{group[state.locale]}</NativeSelectOption>)}
+          {value.category && value.category !== 'all' && !availableCategories.has(value.category) && (
+            <NativeSelectOption value={value.category} disabled>
+              {categoryGroups.find((group) => group.id === value.category)?.[state.locale] ?? (state.locale === 'ko' ? '미분류·확인 필요' : 'Uncategorized / needs review')}
+            </NativeSelectOption>
+          )}
+          {availableCategories.has('uncategorized') && <NativeSelectOption value="uncategorized">{state.locale === 'ko' ? '미분류·확인 필요' : 'Uncategorized / needs review'}</NativeSelectOption>}
         </NativeSelect>
       </label>
 
@@ -104,7 +117,7 @@ export function CatalogView() {
   const t = catalogCopy[state.locale];
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<CatalogFilters>(state.filters);
-  const activeFilterCount = [(state.filters.audience ?? 'all') !== 'all', (state.filters.category ?? 'all') !== 'all', state.filters.ownerId !== 'all', state.filters.status !== 'all', state.filters.language !== 'all'].filter(Boolean).length;
+  const activeFilterCount = [state.filters.audience === 'youth', (state.filters.category ?? 'all') !== 'all', state.filters.ownerId !== 'all', state.filters.status !== 'all', state.filters.language !== 'all'].filter(Boolean).length;
   const filterTags: { key: string; label: string; remove: () => void }[] = [];
   if (state.filters.category && state.filters.category !== 'all') {
     const group = categoryGroups.find((group) => group.id === state.filters.category);
@@ -150,8 +163,8 @@ export function CatalogView() {
 
   function clearAll() {
     actions.setSearchQuery('');
-    actions.setFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all', audience: 'all' });
-    setDraftFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all', audience: 'all' });
+    actions.setFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all', audience: 'general' });
+    setDraftFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all', audience: 'general' });
   }
 
   function openFilters() {
@@ -242,7 +255,7 @@ export function CatalogView() {
                   variant="outline"
                   className="h-11 sm:flex-1"
                   data-testid="clear-filters"
-                  onClick={() => setDraftFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all', audience: 'all' })}
+                  onClick={() => setDraftFilters({ ownerId: 'all', status: 'all', language: 'all', category: 'all', audience: 'general' })}
                 >
                   {t.reset}
                 </Button>
@@ -264,7 +277,16 @@ export function CatalogView() {
             <span><span aria-hidden="true">⭐</span> {state.locale === 'ko' ? '어린이·청소년' : 'Kids & teens'}</span>
             <Switch
               checked={state.filters.audience === 'youth'}
-              onCheckedChange={(checked) => actions.setFilters({ audience: checked ? 'youth' : 'all' })}
+              onCheckedChange={(checked) => {
+                const audience = checked ? 'youth' : 'general';
+                const category = state.filters.category ?? 'all';
+                const categoryExists = state.items.some((item) =>
+                  item.status !== 'archived' &&
+                  matchesAudience(item.edition.isYouthBook, audience) &&
+                  matchesCategory(item.edition.categories, category),
+                );
+                actions.setFilters({ audience, category: categoryExists ? category : 'all' });
+              }}
               data-testid="audience-filter"
             />
           </label>

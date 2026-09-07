@@ -117,8 +117,9 @@ export function HanaAppProvider({
 
   useEffect(() => {
     try {
-      const audience = window.localStorage.getItem(audienceStorageKey);
-      if (audience === 'youth' || audience === 'all') {
+      const savedAudience = window.localStorage.getItem(audienceStorageKey);
+      const audience = savedAudience === 'all' ? 'general' : savedAudience;
+      if (audience === 'youth' || audience === 'general') {
         // Restore browser-only preferences after hydration to keep server markup consistent.
         // eslint-disable-next-line react/react-compiler
         setState((current) => ({

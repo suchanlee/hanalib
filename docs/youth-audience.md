@@ -1,6 +1,6 @@
 # Kids & teens audience
 
-The binary database field is `book_editions.is_youth_book` (SQLite 0/1, default false). The TypeScript/API field is `isYouthBook`. UI labels are **Kids & teens** / **어린이·청소년**, including preschool, children, middle-grade, and young-adult/teen books. This describes intended audience, not an age-specific content rating. False means not marked as youth, including books with missing audience evidence; the filter therefore offers All books and Kids & teens, not Adults only.
+The binary database field is `book_editions.is_youth_book` (SQLite 0/1, default false). The TypeScript/API field is `isYouthBook`. UI labels are **Kids & teens** / **어린이·청소년**, including preschool, children, middle-grade, and young-adult/teen books. This describes intended audience, not an age-specific content rating. False means not marked as youth, including books with missing audience evidence; the toggle shows marked youth books when on and excludes them when off. Unclassified books remain visible when off.
 
 Genre and audience are independent. Intake suggests the flag from explicit existing provider category/subject metadata such as Juvenile Fiction, Young Adult Fiction, 어린이, 유아, or 청소년. Titles, plots, parenting topics, school popularity, and the reader's UI language do not determine it. No additional provider calls are added to lookup. Three reviewed exact ISBN exceptions fill known metadata gaps; their source records are recorded in `lib/books/audience.ts`.
 
@@ -28,4 +28,4 @@ node --experimental-strip-types scripts/backfill-youth-audience.ts docs/audits/2
 
 The generator never connects to production. It only marks reviewed positives, preserves member overrides, and avoids bumping copy versions on repeated application. The migration includes this update so existing catalog books are classified on release. Local sample copies are not included.
 
-The catalog toggle is remembered in browser local storage. Youth mode uses a sky-blue theme and decorative shapes; other active filters appear as individually removable tags.
+The catalog toggle is remembered in browser local storage (`youth` or `general`; the legacy `all` value restores as `general`). Youth mode uses a sky-blue theme and decorative shapes; other active filters appear as individually removable tags.

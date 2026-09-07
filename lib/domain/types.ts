@@ -93,7 +93,7 @@ export interface ReturnCheck {
 }
 
 export interface CatalogFilters {
-  audience?: 'all' | 'youth';
+  audience?: 'general' | 'youth';
   category?: CategoryId | 'all' | 'uncategorized';
   ownerId: string;
   status: 'all' | 'available' | 'held' | 'borrowed';

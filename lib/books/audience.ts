@@ -21,9 +21,9 @@ export function youthAudienceEvidence(subjects: readonly string[]): string[] {
 
 export function matchesAudience(
   isYouthBook: boolean | undefined,
-  filter?: 'all' | 'youth',
+  filter?: 'general' | 'youth',
 ) {
-  return filter !== 'youth' || isYouthBook === true;
+  return filter === 'youth' ? isYouthBook === true : isYouthBook !== true;
 }
 
 // Individually reviewed exact editions whose provider subjects lack audience terms.

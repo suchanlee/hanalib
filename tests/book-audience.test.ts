@@ -63,5 +63,13 @@ void test('audience suggestions use exact-ISBN metadata, not a title or descript
   assert.equal(matchesAudience(true, 'youth'), true);
   assert.equal(matchesAudience(false, 'youth'), false);
   assert.equal(matchesAudience(undefined, 'youth'), false);
-  assert.equal(matchesAudience(false, 'all'), true);
+  assert.equal(matchesAudience(false, 'general'), true);
+});
+
+void test('audience toggle off excludes youth books and includes unclassified books', () => {
+  for (const filter of [undefined, 'general'] as const) {
+    assert.equal(matchesAudience(true, filter), false);
+    assert.equal(matchesAudience(false, filter), true);
+    assert.equal(matchesAudience(undefined, filter), true);
+  }
 });
