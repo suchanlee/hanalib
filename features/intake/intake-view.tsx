@@ -1,6 +1,7 @@
 'use client';
 
 import { confirmCategories, type BookCategories } from '@/lib/books/categories';
+import { YouthBookToggle } from '@/features/catalog/youth-book-toggle';
 import { CategoryPicker } from '@/features/catalog/category-picker';
 import { DescriptionEditor } from '@/features/catalog/description-editor';
 
@@ -41,6 +42,7 @@ import { settleCameraAction } from './camera-lifecycle';
 type IntakeStage = 'idle' | 'permission' | 'scanning' | 'lookup' | 'confirm' | 'error' | 'success';
 
 interface IntakeDraft {
+  isYouthBook: boolean;
   categories?: BookCategories;
   isbn13: string;
   title: string;
@@ -203,6 +205,7 @@ const intakeCopy = {
 function createDraft(metadata: StitchedBookMetadata): IntakeDraft {
   return {
     categories: metadata.categories,
+    isYouthBook: metadata.isYouthBook ?? false,
     isbn13: metadata.isbn13,
     title: metadata.title,
     titleEn: metadata.titleEn ?? '',
@@ -512,7 +515,7 @@ export function IntakeView() {
 
   const editDraft = <Key extends keyof IntakeDraft>(key: Key, value: IntakeDraft[Key]) => {
     setDraft((current) => current ? { ...current, [key]: value,
-      provenance: key === 'description' ? { ...current.provenance, description: 'member' } : current.provenance,
+      provenance: key === 'isYouthBook' ? { ...current.provenance, isYouthBook: 'member' } : key === 'description' ? { ...current.provenance, description: 'member' } : current.provenance,
     } : current);
     setFormError('');
   };
@@ -574,6 +577,7 @@ export function IntakeView() {
     try {
       itemId = await actions.addBook({
         categories: draft.categories,
+        isYouthBook: draft.isYouthBook,
         isbn13: draft.isbn13,
         title: draft.title.trim(),
         titleEn: draft.titleEn.trim() || undefined,
@@ -810,6 +814,7 @@ export function IntakeView() {
                 <NativeSelectOption value="en">{c.english}</NativeSelectOption>
               </NativeSelect>
             </div>
+            <YouthBookToggle locale={locale} checked={draft.isYouthBook} onChange={(value) => editDraft('isYouthBook', value)} />
             <CategoryPicker locale={locale} codes={draft.categories?.codes ?? []} status={draft.categories?.status}
               onChange={(codes) => editDraft('categories', confirmCategories(codes, draft.categories))} />
             <DescriptionEditor id="book-description" isbn13={draft.isbn13} locale={locale} bookLanguage={draft.language}

@@ -38,6 +38,7 @@ export interface BookEdition {
   coverTone: 'amber' | 'blue' | 'green' | 'rose' | 'ink' | 'violet';
   provenance: Record<string, string>;
   categories?: BookCategories;
+  isYouthBook?: boolean;
 }
 
 export interface CatalogItem {
@@ -92,6 +93,7 @@ export interface ReturnCheck {
 }
 
 export interface CatalogFilters {
+  audience?: 'all' | 'youth';
   category?: CategoryId | 'all' | 'uncategorized';
   ownerId: string;
   status: 'all' | 'available' | 'held' | 'borrowed';
@@ -113,10 +115,12 @@ export interface AddBookInput {
   ownerNotes?: string;
   provenance: Record<string, string>;
   categories?: BookCategories;
+  isYouthBook?: boolean;
 }
 
 export interface UpdateCatalogItemInput extends Pick<CatalogItem, 'condition' | 'ownerNotes'> {
   categoryCodes?: ThemaCode[];
+  isYouthBook?: boolean;
   title?: string;
   titleEn?: string | null;
   authors?: string[];

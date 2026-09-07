@@ -27,6 +27,9 @@ import { expireBorrowRequest } from './borrow-request-expiry.ts';
 
 const CATALOG_SELECT = `
   SELECT
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.isYouthBook'), be.is_youth_book) AS isYouthBook,
+    json_extract(ci.metadata_overrides_json, '$.isYouthBook') AS youthOverride,
+    COALESCE(json_extract(ci.metadata_overrides_json, '$.youthSource'), json_extract(be.field_provenance_json, '$.isYouthBook')) AS youthSource,
     ci.id AS itemId,
     ci.owner_id AS ownerId,
     ci.status AS itemStatus,
@@ -64,6 +67,9 @@ const CATALOG_SELECT = `
 `;
 
 interface CatalogRow {
+  isYouthBook?: number;
+  youthOverride?: number | null;
+  youthSource?: string | null;
   itemId: string;
   ownerId: string;
   itemStatus: string;
@@ -275,8 +281,9 @@ function mapCatalogItem(row: CatalogRow): CatalogItem {
         ? `/api/covers/${encodeURIComponent(row.coverOverrideAssetId)}`
         : row.coverSourceUrl ?? (row.coverStoragePath ? `/api/covers/${encodeURIComponent(row.coverStoragePath)}` : undefined),
       coverTone,
-      provenance: parseJson<Record<string, string>>(row.provenanceJson, {}),
+      provenance: { ...parseJson<Record<string, string>>(row.provenanceJson, {}), ...(row.youthSource ? { isYouthBook: row.youthSource } : {}) },
       categories: parseBookCategories(row.categoriesJson),
+      isYouthBook: Boolean(row.isYouthBook),
     },
   };
 }
@@ -386,6 +393,8 @@ function validProvenance(value: Record<string, unknown>) {
 function metadataOverrides(item: CatalogItem) {
   return {
     categories: undefined as BookCategories | undefined,
+    isYouthBook: undefined as boolean | undefined,
+    youthSource: undefined as string | undefined,
     title: item.edition.title,
     titleEn: item.edition.titleEn ?? null,
     authors: item.edition.authors,
@@ -772,6 +781,7 @@ export class D1LibraryRepository implements LibraryRepository {
     if (
       !input ||
       typeof input.isbn13 !== 'string' ||
+      (input.isYouthBook !== undefined && typeof input.isYouthBook !== 'boolean') ||
       (input.categories !== undefined && !validBookCategories(input.categories)) ||
       typeof input.title !== 'string' ||
       !Array.isArray(input.authors) ||
@@ -836,8 +846,8 @@ export class D1LibraryRepository implements LibraryRepository {
         INSERT INTO book_editions (
           id, isbn13, title, title_en, authors_json, authors_en_json, publisher,
           published_on, language, page_count, description, cover_source_url, cover_tone,
-          field_provenance_json, resolver_version, resolved_at, categories_json
-        ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+          field_provenance_json, resolver_version, resolved_at, categories_json, is_youth_book
+        ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
         ON CONFLICT(isbn13) DO NOTHING
       `).bind(
         editionId,
@@ -855,6 +865,7 @@ export class D1LibraryRepository implements LibraryRepository {
         JSON.stringify(input.provenance),
         now,
         input.categories && input.categories.status !== 'confirmed' ? JSON.stringify(input.categories) : null,
+        input.isYouthBook ? 1 : 0,
       ),
       this.db.prepare(`
         INSERT INTO catalog_items (
@@ -881,6 +892,8 @@ export class D1LibraryRepository implements LibraryRepository {
             descriptionUrl: input.provenance.descriptionUrl ?? null, descriptionScope: input.provenance.descriptionScope ?? null },
           coverTone: coverToneFor(input.title),
           categories: input.categories,
+          isYouthBook: input.isYouthBook,
+          youthSource: input.isYouthBook !== undefined ? input.provenance.isYouthBook : undefined,
         }),
         uploadedCoverId ? null : input.coverUrl ?? null,
         operationKey,
@@ -927,6 +940,7 @@ export class D1LibraryRepository implements LibraryRepository {
       (changes.language !== undefined && !['ko', 'en', 'other'].includes(changes.language)) ||
       (changes.pageCount !== undefined && changes.pageCount !== null && (!Number.isInteger(changes.pageCount) || changes.pageCount <= 0)) ||
       (changes.description !== undefined && changes.description !== null && typeof changes.description !== 'string') ||
+      (changes.isYouthBook !== undefined && typeof changes.isYouthBook !== 'boolean') ||
       (changes.categoryCodes !== undefined && !validCategoryCodes(changes.categoryCodes))
     ) {
       throw libraryError('invalid-input', 'Invalid book details.');
@@ -946,6 +960,12 @@ export class D1LibraryRepository implements LibraryRepository {
     }
     const overrides = metadataOverrides(mapCatalogItem(ownedRow));
     overrides.categories = parseBookCategories(ownedRow.categoryOverrideJson);
+    overrides.isYouthBook = ownedRow.youthOverride == null ? undefined : Boolean(ownedRow.youthOverride);
+    overrides.youthSource = ownedRow.youthSource ?? undefined;
+    if (changes.isYouthBook !== undefined) {
+      overrides.isYouthBook = changes.isYouthBook;
+      overrides.youthSource = 'member';
+    }
     overrides.descriptionEdited = Boolean(ownedRow.descriptionEdited);
     if (changes.categoryCodes !== undefined) {
       overrides.categories = confirmCategories(changes.categoryCodes, parseBookCategories(ownedRow.categoriesJson));

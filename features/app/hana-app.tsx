@@ -54,7 +54,10 @@ function LibraryShell() {
   }
 
   return (
-    <div className="min-h-dvh bg-background text-foreground">
+    <div
+      className="hana-shell min-h-dvh bg-background text-foreground"
+      data-youth-theme={state.screen === 'catalog' && state.filters.audience === 'youth' ? 'true' : undefined}
+    >
       <WebMcpBridge />
       <div className="mx-auto flex min-h-dvh w-full max-w-7xl">
         <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r bg-card px-4 py-6 lg:flex">

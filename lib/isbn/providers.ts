@@ -1,3 +1,4 @@
+import { reviewedYouthEditions, youthAudienceEvidence } from '../books/audience.ts';
 import { classifySubjects } from '../books/classify.ts';
 import { bestDescription } from '../books/descriptions.ts';
 import type { CategoryEvidence } from '../books/categories';
@@ -183,7 +184,11 @@ export function stitchMetadata(isbn13: string, locale: AppLocale, candidates: Me
   if (description?.candidate.descriptionSourceUrl) provenance.descriptionUrl = description.candidate.descriptionSourceUrl;
   if (description?.candidate.descriptionScope) provenance.descriptionScope = description.candidate.descriptionScope;
 
+  const youthEvidence = candidates.find((candidate) => youthAudienceEvidence(candidate.subjects ?? []).length > 0);
+  if (youthEvidence) provenance.isYouthBook = youthEvidence.source;
+  if (reviewedYouthEditions[isbn13]) provenance.isYouthBook = 'audience-reviewed';
   return {
+    isYouthBook: Boolean(youthEvidence || reviewedYouthEditions[isbn13]),
     isbn13,
     title: title?.value ?? '',
     titleEn: titleEn?.value,

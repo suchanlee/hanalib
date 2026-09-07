@@ -159,3 +159,70 @@ body {
   .book-cover-ink { background: linear-gradient(145deg, oklch(0.38 0.035 235), oklch(0.2 0.025 230)); }
   .book-cover-violet { background: linear-gradient(145deg, oklch(0.64 0.11 305), oklch(0.38 0.1 300)); }
 }
+
+.hana-shell {
+  position: relative;
+  isolation: isolate;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+.hana-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle 160px at 95% 160px, #fde6b780 0 70%, transparent 71%),
+    radial-gradient(ellipse 120px 160px at 8% 420px, #e3d9fa70 0 70%, transparent 71%),
+    radial-gradient(circle 110px at 85% 720px, #c8efdf70 0 70%, transparent 71%);
+  transition: opacity 300ms ease;
+}
+
+.hana-shell[data-youth-theme='true'] {
+  --background: #eff8ff;
+  --primary: #3165bd;
+  --primary-foreground: #ffffff;
+  --secondary: #dfebff;
+  --secondary-foreground: #244b91;
+  --accent: #dce9ff;
+  --accent-foreground: #244b91;
+  --ring: #5286d8;
+}
+
+.hana-shell[data-youth-theme='true']::before {
+  opacity: 1;
+}
+
+.youth-doodles {
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+[data-youth-theme='true'] .youth-doodles {
+  opacity: 1;
+}
+
+.dark .hana-shell[data-youth-theme='true'] {
+  --background: #18273b;
+  --primary: #9ec5ff;
+  --primary-foreground: #18273b;
+  --secondary: #2a3d5d;
+  --secondary-foreground: #d7e7ff;
+  --accent: #304769;
+  --accent-foreground: #d7e7ff;
+  --ring: #9ec5ff;
+}
+
+.dark .hana-shell[data-youth-theme='true']::before {
+  opacity: 0.15;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hana-shell,
+  .hana-shell::before,
+  .youth-doodles {
+    transition: none;
+  }
+}

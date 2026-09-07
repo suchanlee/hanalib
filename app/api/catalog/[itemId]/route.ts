@@ -18,6 +18,7 @@ export async function PATCH(request: Request, route: RouteContext) {
     const { itemId } = await route.params;
     const body = await jsonObject(request);
     return repository.updateCatalogItem(context, itemId, {
+      isYouthBook: body.isYouthBook as boolean | undefined,
       condition: body.condition as CatalogItem['condition'],
       categoryCodes: body.categoryCodes as ThemaCode[] | undefined,
       ownerNotes: typeof body.ownerNotes === 'string' ? body.ownerNotes : undefined,

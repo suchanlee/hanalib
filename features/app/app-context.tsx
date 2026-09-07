@@ -45,6 +45,8 @@ const emptyState: HanaAppState = {
   returnChecks: [],
 };
 
+const audienceStorageKey = 'hana.catalog.audience';
+
 function mutationInit(
   method: 'POST' | 'PATCH' | 'DELETE',
   body?: object,
@@ -114,6 +116,22 @@ export function HanaAppProvider({
   const stateRef = useRef(state);
 
   useEffect(() => {
+    try {
+      const audience = window.localStorage.getItem(audienceStorageKey);
+      if (audience === 'youth' || audience === 'all') {
+        // Restore browser-only preferences after hydration to keep server markup consistent.
+        // eslint-disable-next-line react/react-compiler
+        setState((current) => ({
+          ...current,
+          filters: { ...current.filters, audience },
+        }));
+      }
+    } catch {
+      // Keep the toggle usable when browser storage is unavailable.
+    }
+  }, []);
+
+  useEffect(() => {
     stateRef.current = state;
   }, [state]);
 
@@ -128,6 +146,7 @@ export function HanaAppProvider({
       refreshVersion.current += 1;
       setState((current) => ({
         ...emptyState,
+        filters: { ...emptyState.filters, audience: current.filters.audience },
         locale: current.locale,
         loadStatus: 'ready',
         issue: userIssue(error, operation),
@@ -173,6 +192,7 @@ export function HanaAppProvider({
       if (error instanceof ApiError && error.status === 401) {
         setState((current) => ({
           ...emptyState,
+          filters: { ...emptyState.filters, audience: current.filters.audience },
           locale: current.locale,
           loadStatus: 'ready',
           issue: current.isAuthenticated
@@ -418,6 +438,7 @@ export function HanaAppProvider({
           writeBrowserRoute({ screen: 'catalog' }, 'replace');
           setState((current) => ({
             ...emptyState,
+            filters: { ...emptyState.filters, audience: current.filters.audience },
             locale: current.locale,
             loadStatus: 'ready',
             screen: 'catalog',
@@ -463,6 +484,13 @@ export function HanaAppProvider({
         setState((current) => ({ ...current, searchQuery }));
       },
       setFilters(filters) {
+        if (filters.audience !== undefined) {
+          try {
+            window.localStorage.setItem(audienceStorageKey, filters.audience);
+          } catch {
+            // Filtering still works when browser storage is unavailable.
+          }
+        }
         setState((current) => ({
           ...current,
           filters: { ...current.filters, ...filters },

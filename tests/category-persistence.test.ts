@@ -1,3 +1,4 @@
+import { youthBackfillSql } from '../scripts/backfill-youth-audience.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -459,4 +460,38 @@ void test('description source and owner-edit protection follow each copy and sur
   } finally {
     sqlite.close();
   }
+});
+
+void test('youth flag persists true and explicit false, rejects non-booleans, and isolates copy edits', async () => {
+  const { sqlite, repository } = fixture();
+  try {
+    const first = await repository.createCatalogItem(context, { ...input, isYouthBook: true, provenance: { isYouthBook: 'google-books' } });
+    const second = await repository.createCatalogItem({ ...context, actorId: 'other' }, { ...input, isYouthBook: true });
+    assert.equal(first.edition.isYouthBook, true);
+    const changed = await repository.updateCatalogItem(context, first.id, { condition: 'good', isYouthBook: false });
+    assert.equal(changed.edition.isYouthBook, false);
+    assert.equal(changed.edition.provenance.isYouthBook, 'member');
+    const unrelated = await repository.updateCatalogItem({ ...context, idempotencyKey: 'other-edit' }, first.id, { condition: 'good', ownerNotes: 'A note' });
+    assert.equal(unrelated.edition.isYouthBook, false);
+    const other = await repository.updateCatalogItem({ ...context, actorId: 'other', idempotencyKey: 'other-copy' }, second.id, { condition: 'good' });
+    assert.equal(other.edition.isYouthBook, true);
+    await assert.rejects(repository.updateCatalogItem(context, first.id, { condition: 'good', isYouthBook: 'false' as unknown as boolean }));
+    await assert.rejects(repository.createCatalogItem({ ...context, idempotencyKey: 'bad-youth' }, { ...input, isYouthBook: 1 as unknown as boolean }));
+  } finally { sqlite.close(); }
+});
+
+void test('audience backfill fixes automatic false values but preserves member false and is repeatable', async () => {
+  const { sqlite, repository } = fixture();
+  try {
+    const automatic = await repository.createCatalogItem(context, { ...input, isYouthBook: false });
+    const manual = await repository.createCatalogItem({ ...context, actorId: 'other' }, { ...input, isYouthBook: false, provenance: { isYouthBook: 'member' } });
+    const sql = youthBackfillSql([{ isbn13: input.isbn13, isYouthBook: true }]);
+    sqlite.exec(sql);
+    const read = (id: string) => sqlite.prepare("SELECT json_extract(metadata_overrides_json, '$.isYouthBook') AS flag, version FROM catalog_items WHERE id = ?").get(id)!;
+    assert.equal(read(automatic.id).flag, 1);
+    assert.equal(read(manual.id).flag, 0);
+    const version = read(automatic.id).version;
+    sqlite.exec(sql);
+    assert.equal(read(automatic.id).version, version);
+  } finally { sqlite.close(); }
 });

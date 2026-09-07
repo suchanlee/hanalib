@@ -1,6 +1,7 @@
 'use client';
 
 import { categoryLabels, type ThemaCode } from '@/lib/books/categories';
+import { YouthBookToggle } from './youth-book-toggle';
 import { CategoryPicker } from './category-picker';
 
 import { useEffect, useState, type ChangeEvent } from 'react';
@@ -46,6 +47,8 @@ import { catalogCopy, conditionLabel, languageLabel, statusLabel } from './catal
 type Feedback = { tone: 'success' | 'error'; text: string } | null;
 
 interface EditListingDraft {
+  isYouthBook: boolean;
+  youthChanged: boolean;
   categoryCodes: ThemaCode[];
   categoriesChanged: boolean;
   title: string;
@@ -66,6 +69,8 @@ function editListingDraft(item?: CatalogItem): EditListingDraft {
   return {
     categoryCodes: item?.edition.categories?.codes ?? [],
     categoriesChanged: false,
+    isYouthBook: item?.edition.isYouthBook ?? false,
+    youthChanged: false,
     title: item?.edition.title ?? '',
     titleEn: item?.edition.titleEn ?? '',
     authors: item?.edition.authors.join(', ') ?? '',
@@ -161,6 +166,7 @@ export function BookDetailView() {
     }
     try {
       await actions.updateItem(itemId, {
+        isYouthBook: editDraft.youthChanged ? editDraft.isYouthBook : undefined,
         categoryCodes: editDraft.categoriesChanged ? editDraft.categoryCodes : undefined,
         title: editDraft.title.trim(),
         titleEn: editDraft.titleEn.trim() || null,
@@ -340,6 +346,7 @@ export function BookDetailView() {
           {item.edition.titleEn && item.edition.titleEn !== item.edition.title ? (
             <p className="mt-2 text-base text-muted-foreground">{item.edition.titleEn}</p>
           ) : null}
+          {item.edition.isYouthBook && <Badge variant="secondary">{state.locale === 'ko' ? '어린이·청소년' : 'Kids & teens'}</Badge>}
           <div className="mt-3 flex flex-wrap gap-2" data-testid="book-categories">
             <span className="text-sm">{categoryLabels(item.edition.categories, state.locale).join(', ')}</span>
             {item.edition.categories?.status === 'review' && <Badge variant="outline">{state.locale === 'ko' ? '분류 확인 필요' : 'Categories need review'}</Badge>}
@@ -584,6 +591,8 @@ export function BookDetailView() {
                           <Input id="item-page-count" className="h-11" inputMode="numeric" min="1" type="number" value={editDraft.pageCount} onChange={(event) => editField('pageCount', event.target.value)} />
                         </div>
                       </div>
+                      <YouthBookToggle locale={state.locale} checked={editDraft.isYouthBook}
+                        onChange={(isYouthBook) => setEditDraft((current) => ({ ...current, isYouthBook, youthChanged: true }))} />
                       <CategoryPicker locale={state.locale} codes={editDraft.categoryCodes}
                         status={editDraft.categoriesChanged ? 'confirmed' : item.edition.categories?.status}
                         onChange={(categoryCodes) => setEditDraft((current) => ({ ...current, categoryCodes, categoriesChanged: true }))} />

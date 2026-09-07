@@ -69,6 +69,7 @@ export const bookEditions = sqliteTable(
     coverTone: text('cover_tone').notNull().default('blue'),
     fieldProvenanceJson: text('field_provenance_json').notNull().default('{}'),
     categoriesJson: text('categories_json'),
+    isYouthBook: integer('is_youth_book', { mode: 'boolean' }).notNull().default(false),
     resolverVersion: integer('resolver_version').notNull().default(1),
     resolvedAt: integer('resolved_at', { mode: 'timestamp_ms' }),
   },
