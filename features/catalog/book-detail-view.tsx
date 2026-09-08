@@ -5,7 +5,7 @@ import { YouthBookToggle } from './youth-book-toggle';
 import { CategoryPicker } from './category-picker';
 
 import { useEffect, useState, type ChangeEvent } from 'react';
-import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Clock3, Hash, ImagePlus, Languages, Library, Pencil, RefreshCw, Trash2, UserRound, UsersRound } from 'lucide-react';
+import { ArrowLeft, BookMarked, CalendarDays, Check, CircleAlert, Clock3, Hash, ImagePlus, Languages, Library, Pencil, RefreshCw, Tags, Trash2, UserRound, UsersRound } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -347,11 +347,6 @@ export function BookDetailView() {
             <p className="mt-2 text-base text-muted-foreground">{item.edition.titleEn}</p>
           ) : null}
           {item.edition.isYouthBook && <Badge variant="secondary">{state.locale === 'ko' ? '어린이·청소년' : 'Kids & teens'}</Badge>}
-          <div className="mt-3 flex flex-wrap gap-2" data-testid="book-categories">
-            <span className="text-sm">{categoryLabels(item.edition.categories, state.locale).join(', ')}</span>
-            {item.edition.categories?.status === 'review' && <Badge variant="outline">{state.locale === 'ko' ? '분류 확인 필요' : 'Categories need review'}</Badge>}
-            {item.edition.categories?.status === 'suggested' && <span className="text-sm text-muted-foreground">{state.locale === 'ko' ? '자동 분류' : 'Suggested categories'}</span>}
-          </div>
           <p className="mt-4 text-lg">{item.edition.authors.join(', ') || (state.locale === 'ko' ? '저자 정보 없음' : 'Author not listed')}</p>
           {item.edition.authorsEn?.length ? <p className="mt-1 text-sm text-muted-foreground">{item.edition.authorsEn.join(', ')}</p> : null}
 
@@ -675,6 +670,11 @@ export function BookDetailView() {
         <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Metadata icon={<CalendarDays />} label={t.published} value={item.edition.publisher ? `${item.edition.publisher} · ${item.edition.publishedYear}` : String(item.edition.publishedYear)} />
           <Metadata icon={<Hash />} label={t.isbn} value={item.edition.isbn13} />
+          <Metadata
+            icon={<Tags />}
+            label={state.locale === 'ko' ? '분류' : 'Category'}
+            value={categoryLabels(item.edition.categories, state.locale).join(', ') || (state.locale === 'ko' ? '미분류·확인 필요' : 'Uncategorized / needs review')}
+          />
           <Metadata icon={<Languages />} label={t.language} value={languageLabel(state.locale, item.edition.language)} />
           <Metadata icon={<BookMarked />} label={t.condition} value={conditionLabel(state.locale, item.condition)} />
           {item.edition.pageCount ? <Metadata icon={<Library />} label={state.locale === 'ko' ? '분량' : 'Length'} value={`${item.edition.pageCount} ${t.pages}`} /> : null}
